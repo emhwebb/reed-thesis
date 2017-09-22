@@ -1,5 +1,7 @@
 ## My Thesis Repo
 
+Emerson Webb
+
 The structure of this repository should serve as a starting point in organizing all of the work related to your thesis.
 
 #### literature-review folder

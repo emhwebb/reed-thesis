@@ -1,6 +1,6 @@
 ## My Thesis Repo
 
-Emerson Webb
+Emerson Webb 2017
 
 The structure of this repository should serve as a starting point in organizing all of the work related to your thesis.
 

@@ -1,0 +1,34 @@
+---
+title: "Untitled"
+author: "Emerson Webb"
+date: "9/22/2017"
+output: md_document
+---
+
+###Research Log
+
+This week I continued with my Lit Review, reading through sections of Elements of Statistical Learning (ESL) and Computer Age Statistics (CASI) pertaining to random forests, and beginning to read Richard Berk's treatment for Random Forests in Statistical Learning from a Regression Perspective (SLRP). All three sources were similar, yet of course different in their treatment of forests with ESL and CASI focusing on Regression settings and SLRp focusing on the Classification setting. In addition, I found several papers that seem of interest as a result of reading these three bookss. Some thoughts: 
+
+(1) I should look at Breiman's 2001 paper on Random Forests some point soon.  There could be good stuff there.  
+
+(2) The case of subsampling instead of bootstrap and distinctions between the two was unclear, but it seems that I should look into subsampling schemes at least a little bit.
+
+(3) It's important to look at Wager's work. He seems to have developed many of the theoretical tools (along with others) these past few years to understand the theory behind Random Forests.
+
+(4) What makes the CART scheme different from those discussed in theoretical papers? 
+
+(5) What about using the L1-norm instead of L2-norm? Does the give better behavior? This is something Berk pointed out (and I think he referenced someone elses paper), but this could be interesting to try to implement. 
+
+(6) Can some of the theoretical tools being developed be used to analyze variable importance, and uses of variable importance for inferential aspects of Random Forests?
+
+In addition I started to play around with RF's (Random Forests) in R using the randomForest package.  I found the rfPermute package by Eric Archer, and I think I'm going to look into fitting RF's to classification data using rfPermute and randomForest. Probably I will use Iris and data from UC Irvines ML lab. In addition, I looked a little into Wager's package on his GitHub for RF confidence intervals which I plan on playing around with in the coming weeks. 
+
+For next week, I plan to:
+
+(1) Finish reading SLRP's section on RF.
+
+(2) Read Wager et al. (2014) Infinitesimal Jackknife in Random Forests paper and try to be able to explain it to Andrew next Friday.
+
+(3) Begin to read Strobl et al.'s work while also beginning to closely read Aurora's thesis.
+
+(4) Continue playing around with RF's in R. In particular, in the next two weeks I will like to try writing my own RF function implementing the RF algorithm into R to try to get a grasp into how exactly they work. This last item (implementation) might not be done next week, but hopefully I can get it done by the following week.

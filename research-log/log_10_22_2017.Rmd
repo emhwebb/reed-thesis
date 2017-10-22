@@ -1,0 +1,22 @@
+---
+title: "Untitled"
+author: "Emerson Webb"
+date: "10/22/2017"
+output: md_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###Research Log 
+
+It's been about a month since my last research log and I've learned a lot about random forests, began (trying) to implement the random forest algorithm in R, and continued with my Lit Review.  At this point I have a pretty good grasp of some of the issues with the Random Forest theory.  In particular, I was able to find Biau and Scornet's "A Random Forest Guided Tour" which has been very helpful in identifying relevant papers concerning statistical inference with Random Forests using Variable Importance (VI) and other approaches.  Aside from Strobl, there are several other efforts by researchers to try to use random forests in inferential settings.  There's Wager, who with Athey has worked on Causal Inference using honest random forests, there's Mentch and Hooker who construct subsampled random forests and are able to interpret them as U-statistics, and there is also the work of Ishwaran with VIMP that uses a scheme different from VI as originally defined for Random Forests and with Strobl's work.  Additionally, it is clear that part of the game is in establishing consistency results for different models of random forests to be able to make asymptotic claims about some test statistics.  Often this requires that an estimate converge to an expected estimate at a rate faster than or equal to $\sqrt{n}$, where $n$ is the sample size.  
+
+For the next week I will be focused on:
+
+(i) trying to finish up my lit review within the next three weeks. Likely my literature-review folder will become quite full soon.  
+
+(ii) look at Ishwaran's scheme more closesly and try to compare it with Aurora and also Strobl's schemes.
+
+(iii) Continue to work on implementing my own random forest in R.  This is much easier said than done.  I know exactly how it should be implemented, but actual implementation is much more difficult.  Part of the difficulty at this point is with trying to determine what the best data structure is for working with binary trees in R.  If I can figure out how to write binary trees in R and to then write CART decision trees in R, then the rest of the random forest algorithm should be comparably easier to implement.  Once I have working code for a random forest there is also the issue of optimization and adding features. One direction that I plan on pursuing is implementing the different feature significance/statistical inferential schemes I've been studying for the past couple of months. 

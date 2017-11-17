@@ -65,7 +65,6 @@ point_chooser <- function(data, split_var, current_rss){
 #chooses best splitting variable using point_chooser
 #outputs optimal splitting variable and splitting point
 split_chooser <- function(data, current_rss){
-  current_best <- rep(TRUE, 5)
   mat <- matrix(NA, nrow = (ncol(data)-1), ncol= 5)
   
   for(i in 1:(ncol(data)-1)){

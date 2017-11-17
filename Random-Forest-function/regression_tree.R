@@ -10,28 +10,31 @@ init_list <- function(data){
    #output is in following order:
    #c(pred, rss, l_rss, r_rss, split_pt, split_var, split_val, node_size, left or right node 
    #(code a 2 or 3))
-   list(c(pred, rss, NA, NA, NA, NA, NA, nrow(data)), NA)
+   list(c(pred, rss, NA, NA, NA, NA, NA, nrow(data), NA))
 }
 
 #use nested lists as the storing data structure for this 
 #ex: tree_list <- c(tree_list, l_list, r_list)
 #where l_list <- list(Lnode_info) and r_list <- list(Rnode_info)
 
+#output is tree_list
 bin_tree <- function(data, tree_list, min_node_size){
     #check if data is null, then terminate tree growing process if it is.
     #check if init_list is null.
     #if null, then run init_list to obtain starting values.
     is_null_data <- is.null(data)
-    is_null_list <- is.null(tree_list)
-    if(is_null_list){
+    is_empty_list <- length(tree_list) == 0
+    if(is_empty_list){
       tree_list <- init_list(data)
     }
     
     #should the tree split based on the current node size?
-    should_split <- min_node_size < tree_list[[8]]
+    should_split <- min_node_size < tree_list[[1]][8]
     
+    if(is_null_data == FALSE & should_split == TRUE){ 
     
-    
+    data_rss <- tree_list[[1]][2]
+      
     #figure out where next split should be.
     split_choice <- split_chooser(data, data_rss)
     #output of split_chooser:
@@ -48,11 +51,27 @@ bin_tree <- function(data, tree_list, min_node_size){
     r_rss <- split_choice[4]
     #need to predict what the value of y is here, also need to include information on nodal 
     #size in tree_list
+    l_pred <- mean(Ldata[,1]) 
+    r_pred <- mean(Rdata[,1])
+    
+    l_node_size <- nrow(Ldata) 
+    r_node_size <- nrow(Rdata)
+    
+    split_val <- data[,split_var][split_pt]
     
     #c(pred, rss, l_rss, r_rss, split_pt, split_var, split_val, node_size, l or r node)
-    l_list <- c(l_pred, l_rss, split_pt, split_var, split_val, node_size, 2)
-    r_list <- c(r_pred, r_rss, split_pt, split_var, split_val, node_size, 3)
+    l_list <- list(c(l_pred, l_rss, NA, NA, split_pt, split_var, split_val, l_node_size, 2))
+    r_list <- list(c(r_pred, r_rss, NA, NA, split_pt, split_var, split_val, r_node_size, 3))
+    
+    tree_list <- list(tree_list, l_list, r_list)
     
     bin_tree(Ldata, l_list, min_node_size)
     bin_tree(Rdata, r_list, min_node_size)
-  }
+    
+    }
+    
+    return(tree_list)
+    
+}
+
+

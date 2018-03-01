@@ -1,0 +1,462 @@
+% This is the Reed College LaTeX thesis template. Most of the work
+% for the document class was done by Sam Noble (SN), as well as this
+% template. Later comments etc. by Ben Salzberg (BTS). Additional
+% restructuring and APA support by Jess Youngberg (JY).
+% Your comments and suggestions are more than welcome; please email
+% them to cus@reed.edu
+%
+% See http://web.reed.edu/cis/help/latex.html for help. There are a
+% great bunch of help pages there, with notes on
+% getting started, bibtex, etc. Go there and read it if you're not
+% already familiar with LaTeX.
+%
+% Any line that starts with a percent symbol is a comment.
+% They won't show up in the document, and are useful for notes
+% to yourself and explaining commands.
+% Commenting also removes a line from the document;
+% very handy for troubleshooting problems. -BTS
+
+% As far as I know, this follows the requirements laid out in
+% the 2002-2003 Senior Handbook. Ask a librarian to check the
+% document before binding. -SN
+
+%%
+%% Preamble
+%%
+% \documentclass{<something>} must begin each LaTeX document
+\documentclass[12pt,twoside]{reedthesis}
+% Packages are extensions to the basic LaTeX functions. Whatever you
+% want to typeset, there is probably a package out there for it.
+% Chemistry (chemtex), screenplays, you name it.
+% Check out CTAN to see: http://www.ctan.org/
+%%
+\usepackage{graphicx,latexsym}
+\usepackage{amsmath}
+\usepackage{amssymb,amsthm}
+\usepackage{longtable,booktabs,setspace}
+\usepackage{chemarr} %% Useful for one reaction arrow, useless if you're not a chem major
+\usepackage[hyphens]{url}
+% Added by CII
+\usepackage{hyperref}
+\usepackage{lmodern}
+\usepackage{float}
+\floatplacement{figure}{H}
+% End of CII addition
+\usepackage{rotating}
+
+% Next line commented out by CII
+%%% \usepackage{natbib}
+% Comment out the natbib line above and uncomment the following two lines to use the new
+% biblatex-chicago style, for Chicago A. Also make some changes at the end where the
+% bibliography is included.
+%\usepackage{biblatex-chicago}
+%\bibliography{thesis}
+
+
+% Added by CII (Thanks, Hadley!)
+% Use ref for internal links
+\renewcommand{\hyperref}[2][???]{\autoref{#1}}
+\def\chapterautorefname{Chapter}
+\def\sectionautorefname{Section}
+\def\subsectionautorefname{Subsection}
+% End of CII addition
+
+% Added by CII
+\usepackage{caption}
+\captionsetup{width=5in}
+% End of CII addition
+
+% \usepackage{times} % other fonts are available like times, bookman, charter, palatino
+
+% Syntax highlighting #22
+
+% To pass between YAML and LaTeX the dollar signs are added by CII
+\title{My Final College Paper}
+\author{Emerson H. Webb}
+% The month and year that you submit your FINAL draft TO THE LIBRARY (May or December)
+\date{May 2018}
+\division{Mathematics and Natural Sciences}
+\advisor{Advisor F. Name}
+\institution{Reed College}
+\degree{Bachelor of Arts}
+%If you have two advisors for some reason, you can use the following
+% Uncommented out by CII
+% End of CII addition
+
+%%% Remember to use the correct department!
+\department{Mathematics}
+% if you're writing a thesis in an interdisciplinary major,
+% uncomment the line below and change the text as appropriate.
+% check the Senior Handbook if unsure.
+%\thedivisionof{The Established Interdisciplinary Committee for}
+% if you want the approval page to say "Approved for the Committee",
+% uncomment the next line
+%\approvedforthe{Committee}
+
+% Added by CII
+%%% Copied from knitr
+%% maxwidth is the original width if it's less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\renewcommand{\contentsname}{Table of Contents}
+% End of CII addition
+
+\setlength{\parskip}{0pt}
+
+% Added by CII
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+\Acknowledgements{
+I want to thank a few people.
+}
+
+\Dedication{
+You can have a dedication here if you wish.
+}
+
+\Preface{
+This is an example of a thesis setup to use the reed thesis document
+class (for LaTeX) and the R bookdown package, in general.
+}
+
+\Abstract{
+The preface pretty much says it all. \par
+
+Second paragraph of abstract starts here.
+}
+
+	\usepackage{tikz, algorithm}
+	\usepackage[noend]{algpseudocode}
+% End of CII addition
+%%
+%% End Preamble
+%%
+%
+
+\usepackage{amsthm}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}{Lemma}[chapter]
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[chapter]
+\newtheorem{corollary}{Corollary}[chapter]
+\newtheorem{proposition}{Proposition}[chapter]
+\theoremstyle{definition}
+\newtheorem{example}{Example}[chapter]
+\theoremstyle{definition}
+\newtheorem{exercise}{Exercise}[chapter]
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem*{solution}{Solution}
+\begin{document}
+
+% Everything below added by CII
+  \maketitle
+
+\frontmatter % this stuff will be roman-numbered
+\pagestyle{empty} % this removes page numbers from the frontmatter
+  \begin{acknowledgements}
+    I want to thank a few people.
+  \end{acknowledgements}
+  \begin{preface}
+    This is an example of a thesis setup to use the reed thesis document
+    class (for LaTeX) and the R bookdown package, in general.
+  \end{preface}
+  \hypersetup{linkcolor=black}
+  \setcounter{tocdepth}{2}
+  \tableofcontents
+
+  \listoftables
+
+  \listoffigures
+  \begin{abstract}
+    The preface pretty much says it all. \par
+    
+    Second paragraph of abstract starts here.
+  \end{abstract}
+  \begin{dedication}
+    You can have a dedication here if you wish.
+  \end{dedication}
+\mainmatter % here the regular arabic numbering starts
+\pagestyle{fancyplain} % turns page numbering back on
+
+\chapter{Delete line 6 if you only have one
+advisor}\label{delete-line-6-if-you-only-have-one-advisor}
+
+Placeholder
+
+\chapter{Introduction to Trees, Random Forests, and the
+Bootstrap}\label{rmd-basics}
+
+Placeholder
+
+\section{CART}\label{cart}
+
+\section{Bootstrap}\label{bootstrap}
+
+\section{Random Forests}\label{random-forests}
+
+\subsection{How Bagged Forests Work}\label{how-bagged-forests-work}
+
+\subsection{The Random Forest
+Algorithm}\label{the-random-forest-algorithm}
+
+\subsection{Variable Importance
+Measures}\label{variable-importance-measures}
+
+\subsection{Issues with Random
+Forests}\label{issues-with-random-forests}
+
+\section{Focus of this Thesis}\label{focus-of-this-thesis}
+
+\section{Outline of Remaining
+Chapters}\label{outline-of-remaining-chapters}
+
+\chapter{Variable Importance and Inference for Random
+Forests}\label{variable-importance-and-inference-for-random-forests}
+
+\section{Introduction}\label{introduction}
+
+In this chapter we focus on various approaches towards inference for
+random forests that have been developed. Generally, we could consider to
+be two approaches towards inference with random forests.
+
+The first approach involves using variable importance measures of random
+forests to evaluate the relative importance of different variables in
+the construction of the forest. Ishwaran, Louppe, Owens, and Strobl et
+al. have been involved in work in this area. Louppe and Ishwaran focused
+on theoretical properties of variable importance measures while Owens,
+and Strobl and colleagues work is centered on developing less biased
+variable importance measures for hypothesis testing.
+
+The second approach involves utilizing properties of the functional form
+of the random forest estimator to construct prediction intervals. Once
+predicton intervals have been constructed, depending on the context,
+confidence intervals and hypothesis tests can be produced. Mentch and
+Hooker's work involves interpreting the random forest ensemble as a
+particular type of U-statistics, and applying theoretical results about
+U-statistics to construct prediction intervals. Wager's work involves
+applying the infintisemal jackknife to the random forest estimator to
+produce prediction intervals. With both approaches there are asymptotic
+results that we will discuss in some detail. In addition, we will
+discuss some of the consistency results that have been proven for random
+forests. It is worth noting here that in mathematically analyzing the
+random forest algorithm, there are trade-offs between fidelity to the
+CART algorithm and amenability to mathematical tool. To our best
+knowledge, at this time there are no theoretical results showing that
+random forests constructed using CART are consistent. Generally,
+simplifications need to be made to the random forest algorithm to allow
+for asymptotic analysis. These simplifications usually involve using a
+different partitioning scheme than CART and also in working a sampling
+without replacement framework. We will note when such assumptions are
+being made when necessary. Otherwise, we assume a setting in which the
+random forest is constructed using CART and bootstrap sampling with
+replacement.
+
+\section{Some Theory for Variable Importance
+Measures}\label{some-theory-for-variable-importance-measures}
+
+In this section we discuss Louppe and Ishwaran's work exploring
+theoretical properties of variable importance measures.
+
+\subsection{Ishwaran's Variable Importance
+Measure}\label{ishwarans-variable-importance-measure}
+
+Ishwaran's approach to variable importance measures of random forests,
+as developed in ``Variable Importance in Binary Regression Trees and
+Forests,'' differs from the original variable importance measures for
+random forests, so we require some additional vocabulary.
+
+Suppose \(T\) is a binary recursive tree and suppose that \(T\) has
+\(M\) many terminal nodes. For each point \(\mathbf{x}\) in the feature
+space, \(T\) maps \(\mathbf{x}\) to one of the \(M\)-many terminal
+nodes. In particular, if we let \(\mathcal{X}\) denote the feature
+space, then \(T\) is a function
+\(\mathcal{X}\rightarrow \{1,\ldots, M\}\) defined by the equation
+\[T(\mathbf{x})=\sum_{m=1}^M m B_m(\mathbf{x}),\] where
+\(B_m(\mathbf{x})\) is a \(0-1\) basis function which partition the
+feature space \(\mathcal{X}\).
+
+Let \(Z=\{(\mathbf{x}_i,Y_i)|i=1,\ldots,n\}\) denote the training data,
+where \(\mathbf{x}_i\) is a covariate in the feature space and \(Y_i\)
+is the response. We call \(T\) a binary regression tree if it is a
+binary recursive tree grown from \(Z\) using using binary recursive
+splits of the form \(x_v\leq c\) and \(x_v> c\) where split values \(c\)
+are chosen based on the observed \(\mathbf{x}_i\) in the training data
+\(Z\). The value \(a_m\) in the terminal node is the average response of
+the training observations falling in the \(m\)th node. That is,
+\[a_m=\frac{\sum_{i=1}^n \mathbb{I}\{T(\mathbf{x}_i)=m\} Y_i}{\sum_{i=1}^n \mathbb{I}\{T(\mathbf{x}_i)=m\}}.\]
+
+For a binary regression tree, the basis functions \(B_m(\mathbf{x})\)
+are product splines of the following form:
+\[B_m(\mathbf{x})=\prod_{l = 1}^{L_m} [x_{l(m)}-c_{l, m}]_{s_{l,m}},\]
+where \(L_m\) denotes the number of splits used to construct
+\(B_m(\mathbf{x})\). For each split \(l\), there is a splitting variable
+\(\mathbf{x}_{l(m)}\) which denotes the \(l(m)\)th coordinate of
+\(\mathbf{x}\) and a splitting value \(c_{l,m}\). The \(s_{l,m}\) are
+binary \(\pm 1\) values, where for a given scalar \(x\),
+\([x]_{+1}=\mathbb{I}(x>0)\) and \([x]_{-1}=\mathbb{I}(x\leq 0).\) Note
+that the basis functions satisfy an orthogonality property, which gives
+\(B_m(\mathbf{x})B_{m'}(\mathbf{x})=0\) if \(m\neq m'\). Note also that
+given a tree \(T\), the predictor associated with the tree can be
+written as a linear combination of basis functions:
+\[\hat{\mu}(\mathbf{x})=\sum_{m=1}^M a_m B_m(\mathbf{x}).\] We are now
+prepared to define Ishwaran's variable importance measure.
+
+Informally, the \(MDA\) variable importance of a variable \(x_j\) is the
+difference between \(MSE\) of the tree \(T\) when \(x_j\) is randomly
+permuted and \(MSE\) of the tree \(T\) when \(x_j\) is not permuted. As
+such a scheme of variable importance is difficult to analyze, Ishwaran
+proposes a surrogate measure. For the variable \(x_j\), we drop
+\(\mathbf{x}\) down the tree and follow the binary splits until either a
+terminal node is reached or a node with a split depending on \(x_j\) is
+reached. If a node with a split depending on \(x_j\) is reached, we then
+subsequently assign \(\mathbf{x}\) randomly to either the left or right
+daughter node, whenever there is a split, until we reach a terminal
+node. The difference in \(MSE\) between noising up \(x_j\) and not
+noising up \(x_j\) to be the variable importance of \(x_j\) in the tree
+\(T\). Denote the tree that results from noising up \(x_j\) by \(T_j\).
+
+Such a scheme relies on the following heuristic: if we chose an adequete
+splitting rule to construct our tree, then we expect that variables that
+are split earlier in the tree are more important, since prediction will
+suffer the most from noising up a variable higher up in the tree than a
+variable close to a terminal node. This is a behavior observed in CART
+trees and random forests based on CART: splits closer to the root node
+are more influential than splits close to terminal nodes, so the MDA or
+MDI variable importance of variables split on close to the root node are
+expected to be higher than otherwise.
+
+\subsection{Maximal Subtrees and Theoretical
+Results}\label{maximal-subtrees-and-theoretical-results}
+
+Defining a structure on binary regression trees called subtrees,
+Ishwaran is able to write the predictor for the noised up tree as a
+deterministic component relying on terminal nodes for no parent nodes
+involve a split on \(x_j\), and a random component involving terminal
+nodes for which there are parent nodes involving a split on \(x_j\). The
+definition of the subtree is quite intuitive. We call \(\tilde{T}_j\) a
+\(j\)-subtree of the tree \(T\), if the root node of \(\tilde{T}_j\) has
+daughters that depend on an \(x_j\) split. A \(j\)-subtree
+\(\tilde{T}_j\) is a maximal \(j\)-subtree of the tree \(T\), if there
+are no larger \(j\)-subtrees continaing \(\tilde{T}_j\). For a given
+tree \(T\) and for each variable \(x_j\), there is a set of \(K_j\) many
+distinct maximal \(j\)-subtrees, which are denoted by
+\(\tilde{T}_{1,j},\ldots, \tilde{T}_{K_j,j}\). Note each distinct
+\(\tilde{T}_{k,j}\) maximal \(j\)-subtree contains a set of distinct
+terminal nodes \(M_{k,j}\). Each \(M_{k,j}\) is distinct for
+\(k=1,\ldots,K_j\), since we are working with maximal \(j\)-subtrees.
+Define \[M_j=\bigcup_{k=1}^{K_j} M_{k,j}\] to be the set of terminal
+nodes for which there is a parent node involving a split on \(x_j\).
+Ishwaran proves the following lemma about the functional form of the
+predictor for the tree \(T_j\).
+\begin{lemma}
+Let $\hat{\mu}_j(\mathbf{x})$ denote the predictor for $T_j$. Then $$\hat{\mu}_j(\mathbf{x})=\sum_{m\notin M_j}a_m B_m(\mathbf{x})+\sum_{k=1}^{K_j} \tilde{a}_{k,j}\mathbb{I}\{T(\mathbf{x})\in M_{k,j}\},$$ where $\tilde{a}_{k,j}$ is the random terminal value assigned by $\tilde{T}_{k,j}$ under the random left right path through $\tilde{T}_{k,j}$. We write $\tilde{P}_{k,j}$ to denote the distribution of $\tilde{a}_{k,j}$. 
+\end{lemma}
+For a proof, the reader is referred to Ishwaran's paper. It is a bit
+surprising that the functional form of \(\hat{mu}_j(\mathbf{x})\) can be
+separated into the two components. Given this lemma and the definition
+of \(j\)-subtrees, we can more formally define the variable importance
+of \(x_j\) in the tree \(T\).
+
+Let \(g\) be a loss function. Often we use the squared error to evaluate
+loss, which corresponds to \(MSE\), but there is no strict requirement
+in the definition. Denote the test data by \((Y,\mathbf{x})\). Then the
+prediction error of the predictor \(\hat{\mu}\) is given by
+\(\mathbb{E}(g(Y,\hat{\mu}(\mathbf{x})))\). As a reminder, we assume
+that there is an underlying regression function
+\[Y=\mu(\mathbf{x})+\varepsilon,\] where \(\varepsilon\) is independent
+error with zero mean and variance \(\sigma^2>0\). Similarly, we can
+define the prediction error of the predictor \(\hat{\mu}_j\) to be
+\(\mathbb{E}(g(Y,\hat{\mu}_j(\mathbf{x}))).\) Set
+\(g(Y,\hat{\mu}(\mathbf{x}))=(Y-\hat{\mu}(\mathbf{x}))^2\) to be the
+\(L_2\) loss, which corresponds to \(MSE\). Define the variable
+importance of the variable \(x_j\) to be
+\[\Delta_j=\mathbb{E}((Y-\hat{\mu}_j(\mathbf{x}))^2)-\mathbb{E}((Y-\hat{\mu})^2).\]
+Application of the lemma and some manipulation allows us to write
+\[\Delta_j=\mathbb{E}(R_j(\mathbf{x})^2)-2\mathbb{E}\left(R_j(\mathbf{x})[\mu(\mathbf{x})-\hat{\mu}(\mathbf{x})]\right),\]
+where
+\[R_j(\mathbf{x})=\sum_{k=1}^{K_j}\sum_{m\in M_{k,j}} (\tilde{a}_{k,j} -a_m)B_m(\mathbf{x}).\]
+
+To aid in his analysis, Ishwaran makes the assumption that the true
+regression function \(\mu\) is of similar form to \(T\). That is, assume
+\[\mu(\mathbf{x})=\sum_{m=1}^M a_{m,0} B_m(\mathbf{x}),\] where
+\(a_{m,0}\) are the true, but unknown, terminal values. Under this and
+some other large sample assumptions, Ishwaran finds that asymptotically,
+each maximal \(j\)-subtree will tend to contribute equally to the
+variable importance \(\Delta_j\). In effect, Ishwaran finds that nodes
+closer to the root of a maximal \(j\)-subtree will have a larger effect
+on \(\Delta_j\) than nodes closer to the terminal nodes.
+
+\subsection{Extension to Forest
+Ensembles}\label{extension-to-forest-ensembles}
+
+Ishwaran's framework extends naturally to forest ensembles and his
+theoretical result regarding forest ensembles provides some information
+of the behavior of variable importance measures for random forests.
+First for some notation, recall that in the forest ensemble setting, we
+draw \(B\) many bootstrap resamples of the training data to obtain the
+bootstrap replicates \(Z^{b}=\{(\mathbf{x}_i^b, Y_i^b)|i=1,\ldots,n\}\)
+of the training data for \(b=1,\ldots, B\). We then construct a binary
+regression tree \(T(\mathbf{x};b)\) on each bootstrap replicate of the
+data and have the forest \(\hat{\mu}_F\) as the average of predictions
+over the trees \(T(\mathbf{x};b)\):
+\[\hat{\mu}_F(\mathbf{x})=\frac{1}{B}\sum_{b=1}^B \hat{\mu}(\mathbf{x};b),\]
+where \(\hat{\mu}(\mathbf{x};b)\) denotes the predictor for the tree
+\(T(\mathbf{x};b)\). Given that each \(\hat{\mu}(\mathbf{x};b)\) is a
+linear combination of basis functions, we can write
+\[\hat{\mu_F}(\mathbf{x})=\frac{1}{B}\sum_{b=1}^B\sum_{m=1}^{M^b}a_m^b B_m(\mathbf{x};b).\]
+Again assume that the \(\mu(\mathbf{x})\) has a similar structure to
+\(\mu(\mathbf{x})\). That is,
+\(\mu(\mathbf{x})=\frac{1}{B}\sum_{b=1}^B\sum_{m=1}^{M^b}a_{m,0}^b B_m(\mathbf{x};b)\).
+
+\chapter{The Bootstrap}\label{the-bootstrap}
+
+\chapter*{Conclusion}\label{conclusion}
+\addcontentsline{toc}{chapter}{Conclusion}
+
+If we don't want Conclusion to have a chapter number next to it, we can
+add the \texttt{\{-\}} attribute.
+
+\textbf{More info}
+
+And here's some other random info: the first paragraph after a chapter
+title or section head \emph{shouldn't be} indented, because indents are
+to tell the reader that you're starting a new paragraph. Since that's
+obvious after a chapter or section title, proper typesetting doesn't add
+an indent there.
+
+\appendix
+
+\chapter{The First Appendix}\label{the-first-appendix}
+
+This first appendix includes all of the R chunks of code that were
+hidden throughout the document (using the \texttt{include\ =\ FALSE}
+chunk tag) to help with readibility and/or setup.
+
+\textbf{In the main Rmd file}
+
+\textbf{In Chapter \ref{ref-labels}:}
+
+\chapter{The Second Appendix, for
+Fun}\label{the-second-appendix-for-fun}
+
+\chapter*{References}\label{references}
+\addcontentsline{toc}{chapter}{References}
+
+Placeholder
+
+
+% Index?
+
+\end{document}

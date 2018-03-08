@@ -2,13 +2,7 @@
 
 ## Introduction 
 
-  In this chapter we focus on various approaches towards inference for random forests that have been developed. Generally, we could consider to be two approaches towards inference with random forests. 
-  
-  The first approach involves using variable importance measures of random forests to evaluate the relative importance of different variables in the construction of the forest. @louppe2014 and @ishwaran2007 focused on theoretical properties of variable importance measures while @owens2017, @strobl2007, and @strobl2008 are centered on developing less biased variable importance measures for hypothesis testing. 
-  
-  The second approach involves utilizing properties of the functional form of the random forest estimator to construct prediction intervals. Once predicton intervals have been constructed, depending on the context, confidence intervals and hypothesis tests can be produced. @mentch2016a interpret the random forest ensemble as a particular type of U-statistics, and applying theoretical results about U-statistics to construct prediction intervals. @wager2014 the infintisemal jackknife to the random forest estimator to produce prediction intervals. 
-  With both approaches there are asymptotic results that we will discuss in some detail. In addition, we will discuss some of the consistency results that have been proven for random forests. It is worth noting here that in mathematically analyzing the random forest algorithm, there are trade-offs between fidelity to the CART algorithm and amenability to mathematical tool. To our best knowledge, at this time there are no theoretical results showing that random forests constructed using CART are consistent. Generally, simplifications need to be made to the random forest algorithm to allow for asymptotic analysis. These simplifications usually involve using a different partitioning scheme than CART and also in working a sampling without replacement framework. We will note when such assumptions are being made when necessary. Otherwise, we assume a setting in which the random forest is constructed using CART and bootstrap sampling with replacement. 
-  
+  In this chapter we focus on approaches of inference for random forests involving variable importance measures of random forests. Such approaches involve using variable importance measures of random forests to evaluate the relative importance of different variables in the construction of the forest. @louppe2014 and @ishwaran2007 focused on theoretical properties of variable importance measures while @owens2017, @strobl2007, and @strobl2008 are centered on developing less biased variable importance measures for hypothesis testing. 
 
 ## Theoretical Analysis of MDA Variable Importance Measures 
 
@@ -128,6 +122,3 @@ One issue with infforest variable importance is the steep computational cost of 
       \end{algorithmic}
   \end{algorithm}
   
-## Random Forest Prediction Intervals 
-
-Up to now, in this chapter we have discussed approaches to inference for random forests involving variable importance. As we have seen, variable importance measures suffer from issues of bias stemming from the correlation structures within the predictors often present in datasets to which random forests are applied to. While there are different approaches to accounting for the correlation structure, the effectiveness varies depending from dataset to dataset. A different approach to developing inference for random forests involves manipulating the functional form of the random forest predictor to produce prediction intervals amenable to theoretical analysis and computationally feasible. There has been work, @mentch2016a and @mentch2016b, interpreting random forest predictors as a certain type of U-statistic and developing inference from there, however, these constructions are quite technical and beyond the particular focus of this thesis.  

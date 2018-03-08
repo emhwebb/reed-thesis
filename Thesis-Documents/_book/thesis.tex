@@ -233,51 +233,6 @@ Second paragraph of abstract starts here.
 \chapter*{Introduction}\label{introduction}
 \addcontentsline{toc}{chapter}{Introduction}
 
-Welcome to the \emph{R Markdown} thesis template. This template is based
-on (and in many places copied directly from) the Reed College LaTeX
-template, but hopefully it will provide a nicer interface for those that
-have never used TeX or LaTeX before. Using \emph{R Markdown} will also
-allow you to easily keep track of your analyses in \textbf{R} chunks of
-code, with the resulting plots and output included as well. The hope is
-this \emph{R Markdown} template gets you in the habit of doing
-reproducible research, which benefits you long-term as a researcher, but
-also will greatly help anyone that is trying to reproduce or build onto
-your results down the road.
-
-Hopefully, you won't have much of a learning period to go through and
-you will reap the benefits of a nicely formatted thesis. The use of
-LaTeX in combination with \emph{Markdown} is more consistent than the
-output of a word processor, much less prone to corruption or crashing,
-and the resulting file is smaller than a Word file. While you may have
-never had problems using Word in the past, your thesis is likely going
-to be about twice as large and complex as anything you've written
-before, taxing Word's capabilities. After working with \emph{Markdown}
-and \textbf{R} together for a few weeks, we are confident this will be
-your reporting style of choice going forward.
-
-\textbf{Why use it?}
-
-\emph{R Markdown} creates a simple and straightforward way to interface
-with the beauty of LaTeX. Packages have been written in \textbf{R} to
-work directly with LaTeX to produce nicely formatting tables and
-paragraphs. In addition to creating a user friendly interface to LaTeX,
-\emph{R Markdown} also allows you to read in your data, to analyze it
-and to visualize it using \textbf{R} functions, and also to provide the
-documentation and commentary on the results of your project. Further, it
-allows for \textbf{R} results to be passed inline to the commentary of
-your results. You'll see more on this later.
-
-\textbf{Who should use it?}
-
-Anyone who needs to use data analysis, math, tables, a lot of figures,
-complex cross-references, or who just cares about the final appearance
-of their document should use \emph{R Markdown}. Of particular use should
-be anyone in the sciences, but the user-friendly nature of
-\emph{Markdown} and its ability to keep track of and easily include
-figures, automatically generate a table of contents, index, references,
-table of figures, etc. should make it of great benefit to nearly anyone
-writing a thesis project.
-
 \chapter{Introduction to Trees, Random Forests, and the
 Bootstrap}\label{rmd-basics}
 
@@ -807,7 +762,7 @@ much the predictive accuracy of the forest as measured using RSS suffers
 when the \(X_j\) component is permuted across observations within the
 OOB dataset \(\bar{Z}_b\) of each tree \(T_b\) in the ensemble.
 \begin{algorithm}
-        \caption{MDA Variable Importance}\label{mdi variable importance}
+        \caption{MDA Variable Importance}\label{mda variable importance}
         \begin{algorithmic}[1]
             \State Grow a random forest $\{T_b\}_{b=1}^B$.
             \For {$j=1,\ldots,p$ }
@@ -1020,55 +975,23 @@ Forests}\label{variable-importance-and-inference-for-random-forests}
 
 \section{Introduction}\label{introduction-1}
 
-In this chapter we focus on various approaches towards inference for
-random forests that have been developed. Generally, we could consider to
-be two approaches towards inference with random forests.
+In this chapter we focus on approaches of inference for random forests
+involving variable importance measures of random forests. Such
+approaches involve using variable importance measures of random forests
+to evaluate the relative importance of different variables in the
+construction of the forest. Louppe (2014) and Ishwaran (2007) focused on
+theoretical properties of variable importance measures while Owens
+(2017), Strobl, Boulesteix, Zeileis, \& Hothorn (2007), and Strobl,
+Boulesteix, Kneib, Augustin, \& Zeileis (2008) are centered on
+developing less biased variable importance measures for hypothesis
+testing.
 
-The first approach involves using variable importance measures of random
-forests to evaluate the relative importance of different variables in
-the construction of the forest. Ishwaran, Louppe, Owens, and Strobl et
-al. have been involved in work in this area. Louppe and Ishwaran focused
-on theoretical properties of variable importance measures while Owens,
-and Strobl and colleagues work is centered on developing less biased
-variable importance measures for hypothesis testing.
+\section{Theoretical Analysis of MDA Variable Importance
+Measures}\label{theoretical-analysis-of-mda-variable-importance-measures}
 
-The second approach involves utilizing properties of the functional form
-of the random forest estimator to construct prediction intervals. Once
-predicton intervals have been constructed, depending on the context,
-confidence intervals and hypothesis tests can be produced. Mentch and
-Hooker's work involves interpreting the random forest ensemble as a
-particular type of U-statistics, and applying theoretical results about
-U-statistics to construct prediction intervals. Wager's work involves
-applying the infintisemal jackknife to the random forest estimator to
-produce prediction intervals. With both approaches there are asymptotic
-results that we will discuss in some detail. In addition, we will
-discuss some of the consistency results that have been proven for random
-forests. It is worth noting here that in mathematically analyzing the
-random forest algorithm, there are trade-offs between fidelity to the
-CART algorithm and amenability to mathematical tool. To our best
-knowledge, at this time there are no theoretical results showing that
-random forests constructed using CART are consistent. Generally,
-simplifications need to be made to the random forest algorithm to allow
-for asymptotic analysis. These simplifications usually involve using a
-different partitioning scheme than CART and also in working a sampling
-without replacement framework. We will note when such assumptions are
-being made when necessary. Otherwise, we assume a setting in which the
-random forest is constructed using CART and bootstrap sampling with
-replacement.
-
-\section{Some Theory for Variable Importance
-Measures}\label{some-theory-for-variable-importance-measures}
-
-In this section we discuss Louppe and Ishwaran's work exploring
-theoretical properties of variable importance measures.
-
-\subsection{Ishwaran's Variable Importance
-Measure}\label{ishwarans-variable-importance-measure}
-
-Ishwaran's approach to variable importance measures of random forests,
-as developed in ``Variable Importance in Binary Regression Trees and
-Forests,'' differs from the original variable importance measures for
-random forests, so we require some additional vocabulary.
+The approach to variable importances adopted in Ishwaran (2007) differs
+from the original variable importance measures for random forests, so we
+require some additional vocabulary.
 
 Suppose \(T\) is a binary recursive tree and suppose that \(T\) has
 \(M\) many terminal nodes. For each point \(\mathbf{x}\) in the feature
@@ -1136,34 +1059,33 @@ expected to be higher than otherwise.
 \subsection{Maximal Subtrees and Theoretical
 Results}\label{maximal-subtrees-and-theoretical-results}
 
-Defining a structure on binary regression trees called subtrees,
-Ishwaran is able to write the predictor for the noised up tree as a
-deterministic component relying on terminal nodes for no parent nodes
-involve a split on \(x_j\), and a random component involving terminal
-nodes for which there are parent nodes involving a split on \(x_j\). The
-definition of the subtree is quite intuitive. We call \(\tilde{T}_j\) a
-\(j\)-subtree of the tree \(T\), if the root node of \(\tilde{T}_j\) has
-daughters that depend on an \(x_j\) split. A \(j\)-subtree
-\(\tilde{T}_j\) is a maximal \(j\)-subtree of the tree \(T\), if there
-are no larger \(j\)-subtrees continaing \(\tilde{T}_j\). For a given
-tree \(T\) and for each variable \(x_j\), there is a set of \(K_j\) many
-distinct maximal \(j\)-subtrees, which are denoted by
-\(\tilde{T}_{1,j},\ldots, \tilde{T}_{K_j,j}\). Note each distinct
-\(\tilde{T}_{k,j}\) maximal \(j\)-subtree contains a set of distinct
-terminal nodes \(M_{k,j}\). Each \(M_{k,j}\) is distinct for
+Defining a structure on binary regression trees called subtrees, we can
+write the predictor for the noised up tree as a deterministic component
+relying on terminal nodes for no parent nodes involve a split on
+\(x_j\), and a random component involving terminal nodes for which there
+are parent nodes involving a split on \(x_j\). The definition of the
+subtree is quite intuitive. We call \(\tilde{T}_j\) a \(j\)-subtree of
+the tree \(T\), if the root node of \(\tilde{T}_j\) has daughters that
+depend on an \(x_j\) split. A \(j\)-subtree \(\tilde{T}_j\) is a maximal
+\(j\)-subtree of the tree \(T\), if there are no larger \(j\)-subtrees
+continaing \(\tilde{T}_j\). For a given tree \(T\) and for each variable
+\(x_j\), there is a set of \(K_j\) many distinct maximal \(j\)-subtrees,
+which are denoted by \(\tilde{T}_{1,j},\ldots, \tilde{T}_{K_j,j}\). Note
+each distinct \(\tilde{T}_{k,j}\) maximal \(j\)-subtree contains a set
+of distinct terminal nodes \(M_{k,j}\). Each \(M_{k,j}\) is distinct for
 \(k=1,\ldots,K_j\), since we are working with maximal \(j\)-subtrees.
 Define \[M_j=\bigcup_{k=1}^{K_j} M_{k,j}\] to be the set of terminal
 nodes for which there is a parent node involving a split on \(x_j\).
-Ishwaran proves the following lemma about the functional form of the
-predictor for the tree \(T_j\).
+Ishwaran (2007) proves the following lemma about the functional form of
+the predictor for the tree \(T_j\).
 \begin{lemma}
 Let $\hat{\mu}_j(\mathbf{x})$ denote the predictor for $T_j$. Then $$\hat{\mu}_j(\mathbf{x})=\sum_{m\notin M_j}a_m B_m(\mathbf{x})+\sum_{k=1}^{K_j} \tilde{a}_{k,j}\mathbb{I}\{T(\mathbf{x})\in M_{k,j}\},$$ where $\tilde{a}_{k,j}$ is the random terminal value assigned by $\tilde{T}_{k,j}$ under the random left right path through $\tilde{T}_{k,j}$. We write $\tilde{P}_{k,j}$ to denote the distribution of $\tilde{a}_{k,j}$. 
 \end{lemma}
-For a proof, the reader is referred to Ishwaran's paper. It is a bit
-surprising that the functional form of \(\hat{mu}_j(\mathbf{x})\) can be
-separated into the two components. Given this lemma and the definition
-of \(j\)-subtrees, we can more formally define the variable importance
-of \(x_j\) in the tree \(T\).
+For a proof, see Ishwaran (2007). It is a bit surprising that the
+functional form of \(\hat{mu}_j(\mathbf{x})\) can be separated into the
+two components. Given this lemma and the definition of \(j\)-subtrees,
+we can more formally define the variable importance of \(x_j\) in the
+tree \(T\).
 
 Let \(g\) be a loss function. Often we use the squared error to evaluate
 loss, which corresponds to \(MSE\), but there is no strict requirement
@@ -1184,29 +1106,30 @@ Application of the lemma and some manipulation allows us to write
 where
 \[R_j(\mathbf{x})=\sum_{k=1}^{K_j}\sum_{m\in M_{k,j}} (\tilde{a}_{k,j} -a_m)B_m(\mathbf{x}).\]
 
-To aid in his analysis, Ishwaran makes the assumption that the true
+As noted in Ishwaran (2007), we make the assumption that the true
 regression function \(\mu\) is of similar form to \(T\). That is, assume
 \[\mu(\mathbf{x})=\sum_{m=1}^M a_{m,0} B_m(\mathbf{x}),\] where
 \(a_{m,0}\) are the true, but unknown, terminal values. Under this and
 some other large sample assumptions, Ishwaran finds that asymptotically,
 each maximal \(j\)-subtree will tend to contribute equally to the
-variable importance \(\Delta_j\). In effect, Ishwaran finds that nodes
-closer to the root of a maximal \(j\)-subtree will have a larger effect
-on \(\Delta_j\) than nodes closer to the terminal nodes.
+variable importance \(\Delta_j\). In effect, nodes closer to the root of
+a maximal \(j\)-subtree will have a larger effect on \(\Delta_j\) than
+nodes closer to the terminal nodes.
 
 \subsection{Extension to Forest
 Ensembles}\label{extension-to-forest-ensembles}
 
-Ishwaran's framework extends naturally to forest ensembles and his
-theoretical result regarding forest ensembles provides some information
-of the behavior of variable importance measures for random forests.
-First for some notation, recall that in the forest ensemble setting, we
-draw \(B\) many bootstrap resamples of the training data to obtain the
-bootstrap replicates \(Z^{b}=\{(\mathbf{x}_i^b, Y_i^b)|i=1,\ldots,n\}\)
-of the training data for \(b=1,\ldots, B\). We then construct a binary
-regression tree \(T(\mathbf{x};b)\) on each bootstrap replicate of the
-data and have the forest \(\hat{\mu}_F\) as the average of predictions
-over the trees \(T(\mathbf{x};b)\):
+The framework developed in Ishwaran (2007) extends naturally to forest
+ensembles and his theoretical result regarding forest ensembles provides
+some information of the behavior of variable importance measures for
+random forests. First for some notation, recall that in the forest
+ensemble setting, we draw \(B\) many bootstrap resamples of the training
+data to obtain the bootstrap replicates
+\(Z^{b}=\{(\mathbf{x}_i^b, Y_i^b)|i=1,\ldots,n\}\) of the training data
+for \(b=1,\ldots, B\). We then construct a binary regression tree
+\(T(\mathbf{x};b)\) on each bootstrap replicate of the data and have the
+forest \(\hat{\mu}_F\) as the average of predictions over the trees
+\(T(\mathbf{x};b)\):
 \[\hat{\mu}_F(\mathbf{x})=\frac{1}{B}\sum_{b=1}^B \hat{\mu}(\mathbf{x};b),\]
 where \(\hat{\mu}(\mathbf{x};b)\) denotes the predictor for the tree
 \(T(\mathbf{x};b)\). Given that each \(\hat{\mu}(\mathbf{x};b)\) is a
@@ -1239,50 +1162,302 @@ We are now ready to state a result about the asymptotic form of
 \begin{theorem}
 Let $R_{F_j, 0}(\mathbf{x})$ be the function $R_{F_j}(\mathbf{x})$, in which each instance of $a_m^b$ has been replaced with $a_{m,0}^b$. Assume that $Y$ can be written in terms of a regression model $$Y=\mu(\mathbf{x})+\varepsilon$$ and that $$\mu(\mathbf{x})=\frac{1}{B}\sum_{b=1}^B\sum_{m=1}^{M^b}a_{m,0}^b B_m(\mathbf{x};b).$$ If $a_m^b\rightarrow a_{m,0}^b$ for each $m$ and $b$, then $$\Delta_{F_j}\rightarrow \mathbb{E}\left(R_{F_j,0}(\mathbf{x})^2\right)\leq\mathbb{E}\left(\frac{1}{B}\sum_{b=1}^b\sum_{k=1}^{K_j^b}\theta_0(k,j,b)\right),$$ where $$\theta_0(k,j,b)=\sum_{m\in M_{k,j}^b} \pi_{m,b}\tilde{P}_{k,j,0}^b\left(\tilde{a}_{k,j,0}^b-a_{m,0}^b\right)^2$$ is the node mean squared error for the $k$th maximal $v$-subtree of $T(\mathbf{x};b)$and $\pi_{m,b}=\mathbb{P}(B_m(\mathbf{x};b)=1|Z)$. 
 \end{theorem}
-{[}Note: explain node mean squared error. Also show a proof.{]}
+For a proof, see Ishwaran (2007). As Ishwaran (2007) notes, the bound in
+the above theorem becomes tighter as the trees in the forest become more
+and more orthogonal to each other. The above theorem is applicable if
+the forest predictor is consistent. This suggests that forest ensemble
+methods which are consistent and produce trees that are at least
+approximately orthogonal to each other allow for variable importance to
+be characterized through node mean squared error of subtrees. Variable
+importance as defined above differs from the \(MDA\) variable importance
+for random forests, but the two follow a similar heuristic towards
+measuring variable importance via the loss of predictive accuracy when
+the variable \(x_j\) is pertrubed. Therefore this result suggests that,
+perhaps, so long as the random forest estimator is consistent and the
+trees constructed are at least approximately orthogonal, the \(MDA\)
+variable importance can be characterized via the mean squared error of
+some analogous structure to maximal subtrees. This is, of course,
+conjectural, but we are interested whether for simpler forest
+algorithms, results similar to the theorem can be proven. Asymptotic
+results for the \(MDA\) and also \(MDI\) variable importance measures
+are difficult to formulate and prove for several reasons. First, the
+\(CART\) tree construction process combined with the bootstrapping and
+randomization procedure of the random forest is difficult to
+mathematically analyze. Second, it is still unknown whether random
+forests constructed via \(CART\) are consistent. However, there are
+other random forest variants known to be consistent, so those variants
+may be a natural starting point to try to prove asymptotic results about
+\(MDA\) and \(MDI\) variable importances. Third, the definition of
+\(MDA\) variable importance involves a permutation step that is
+difficult to analyze mathematically. The above results are
+mathematically amenable due to the noising-up procedure adopted allowing
+for a quite elegant analysis of the variable importance. One possible
+approach to dealing with this issue may be to adopt the above definition
+of variable importance in different random forest settings and see if
+similar results to Ishwaran (2007) may be derived. Another approach,
+which is the one more or less taken by Ishwaran (2007), is to to find a
+mathematically tractible definition of variable importance which is
+approximately the MDA variable importance measure and proceed with
+analysis from there.
 
-In the above theorem, we
+\section{Theoretical Analysis of MDI Variable
+Importance}\label{theoretical-analysis-of-mdi-variable-importance}
 
-As Ishwaran (2007) notes, the bound in the above theorem becomes tighter
-as the trees in the forest become more and more orthogonal to each
-other. The above theorem is applicable if the forest predictor is
-consistent. This suggests that forest ensemble methods which are
-consistent and produce trees that are at least approximately orthogonal
-to each other allow for variable importance to be characterized through
-node mean squared error of subtrees. Variable importance as defined
-above differs from the \(MDA\) variable importance for random forests,
-but the two follow a similar heuristic towards measuring variable
-importance via the loss of predictive accuracy when the variable \(x_j\)
-is pertrubed. Therefore this result suggests that, perhaps, so long as
-the random forest estimator is consistent and the trees constructed are
-at least approximately orthogonal, the \(MDA\) variable importance can
-be characterized via the mean squared error of some analogous structure
-to maximal subtrees. This is, of course, conjectural, but we are
-interested whether for simpler forest algorithms, results similar to the
-theorem can be proven. Asymptotic results for the \(MDA\) and also
-\(MDI\) variable importance measures are difficult to formulate and
-prove for several reasons. First, the \(CART\) tree construction process
-combined with the bootstrapping and randomization procedure of the
-random forest is difficult to mathematically analyze. Second, it is
-still unknown whether random forests constructed via \(CART\) are
-consistent. However, there are other random forest variants known to be
-consistent, so those variants may be a natural starting point to try to
-prove asymptotic results about \(MDA\) and \(MDI\) variable importances.
-Third, the definition of \(MDA\) variable importance involves a
-permutation step that is difficult to analyze mathematically. The above
-results are mathematically amenable due to the noising-up procedure
-adopted allowing for a quite elegant analysis of the variable
-importance. One possible approach to dealing with this issue may be to
-adopt the above definition of variable importance in different random
-forest settings and see if similar results to Ishwaran (2007) may be
-derived. Another approach, which is the one more or less taken by
-Ishwaran (2007), is to to find a mathematically tractible definition of
-variable importance which is approximately the \(MDA\) variable
-importance measure and proceed with analysis from there.
+Up to now in this chapter, we have been discussing theoretical results
+concerning the \(MDA\) variable importance. Louppe (2014) has explored
+some of the theory for \(MDI\) variable importance of forest ensembles.
 
-{[}Lead into Strobl and the problem of collinearity and bias(bias as in
-which variables are chosen) in random forests{]}
+In order to discuss the following theoretical results regarding MDI
+variable importance, we make some modifications to the setting we are
+working in. Assume that we are working in a finite probability space
+{[}this assumption is necessary primarily for technical reasons{]} and
+that observations \(Y,X_1,\ldots,X_p\) in the training set \(Z\) are
+categorical variables. Recall that if a forest ensemble is grown by
+choosing splits and variables maximizing the decrease in nodal impurity
+where \(i(s,t)\) denotes the impurity measure used, then the MDI
+variable importance of the variable \(X_j\) is defined to be
+\[VI(X_j)=\frac{1}{B}\sum_{b=1}^B \sum_{t\in T_b} \mathbb{I}(j_t=j)p(t)\Delta i(s,t),\]
+where \(p(t)\) is the proportion of samples which reach the node \(t\)
+in the tree \(T_b\). Note that MDI variable importance is the average
+over the bootstrap resamples of the sum of the weighted decrease in
+impurity over the nodes of the tree using \(X_j\) as the splitting
+variable.
 
+Rather than working with random forests, we will work with an infinite
+ensemble of totally randomized and fully developed trees. Totally
+randomized and fully developed trees are a variant of forest ensembles
+given by the following. A totally randomized and fully developed tree is
+a decision tree in which each node \(t\) is partioned using a variable
+\(X_j\) picked uniformly at random among those not yet used at the
+parent nodes of \(t\), where each node \(t\) is split into \(|X_j|\)
+sub-trees, i.e., one for each possiblevalue of \(X_j\), and where the
+recursive construction process halts only when all \(p\) variables have
+been used along the current branch.
+
+Using an impurity measure called Shannon entropy, Louppe (2014) is able
+to show that only relevant variables (that is variables whose
+information content, conditional on the other variables, is useful
+towards explaining the response \(Y\)) have non-zero infinite sample
+size variable importance. Furthermore, this means that irrelevant
+variables (which are variables whose information content, conditional on
+the other variables, is not useful towards explaining the response
+\(Y\)) have a infinite sample size variable importance of zero. In fact,
+in this context, a variable is irrelevant if and only if it has an
+infinite sample size variable importance of zero. Generalizing from
+Shannon entropy to other impurity measures, for the GINI index (used in
+commonly in classification problems) and variance (used in regression
+via MSE), only irrelevant variables result in no decrease in nodal
+impurity. We would like to reiterate that these results concerning
+irrelvant variables are valid particularly in the setting of infinite
+ensembles of totally randomized and fully developed trees.
+
+In the random forest setting, the results discussed in the previous
+paragraph may not be valid. In the random forest setting, a key step in
+the construction of trees is the randomization step in which we choose
+at random a subset of size \(m\leq p\) of the variables to choose the
+next split from. If \(m>1\), then it is possible for some variables to
+never be chosen at a node \(t\), since there will always be other
+variables which have a larger decrease in nodal impurity. This results
+in trees in which the variables with the largest reduction in nodal
+impurity are centered in the trunk of the tree with variables with
+smaller reduction in nodal impurity are pushed to leaves, or otherwise
+not chosen to split on. This is an undesirable property to have since
+this can result in an ensemble which inadequately explores the feature
+space and is thus more consistently biased towards some variables over
+others, even if other variables can provide only slightly lower
+reductions in nodal impurity. As a consequence, if \(m>1\), then it is
+not the case that a variable is irrelevant if and only if it has a
+variable importance of zero. One implication is that in data sets where
+there are correlated variables, random forest variable importance
+measures may result in variable importances which do not reflect the
+actually importance of variables in explaining the response \(Y\). In
+particular, it could be the case that if \(X_j\) and \(X_{j'}\) are two
+correlated variables, then even if both \(X_j\) and \(X_{j'}\) are
+important in explaining the response \(Y\), it may be the case that
+\(X_j\) is consistently chosen as the splitting variable over \(X_{j'}\)
+if the two variables are both possible splitting variables.
+
+\section{Dealing with Bias in Random Forest Variable
+Importance}\label{dealing-with-bias-in-random-forest-variable-importance}
+
+In the previous two sections of this chapter we discussed theoretical
+results pertaining to MDA and MDI variable importance measures. For MDA
+variable importance, a consistent ensemble with orthogonal trees have a
+nice asymptotic form in the framework developed in Ishwaran (2007). On
+the otherhand, with MDI variable importance, if the trees are grown in
+the random forest setting, then there are issues of the variable
+importance not capturing the actual importance of the variables in the
+training data. This could particularly arise as an issue in data sets
+with correlated variables where equally important variables receive
+different variable importances due to bias introduced by tree
+construction process. In using the term `bias,' we would like to
+emphasise that this is not bias in the sense of biased estimators, but
+bias in the sense of which variables are chosen to be split upon in the
+tree growing process. Bias in the variable importance measures of random
+forests is concerning as we would like to be able to use random forests
+for inferential statistics. A couple of methods have been proposed to
+construct more reliable variable importance measures, which we discuss
+in this section.
+
+\subsection{Bias in Random Forest Variable Importance
+Measures}\label{bias-in-random-forest-variable-importance-measures}
+
+Bias in random forest variable importance measures was first
+substantively analyzed in Strobl et al. (2007). Strobl et al. (2007) ran
+a simulation study comparing MDI variable importance using the GINI
+index, MDA variable importance, and a conditional variable importance
+measure in a classification setting. The conditional variable importance
+measure used by Strobl et al. (2007) is a variable importance method
+similar to MDA variable importance, but utilizing an ensemble of
+conditional inference trees. We will define conditional inference trees
+and the conditional variable importance measures below. For now, note
+that Strobl et al. (2007) found that MDI variable importance using the
+GINI index and MDA variable importance tends to be biased from the
+expected variable importance value within their simulation. They also
+found that subsampling without replacement tends to reduce the bias in
+variable importance in comparison to using bootstrap resampling with
+replacement. In their analysis, Strobl et al. (2007) claim that the GINI
+index tends to favor variables with more potential cutpoints. Hence the
+MDI variable importance measure using the GINI index is biased towards
+variables with more potential cutpoints. Strobl et al. (2007) also found
+that in using the MDA variable importance measure, since variables that
+are split upon closer to the root node affect the predictive accuracy of
+the ensemble more than variables split upon in leaves, the MDA variable
+importance measure will be affected by the variable selection bias of
+individual trees. Furthermore, Strobl et al. (2008) find that correlated
+variables tend to be overselected in the tree growing process. In order
+to utilize random forest variable importance measures as inferential
+tools, several methods have been proposed to deal with the issue of
+variable selection bias in random forests.
+
+\subsection{Conditional Variable
+Importance}\label{conditional-variable-importance}
+
+The MDA variable importance measure can be viewed in the context of
+permutation tests and hypothesis testing. In particular, we can consider
+that the MDA variable importance measure operates on the null hypothesis
+that permuting the values of the variable \(X_j\) has no affect on the
+predictive accuracy of the random forest predictor. This corresponds to
+the null hypothesis that the variable \(X_j\) is independent of the
+response \(Y\) and the variables \(X_1,\ldots,X_p\). If the predictive
+accuracy of the random forest suffers from permuting \(X_j\), that is if
+the \(VI(X_j)\) is nonzero, then if also \(X_j\perp X_{-j}\), it would
+follow that \(Y\) and \(X_j\) are not independent. However, it is
+important to note that the null hypothesis under which the MDA variable
+importance measure operates is: \[H_0:X_j \perp Y,X_{-j}.\] If on the
+otherhand, \(X_j\) and \(X_{-j}\) are not independent, then \(VI(X_j)\)
+will be biased by the correlation between \(X_j\) and \(X_{-j}\). It
+could be that \(Y\) and \(X_j\) are not independent or that \(Y\) and
+\(X_j\) are independent, but in either case, if the predictor variables
+are correlated, we see that \(VI(X_j)\) will not accurately capture the
+importance of \(X_j\). Strobl et al. (2008) propose a permutation scheme
+corresponding to the null hypothesis \[H_0:(X_j\perp Y)|X_{-j},\] that
+is that \(X_j\) is independent of \(Y\) conditional on the \(X_{-j}\).
+Such a permutation scheme would take into account the correlation
+structure of the predictor variables and would allow for a less biased
+variable importance measure so long as the individual trees within the
+ensembles do not exhibit large variable selection bias.
+
+Strobl et al. (2008) propose defining a grid within which values of
+\(X_j\) are permuted according to partitions of the feature space given
+by each tree. While Strobl et al. (2008) propose using unbiased
+conditional inference trees from Hothorn, Hornik, \& Zeileis (2006) to
+determine the partition, it is possible to use partitions given by CART
+trees. The algorithm is presented as follows.
+\begin{algorithm}
+    \caption{Conditional Variable Importance} \label{conditional variable importance}
+      \begin{algorithmic}[1]
+        \State Grow a forest ensemble $\{T_b\}_{b=1}^B$
+          \For{ $j=1,\ldots,p$ }
+            \For{ $b=1,\ldots,B$ }
+            \State Compute $RSS(T_b,Z_b)$.
+            \For{ all variables $X_i$ to be conditioned on }
+            \State Extract cutpoints that split $X_i$ in the tree $T_b$ and create a grid $\mathcal{G}$ by bisecting the sample space in each cutpoint.
+            \EndFor
+            \State Within the grid $\mathcal{G}$, permute the values of $X_j$ and denote the permuted resample by $Z_b^j$.
+            \State Compute $RSS(T_b,Z_b^j)$.
+            \State Compute the conditional variable importance of $X_j$ in the tree $T_b$ to be $VI_b(X_j)=\frac{1}{|Z_b|}\left(RSS(T_b,Z_b)-RSS(T_b,Z_b^j)\right)$.
+            \EndFor
+            \State Compute the conditional variable importance of $X_j$ in the forest ensemble to be $VI(X_j)=\frac{1}{B}\sum_{b=1}^B VI_b(X_j)$.
+          \EndFor
+      \end{algorithmic}
+  \end{algorithm}
+To determine the variables \(X_i\) to be conditioned on Strobl et al.
+(2008) suggest including only variables whose empirical correlation with
+the variable \(X_j\) suggests some reasonable threshold.
+
+\subsection{Infforest Variable
+Importance}\label{infforest-variable-importance}
+
+While simulation results of Strobl et al. (2008) suggest that the
+conditional variable importance is more effective at capturing the
+importance of each variable \(X_j\) compared to the marginal approach
+followed in MDA, they note that conditional variable importance cannot
+completely eliminate preference for correlated variables in random
+forests. Owens (2017) instead suggests a partition then permute scheme
+which produces a sampling distribution for the variable importance of
+each variable \(X_j\). Once a sampling distribution for \(VI(X_j)\) has
+been obtained, hypothesis testing and other sorts of statistical
+inference can proceed. As the Infforest variable importance is quite
+complicated, some explanation is needed.
+
+After growing a forest ensemble \(\{T_b\}_{b=1}^B\), infforest variable
+importance values are computed as follows. First, for each
+\(b=1,\ldots,B\) and each variable \(X_j\), grow a tree
+\(X_j\sim X_1,\ldots,X_{j-1},X_{j+1},\ldots,X_p\) using all \(p-1\)
+predictors using the in-bag sample used to grow \(T_b\). Denote this
+tree by \(T_j^{b*}\). The rows of \(\overline{Z}_b\) are permuted within
+the partitions of the feature space determined by \(T_j^{b*}\). The
+difference in predictive accuracy of \(T_b\) before and after the OOB
+sample \(\overline{Z}_b\) has been permuted is the infforest variable
+importance for the variable \(X_j\) in the tree \(T_b\). Owens (2017)
+suggests then using the sampling distribution of \(VI(X_j)\) obtained
+from the infforest partition-permute scheme to test the null hypothesis
+that the variable importance of \(X_j\) is zero. On the other hand, if
+we let \(VI_b(X_j)\) denote the infforest variable importance of the
+variable \(X_j\) in the tree \(T_b\), then we could define the infforest
+variable importance of \(X_j\) in the forest ensemble
+\(\{T_b\}_{b=1}^B\) to be \[VI(X_j)=\frac{1}{B}\sum_{b=1}^B VI_b(X_j).\]
+In particular, this corresponds to the mean of the sampling distribution
+of the infforest variable importances of \(X_j\) over the trees \(T_b\).
+
+Originally, Owens (2017) developed for random forests using CART trees
+as base learners. However, the infforest variable importance could
+certainly be used with random forest variants such as conditional
+inference forests used in Strobl et al. (2008). Another possible
+modification of the infforest variable importance algorithm is to only
+grow an auxilary tree predicting
+\(X_j\sim X_{\alpha_1},\ldots,X_{\alpha_k}\), where
+\(X_{\alpha_1},\ldots,X_{\alpha_k}\) are variables whose correlation
+with \(X_j\) exceeds some reasonable threshold. This would combine the
+suggestion in Strobl et al. (2008) of considering the correlation
+structure of the predictor variables in setting up the grid for the
+conditional variable importance with the infforest partition-permute
+scheme.
+
+One issue with infforest variable importance is the steep computational
+cost of the algorithm. The algorithm grows an auxilary tree
+\(T_{j}^{b*}\) for each variable \(X_j\) and bootstrap resample \(b\)
+and then proceeds to permute the OOB sample with respect to each
+\(T_j^{b*}\). Even implementing the infforest variable importance
+algorithm on small bootstrap resamples of around several hundred is
+computationally intensive.
+\begin{algorithm}
+    \caption{Infforest Variable Importance} \label{infforest variable importance}
+      \begin{algorithmic}[1]
+        \State Grow a forest ensemble $\{T_b\}_{b=1}^B$
+          \For{ $j=1,\ldots,p$ }
+            \For{ $b=1,\ldots,B$ }
+              \State Compute $RSS(T_b,\overline{Z}_b)$.
+              \State Grow a tree $T_j^{b*}$ predicting $X_j\sim X_{-j}$ using in-bag sample.
+              \State Permute rows of the OOB sample $\overline{Z}_b$ with respect to the partitions of the feature space from $T_j^{b*}$ to obtain the permuted OOB sample $\overline{Z}_b^*$. 
+              \State Compute $RSS(T_b,\overline{Z}_b^*)$.
+              \State Compute the infforest variable importance of $X_j$ in $T_b$ to be $VI_b(X_j)=\frac{1}{\overline{Z}_b}\left(RSS(T_b,\overline{Z}_b)-RSS(T_b,\overline{Z}_b^*)\right)$.  
+            \EndFor
+            \State Test the null hypothesis that the variable importance of $X_j$ is zeror using the distribution of values $VI_b(X_j)$. 
+          \EndFor
+      \end{algorithmic}
+  \end{algorithm}
 \chapter{The Bootstrap}\label{the-bootstrap}
 
 \chapter*{Conclusion}\label{conclusion}
@@ -1347,6 +1522,12 @@ Efron, B. (2014). Estimation and accuracy after model selection.
 \emph{Journal of the American Statistical Association}, \emph{109}(507),
 991--1007. \url{http://doi.org/doi.org/10.1080/01621459.2013.823775}
 
+\hypertarget{ref-hothorn2006}{}
+Hothorn, T., Hornik, K., \& Zeileis, A. (2006). Unbiased recursive
+partitioning: A conditional inference framework. \emph{Journal of
+Computational and Graphical Statistics}, \emph{15}(3), 651--674.
+\url{http://doi.org/10.1198/106186006X133933}
+
 \hypertarget{ref-ishwaran2007}{}
 Ishwaran, H. (2007). Variable importance in binary regression trees and
 forests. \emph{Electron J Stat}, 519--537.
@@ -1370,6 +1551,22 @@ Mentch, L., \& Hooker, G. (2016b). Quantifying uncertainty in random
 forests via confidence intervals and hypothesis tests. \emph{Journal of
 Machine Learning Research}, \emph{17}(26), 1--41. Retrieved from
 \url{http://jmlr.org/papers/v17/14-168.html}
+
+\hypertarget{ref-owens2017}{}
+Owens, A. (2017). \emph{INFFOREST variable importance for random
+forests} (Undergraduate Thesis). Reed College.
+
+\hypertarget{ref-strobl2008}{}
+Strobl, C., Boulesteix, A.-L., Kneib, T., Augustin, T., \& Zeileis, A.
+(2008). Conditional variable importance for random forests. \emph{BMC
+Bioinformatics}, \emph{9}(1), 307.
+\url{http://doi.org/10.1186/1471-2105-9-307}
+
+\hypertarget{ref-strobl2007}{}
+Strobl, C., Boulesteix, A.-L., Zeileis, A., \& Hothorn, T. (2007). Bias
+in random forest variable importance measures: Illustrations, sources
+and a solution. \emph{BMC Bioinformatics}, \emph{8}(1), 25.
+\url{http://doi.org/10.1186/1471-2105-8-25}
 
 
 % Index?

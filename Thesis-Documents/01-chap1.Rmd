@@ -171,7 +171,7 @@ The {#rmd-basics} text after the chapter declaration will allow us to link throu
   The idea of MDA is to measure for each variable $X_j$, on average how much the predictive accuracy of the forest as measured using RSS suffers when the $X_j$ component is permuted across observations within the OOB dataset $\bar{Z}_b$ of each tree $T_b$ in the ensemble.  
   
   \begin{algorithm}
-		\caption{MDA Variable Importance}\label{mdi variable importance}
+		\caption{MDA Variable Importance}\label{mda variable importance}
 		\begin{algorithmic}[1]
 			\State Grow a random forest $\{T_b\}_{b=1}^B$.
 			\For {$j=1,\ldots,p$ }

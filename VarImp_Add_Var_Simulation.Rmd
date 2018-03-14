@@ -1,8 +1,8 @@
 ---
-title: "Untitled"
-author: 
-date:
-output: html_document
+title: "Simulation for Added Variable Plot then Variable Importance Scheme"
+author: "Emerson Webb"
+date: "3/14/2018"
+output: github_document
 ---
 
 ```{r}
@@ -10,6 +10,7 @@ output: html_document
 library(randomForest)
 library(tidyverse)
 library(grid)
+library(gridExtra)
 library(mvtnorm)
 
 ```
@@ -67,13 +68,13 @@ extract_rf_pred <- function(i, data.list, p){
 #each_pred_rf is a function whose input is a list of dataframes that come from output of df_combs and runs the 
 #randomForest function on each dataframe using the map function. Output is dataframe of predicted values along with actual value of Y as last column. Second to last column is the predicted value of full model. 
 each_pred_rf <- function(data.list, ntree1, replace = TRUE){
-  p <- length(df.list)-1
+  p <- length(data.list)-1
   rf.list <- map(.x = data.list, function(x) 
     randomForest(Y~., data = x, ntree = ntree1, replace = replace, importance = TRUE))
   rf.df <- map_dfc(1:(p+1), extract_rf_pred, data.list = rf.list, p = p)
   Y <- data.list[[1]]$Y
   new.df <- cbind(rf.df, Y)
-  imp <- importance(rf.list[[6]])
+  imp <- importance(rf.list[[p+1]])
   list(new.df, imp)
 }
 
@@ -146,6 +147,7 @@ add_var_randomforest <- function(data, ntree1, ntree2, replace = TRUE){
   #the variable importances from full model run in each_pred_rf
   list(add.var.imp, rf.add.var.list, rf.list[[2]])
 }
+
 
 #input for rf_added_var_plot is output of 
 #add_var_randomforest. Output is plot of added variable plots for 
@@ -224,12 +226,49 @@ siml.data2 <- siml.data2 %>%
   mutate(Y = 5*V1+5*V2+2*V3+-5*V5+-5*V6+-2*V7+err2)
 
 #run the simulations with and without replacement for bootstrapping
-siml1.wrep.results <- add_var_randomforest(data = siml.data1, ntree1 = 2000, ntree2 = 2000, replace = TRUE)
-siml1.worep.results <- add_var_randomforest(data = siml.data1, ntree1 = 2000, ntree2 = 2000, replacee = FALSE)
-siml2.wrep.rseults <- add_var_randomforest(data = siml.data2, ntree1 = 2000, ntree2 = 2000, replace = TRUE)
-siml2.worep.results <- add_var_randomforest(data = siml.data2, ntree1 = 2000, ntree2 = 2000, replace = FALSE)
-
+siml1.wrep.results <- add_var_randomforest(data = siml.data1, ntree1 = 1000, ntree2 = 1000)
+siml1.worep.results <- add_var_randomforest(data = siml.data1, ntree1 = 1000, ntree2 = 1000, replace = FALSE)
+siml2.wrep.results <- add_var_randomforest(data = siml.data2, ntree1 = 1000, ntree2 = 1000)
+siml2.worep.results <- add_var_randomforest(data = siml.data2, ntree1 = 1000, ntree2 = 1000, replace = FALSE)
 
 
 ```
 
+```{r}
+
+siml1.wrep.results[[1]]
+siml1.wrep.results[[3]]
+rf_added_var_plot(siml1.wrep.results)
+
+```
+
+Above are results for the first simulated dataset with replacement. The added variable plot does seem to be useful in capturing linear relationships, even with using the random forest mechanism. In terms of variable importance scores, the original forest performs better. Part of this seems to be that even non-significant variables will be assigned a non-trivial importance scores within the forest that splits only on the difference between the full model and the model excluding the particular variable. 
+
+```{r}
+siml1.worep.results[[1]]
+siml1.worep.results[[3]]
+rf_added_var_plot(siml1.worep.results)
+
+```
+
+Sampling without replacement as opposed to bootstrap withreplacement seems to improve performance of added variable then variable importance scheme. Overall, if the variables are independent, then the random forest variable importance score seems quite reliable. 
+
+```{r}
+
+siml2.wrep.results[[1]]
+siml2.wrep.results[[3]]
+rf_added_var_plot(siml2.wrep.results)
+
+```
+
+With correlated predictors, the added variable plots does seem to improve the performance of the variable importance somewhat. Variables 1 through 4 are correlated, so their raw variable importance score is dampened by that fact. When using added variable then variable importance scheme, variable 1 and 2 look particularly important, which we expect. The score for variable 3 increases, but the scoresfor variables 8 through 12 also increase. 
+
+```{r}
+
+siml2.worep.results[[1]]
+siml2.worep.results[[3]]
+rf_added_var_plot(siml2.worep.results)
+
+```
+
+Sampling without replacement improves the performacne of the added variable then variable importance scheme, although the issue of irrelvant variables (particularly variables 8 through 12) persists. 

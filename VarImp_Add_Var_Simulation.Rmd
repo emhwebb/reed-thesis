@@ -5,36 +5,21 @@ date: "3/14/2018"
 output: github_document
 ---
 
-```{r}
+```{r, echo=FALSE, message=FALSE, warnings = FALSE}
 
 library(randomForest)
 library(tidyverse)
 library(grid)
 library(gridExtra)
 library(mvtnorm)
+library(partykit)
 
 ```
-
-Here we create simulated data used to test the code. 
-```{r}
-
-#n is number of observations in dataset
-n <- 1000
-#p is number of variables
-p <- 5
-#our weights are given by wt_vec <- c(5,5,1,0,0)
-err <- rnorm(n, mean = 0, sd = 0.05)
-siml.data <- as.data.frame(matrix(rnorm(n*p, mean = 0, sd = 1), nrow = n))
-siml.data <- siml.data %>% 
-  mutate(Y = 5*V1+5*V2+V3+err)
-
-
-```
-
 
 Next want to write a function which takes a dataframe and applys the added-variable plot then permute scheme to each predictor in the dataset. 
 
 ```{r}
+
 
 #first need to take our data frame and make the p+1 datasets that we apply the random forest to
 
@@ -54,9 +39,12 @@ df_combs <- function(data){
   df.list
 }
 
-#extract_rf_pred is a function which takes as input a list of randomforest objects, an index value, 
-#and the number of predictors in the model and outputs the predicted values of the random forest in 
-#a dataframe. extract_rf_pred is mainly for use in map_dfc, which binds by column the predicted values in 
+#extract_rf_pred is a function which takes as input 
+#a list of randomforest objects, an index value, 
+#and the number of predictors in the model and 
+#outputs the predicted values of the random forest in 
+#a dataframe. extract_rf_pred is mainly for use in map_dfc, 
+#which binds by column the predicted values in 
 #data.list as a dataframe. Primarily for use in each_pred_rf
 extract_rf_pred <- function(i, data.list, p){
  new.df <- as.data.frame(data.list[[i]]$predicted) 
@@ -65,8 +53,11 @@ extract_rf_pred <- function(i, data.list, p){
  new.df
 }
 
-#each_pred_rf is a function whose input is a list of dataframes that come from output of df_combs and runs the 
-#randomForest function on each dataframe using the map function. Output is dataframe of predicted values along with actual value of Y as last column. Second to last column is the predicted value of full model. 
+#each_pred_rf is a function whose input is a list of dataframes 
+#that come from output of df_combs and runs the 
+#randomForest function on each dataframe using the map function. 
+#Output is dataframe of predicted values along with actual value of Y as last column. 
+#Second to last column is the predicted value of full model. 
 each_pred_rf <- function(data.list, ntree1, replace = TRUE){
   p <- length(data.list)-1
   rf.list <- map(.x = data.list, function(x) 
@@ -93,12 +84,13 @@ extract_add_var <-function(i, df){
   x.res <- df[[PredFullMod]]-df[[V]]
   y.res <- df[[Y]]-df[[V]]
   new.df <- data.frame(x.res, y.res)
-  colnames(new.df) <- c(paste("diff.full.woVar", as.character(i), sep = ""), "y.res")
+  colnames(new.df) <- c(paste("added.Var", as.character(i), sep = ""), "y.res")
   new.df
 }
 
 #rf_add_var takes as input the output of each_pred_rf and outputs a list of length p 
-#in which each entry is a data frame corresponding to an added variable plot for the jth predictor in the 
+#in which each entry is a data frame corresponding
+#to an added variable plot for the jth predictor in the 
 #data set.
 rf_add_var <- function(data.list){
   rf.df <- data.list[[1]]
@@ -109,11 +101,19 @@ rf_add_var <- function(data.list){
 
 #rf_add_var_imp takes as input a list of add_var df's from rf_add_var and runs
 #a random forest on the y-residuals with x-residuals as input.
-#output is a list of random forest objects. Might change output to be just variable importance values. 
+#output is a list of random forest objects. \
+#Might change output to be just variable importance values. 
 rf_add_var_imp <- function(data.list, ntree2, replace = TRUE){
   p <- length(data.list)
   rf.add.imp.list <- map(.x = data.list, function(x) 
     randomForest(y.res~., data = x, ntree = ntree2, replace = replace, importance = TRUE))
+  rf.add.imp.list
+}
+
+rf_shallow_add_var_imp <- function(data.list, ntree2, replace = TRUE){
+  p <- length(data.list)
+  rf.add.imp.list <- map(.x = data.list, function(x) 
+    randomForest(y.res~., data = x, ntree = ntree2, replace = replace, importance = TRUE, nodesize = 10))
   rf.add.imp.list
 }
 
@@ -148,6 +148,24 @@ add_var_randomforest <- function(data, ntree1, ntree2, replace = TRUE){
   list(add.var.imp, rf.add.var.list, rf.list[[2]])
 }
 
+#same as add_var_randomforest except shallow trees are grown on the added variable plots
+shallow_add_var_randomforest <- function(data, ntree1, ntree2, replace = TRUE){
+  #to get the copy of the data with one predictor removed
+  df.list <- df_combs(data)
+  #running initial randomFoest on each data frame
+  rf.list <- each_pred_rf(df.list, ntree1 = ntree1)
+  #tidying the data to compute added variable plots
+  rf.add.var.list <- rf_add_var(rf.list)
+  #running randomForests on each plot
+  rf.add.imp.list <- rf_shallow_add_var_imp(rf.add.var.list, ntree2 = ntree2)
+  #extracts variable importance values for each randomForest ran on added variable plots
+  add.var.imp <- extract_var_imp(rf.add.imp.list)
+  #output is list containing data frame of added variable plot variable importances, 
+  #rf.add.var.list which are dataframe for added variable plots, and 
+  #the variable importances from full model run in each_pred_rf
+  list(add.var.imp, rf.add.var.list, rf.list[[2]])
+}
+
 
 #input for rf_added_var_plot is output of 
 #add_var_randomforest. Output is plot of added variable plots for 
@@ -169,13 +187,6 @@ rf_added_var_plot <- function(data.list){
     do.call("grid.arrange", c(gg.list, ncol = nCol))
 }
 
-#Now to test
-rf.add.var.imp <- add_var_randomforest(siml.data, ntree1 = 1000, ntree2 = 1000, replace = FALSE)
-rf.add.var.imp[[1]]
-rf.add.var.imp[[3]]
-rf_added_var_plot(rf.add.var.imp)
-
-
 ```
 
 Now ready to run simulations. First and second simulated datasets are from Strobl (2008). 
@@ -185,14 +196,14 @@ Both are cases of a response in which the effect of added variables is linear.
 
 ```{r}
 
-set.seed(17)
+set.seed(15)
 #iid
 #n1 is number of observations in dataset
 n1 <- 2000
 #p1 is number of variables
 p1 <- 12
 #our weights are given by wt_vec <- c(5,5,2,0,-5,-5,-2,0,0,0,0,0) 
-err1 <- rnorm(n1, mean = 0, sd = 0.5)
+err1 <- rnorm(n1, mean = 0, sd = 0.25)
 siml.data1 <- as.data.frame(matrix(rnorm(n1*p1, mean = 0, sd = 1), nrow = n1))
 siml.data1 <- siml.data1 %>% 
   mutate(Y = 5*V1+5*V2+2*V3+-5*V5+-5*V6+-2*V7+err1)
@@ -220,7 +231,7 @@ u8 <- c(rep(0, times = 11), 1)
 
 Sigma2 <- matrix(c(v1,w,v2,w,v3,w,v4,w,
                    u1,u2,u3,u4,u5,u6,u7,u8), nrow = 12, ncol = 12)
-err2 <- rnorm(n2, mean = 0, sd = 0.5)
+err2 <- rnorm(n2, mean = 0, sd = 0.25)
 siml.data2 <- as.data.frame(rmvnorm(n = n2, mean = rep(0, times = 12), sigma = Sigma2))
 siml.data2 <- siml.data2 %>% 
   mutate(Y = 5*V1+5*V2+2*V3+-5*V5+-5*V6+-2*V7+err2)
@@ -271,4 +282,156 @@ rf_added_var_plot(siml2.worep.results)
 
 ```
 
-Sampling without replacement improves the performacne of the added variable then variable importance scheme, although the issue of irrelvant variables (particularly variables 8 through 12) persists. 
+Sampling without replacement improves the performance of the added variable then variable importance scheme, although the issue of irrelvant variables (particularly variables 8 through 12) persists. 
+
+```{r}
+
+#independent variables with a non-linear response
+#n3 is number of observations
+n3 <- 2000
+#p3 is numberof variables
+p3 <- 12
+#some error to add in 
+err3 <- rnorm(n3, mean = 0, sd = 0.25)
+siml.data3 <- as.data.frame(matrix(rnorm(n3*p3, mean = 0, sd = 1), nrow = n3))
+siml.data3 <- siml.data3 %>% 
+  mutate(Y = 5*V1^4+5*V2^3+6*V3^4+5*V5^3+err3)
+
+#correlated variables with a non-linear response
+n4 <- 2000
+err4 <- rnorm(n4, mean = 0, sd = 0.25)
+siml.data4 <- as.data.frame(rmvnorm(n = n4, mean = rep(0, times = 12), sigma = Sigma2))
+siml.data4 <- siml.data4 %>%
+  mutate(Y = 5*V1^4+5*V2^3+6*V3^4+5*V5^3+err4)
+
+siml3.wrep.results <- add_var_randomforest(data = siml.data3, ntree1 = 1000, ntree2 = 1000)
+siml3.worep.results <- add_var_randomforest(data = siml.data3, ntree1 = 1000, ntree2 = 1000, replace = FALSE)
+siml4.wrep.results <- add_var_randomforest(data = siml.data4, ntree1 = 1000, ntree2 = 1000)
+siml4.worep.results <- add_var_randomforest(data = siml.data4, ntree1 = 1000, ntree2 = 1000, replace = FALSE)
+
+
+
+```
+
+
+```{r}
+#Simulation of non-linear response with iid variables and bootstrap resampling 
+#with replacement
+
+siml3.wrep.results[[1]]
+siml3.wrep.results[[3]]
+rf_added_var_plot(siml3.wrep.results)
+
+```
+Appears to be in this scenario, that full random forest offers better interpretation of important variables than added variable importance scheme. This is likely due to variability introduced by bootstrap resampling with replacement, 
+
+```{r}
+
+#Simulation of non-linear response with iid variables and 
+#bootstrap resampling without replacement
+siml3.worep.results[[1]]
+siml3.worep.results[[3]]
+rf_added_var_plot(siml3.worep.results)
+
+```
+
+In this scenario, appears that added variable importance and the full random forest offer similar interpretations of which the influential variables are. In particular, we see that variables 1, 2, 3, and 5 are all assigned high variable importance scores as expected. 
+
+```{r}
+
+#simulation with non-linear response and correlated predictors
+#using bootstrap resampling with replacement
+siml4.wrep.results[[1]]
+siml4.wrep.results[[3]]
+rf_added_var_plot(siml4.wrep.results)
+
+```
+
+With correlated predictors and non-linear response, the full random forest variable importance has trouble determining which variables are important, in particular, variable 4 appears to be more important than it actually is. The added variable importance is able to separate out the importance of variables 1, 3, and 5, but has difficulties with determining variable 2 is important. Examining the added variable plots, we see that the added variable plot for variable 2 has a similar shape to the added variable plot for variable 4.  
+
+```{r}
+
+#simulation with non-linear response and correlated predictors
+#using bootstrap resampling without replacement
+siml4.worep.results[[1]]
+siml4.worep.results[[3]]
+rf_added_var_plot(siml4.worep.results)
+
+```
+
+
+
+```{r}
+#Interactions 
+
+#iid dataset for interactions 
+n5 <- 2000
+p5 <- 12
+err5 <- rnorm(n5, mean = 0, sd = 0.25)
+siml.data5 <- as.data.frame(matrix(rnorm(n5*p5, mean = 0, sd = 1), nrow = n5))
+siml.data5 <- siml.data5 %>%
+  mutate(Y = 8*V1*V2+7*V5*V6+err5)
+
+
+#Correlated variables for interactions 
+n6 <- 2000
+err6 <- rnorm(n6, mean = 0 , sd = 0.25)
+siml.data6 <- as.data.frame(rmvnorm(n = n6, mean = rep(0, times = 12), sigma = Sigma2))
+siml.data6 <- siml.data6 %>%
+  mutate(Y = 8*V1*V2+7*V5*V6+err6)
+
+siml5.wrep.results <- add_var_randomforest(data = siml.data5, ntree1 = 1000, ntree2 = 1000)
+siml5.worep.results <- add_var_randomforest(data = siml.data5, ntree1 = 1000, ntree2 = 1000, replace = FALSE)
+siml6.wrep.results <- add_var_randomforest(data = siml.data6, ntree1 = 1000, ntree2 = 1000)
+siml6.worep.results <- add_var_randomforest(data = siml.data6, ntree1 = 1000, ntree2 = 1000, replace = FALSE)
+
+```
+
+```{r}
+
+#simulation of interactions with iid predictors
+#and bootstrap resampling with replacement
+siml5.wrep.results[[1]]
+siml5.wrep.results[[3]]
+rf_added_var_plot(siml5.wrep.results)
+
+```
+
+
+
+```{r}
+
+#simulation of interactions with iid predictors
+#and bootstrap resampling without replacement
+siml5.worep.results[[1]]
+siml5.worep.results[[3]]
+rf_added_var_plot(siml5.worep.results)
+
+```
+
+For interactions with iid predictors, the full random forest variable importance and added variable importance perform similarly in terms of determining which variables are important. Bootstrap resampling without replacement does not seem to offer performance benefits in this particular scenario. 
+
+```{r}
+
+#simulation of interactions with correlated predictors
+#and bootstrap resampling with replacement
+siml6.wrep.results[[1]]
+siml6.wrep.results[[3]]
+rf_added_var_plot(siml6.wrep.results)
+
+```
+
+
+```{r}
+
+#simulation of interactions with correlated predictors
+#and bootstrap resampling without replacement
+siml6.worep.results[[1]]
+siml6.worep.results[[3]]
+rf_added_var_plot(siml6.worep.results)
+
+```
+
+With interacting terms using correlated predictors, the random forest seems to overinflate of the irrelevant predictors that are correlated with variables 1 and 2 (which are actually important). In this regard, the added variable importance correctly deflates the importance of the irrelevant correlated predictors. Sampling with and without replacement seem to offer similar performance in this scenario. 
+
+

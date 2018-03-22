@@ -16,10 +16,21 @@ library(partykit)
 
 ```
 
+```{r}
+
+n_toy <- 500
+p_toy <- 3
+err_toy <- rnorm(n_toy, mean = 0, sd = 0.05)
+toy.data <- as.data.frame(matrix(rnorm(n_toy*p_toy, mean = 0, sd = 1), nrow = n_toy))
+toy.data <- toy.data %>% 
+  mutate(Y = 5*V1+5*V2+err_toy)
+
+```
+
+
 Next want to write a function which takes a dataframe and applys the added-variable plot then permute scheme to each predictor in the dataset. 
 
 ```{r}
-
 
 #first need to take our data frame and make the p+1 datasets that we apply the random forest to
 
@@ -69,8 +80,6 @@ each_pred_rf <- function(data.list, ntree1, replace = TRUE){
   list(new.df, imp)
 }
 
-
-
 #extract_add_var takes as input an index value and data frame and 
 #outputs a dataframe of the basic added variable data frame where 
 #x.res is the difference between predicted values of full model and 
@@ -113,7 +122,7 @@ rf_add_var_imp <- function(data.list, ntree2, replace = TRUE){
 rf_shallow_add_var_imp <- function(data.list, ntree2, replace = TRUE){
   p <- length(data.list)
   rf.add.imp.list <- map(.x = data.list, function(x) 
-    randomForest(y.res~., data = x, ntree = ntree2, replace = replace, importance = TRUE, nodesize = 10))
+    randomForest(y.res~., data = x, ntree = ntree2, replace = replace, importance = TRUE, nodesize = 3))
   rf.add.imp.list
 }
 
@@ -130,16 +139,55 @@ extract_var_imp <- function(data.list){
 }
 
 
-#add_var_randomforest is a wrapper for the previous functions
+#Once rf has been run once on each added variable plot, we can try to assess
+#importance via framework of p-values. In particular, we implement a 
+#permutation test to obtain distribution of variable importance scores 
+#rf_perm takes as input a list of added variable dataframes 
+#(in particular output of rf_add_var
+#and outputs a list of dataframes consisting of variable importance scores 
+#obtained after permuting each added variable dataframe. 
+#number of permutations is it input for rf_perm
+
+#perm_rf takes as input a dataframe, permutes the dataframe
+#runs a randomforest and returns the variable importance score
+#variable importance score is MDA (mean decrease in accuracy) as a percentage change
+perm_rf <-function(df, ntree3, replace){
+  df.names <- colnames(df)
+  df.mat <- as.matrix(df)
+  x <- df.mat[sample(nrow(df.mat),replace = FALSE),1]
+  y <- df.mat[,2]
+  perm.df <- as.data.frame(cbind(x,y))
+  colnames(perm.df) <- df.names
+  perm.rf <- randomForest(y.res~., data = perm.df, replace = replace, importance = TRUE)
+  importance(perm.rf, type = 1)
+}
+
+#perm_add_var takes as input an index value, the data.list, it the number of permutations, 
+#ntree3 the number of trees to grow for each forest on the permuted data
+perm_add_var <- function(i, data.list, it, ntree3, replace){
+  df <- data.list[[i]]
+  new.df <- as.data.frame(replicate(n = it, expr = perm_rf(df = df, ntree3 = ntree3, replace = replace)))
+  colnames(new.df) <- paste("Var", as.character(i), "VI", sep = "")
+  new.df
+}
+
+rf_perm_add_var <- function(data.list, it, ntree3, replace = TRUE){
+  p <- length(data.list)
+  new.list <- map(1:p, perm_add_var, data.list = data.list, 
+      it = it, ntree3 = ntree3, replace = replace)
+  new.list
+}
+
+#add_var_randomforest is a wrapper for the previous functions (exluding rf_perm_add_var)
 add_var_randomforest <- function(data, ntree1, ntree2, replace = TRUE){
   #to get the copy of the data with one predictor removed
   df.list <- df_combs(data)
   #running initial randomFoest on each data frame
-  rf.list <- each_pred_rf(df.list, ntree1 = ntree1)
+  rf.list <- each_pred_rf(df.list, ntree1 = ntree1, replace = replace)
   #tidying the data to compute added variable plots
   rf.add.var.list <- rf_add_var(rf.list)
   #running randomForests on each plot
-  rf.add.imp.list <- rf_add_var_imp(rf.add.var.list, ntree2 = ntree2)
+  rf.add.imp.list <- rf_add_var_imp(rf.add.var.list, ntree2 = ntree2, replace = replace)
   #extracts variable importance values for each randomForest ran on added variable plots
   add.var.imp <- extract_var_imp(rf.add.imp.list)
   #output is list containing data frame of added variable plot variable importances, 
@@ -148,24 +196,23 @@ add_var_randomforest <- function(data, ntree1, ntree2, replace = TRUE){
   list(add.var.imp, rf.add.var.list, rf.list[[2]])
 }
 
-#same as add_var_randomforest except shallow trees are grown on the added variable plots
-shallow_add_var_randomforest <- function(data, ntree1, ntree2, replace = TRUE){
-  #to get the copy of the data with one predictor removed
-  df.list <- df_combs(data)
+#perm_add_var_randomforest is a wrapper for previous functions (including rf_perm_add_var)
+perm_add_var_randomforest <- function(data, it, ntree1, ntree2, ntree3, replace = TRUE){
+   df.list <- df_combs(data)
   #running initial randomFoest on each data frame
-  rf.list <- each_pred_rf(df.list, ntree1 = ntree1)
+  rf.list <- each_pred_rf(df.list, ntree1 = ntree1, replace = replace)
   #tidying the data to compute added variable plots
   rf.add.var.list <- rf_add_var(rf.list)
   #running randomForests on each plot
-  rf.add.imp.list <- rf_shallow_add_var_imp(rf.add.var.list, ntree2 = ntree2)
+  rf.add.imp.list <- rf_add_var_imp(rf.add.var.list, ntree2 = ntree2, replace = replace)
   #extracts variable importance values for each randomForest ran on added variable plots
   add.var.imp <- extract_var_imp(rf.add.imp.list)
-  #output is list containing data frame of added variable plot variable importances, 
-  #rf.add.var.list which are dataframe for added variable plots, and 
-  #the variable importances from full model run in each_pred_rf
-  list(add.var.imp, rf.add.var.list, rf.list[[2]])
+  #run permutations on each dataframe in rf.add.var.list to obtain 
+  #distribution of importance values
+  rf.perm.add.var.list <- rf_perm_add_var(data.list = rf.add.var.list, 
+                                          it = it, ntree3 = ntree3, replace = replace)
+  list(add.var.imp, rf.add.var.list, rf.list[[2]], rf.perm.add.var)
 }
-
 
 #input for rf_added_var_plot is output of 
 #add_var_randomforest. Output is plot of added variable plots for 
@@ -187,7 +234,48 @@ rf_added_var_plot <- function(data.list){
     do.call("grid.arrange", c(gg.list, ncol = nCol))
 }
 
+#next make functions which plot distributions of the added variable importances and 
+#adds in observed variable importance of added variable
+
+plot_var_imp <- function(i, df.list, add.var.imp){
+  df <- df.list[[i]]
+  x.name <- colnames(df)
+  obs.add.var <- add.var.imp[i,1]
+  plot.obj <- ggplot(df, aes_string(x = x.name))+
+    geom_histogram()+
+    geom_vline(xintercept = obs.add.var, col = "Red", size = 1)
+  plot.obj
+}
+
+rf_plot_var_imp <- function(data.list){
+ df.list  <-data.list[[4]]
+ add.var.imp <- data.list[[1]]
+ p <- length(df.list)
+ gg.list <- map(1:p, plot_var_imp, df.list = df.list, add.var.imp = add.var.imp)
+ nCol <- floor(sqrt(p))
+ do.call("grid.arrange", c(gg.list, ncol = nCol))
+}
+
 ```
+
+```{r}
+
+df.list <- df_combs(toy.data)
+rf.list <- each_pred_rf(df.list, ntree1 = 50)
+rf.add.var.list <- rf_add_var(rf.list)
+rf.add.imp.list <- rf_add_var_imp(rf.add.var.list, ntree2 = 50)
+add.var.imp <- extract_var_imp(rf.add.imp.list)
+rf.perm <- perm_rf(rf.add.var.list[[1]], ntree3 = 50, replace = TRUE)
+perm.add.var <- perm_add_var(i = 1, data.list = rf.add.var.list, it = 5, ntree3 = 50, replace = TRUE)
+rf.perm.add.var <- rf_perm_add_var(data.list = rf.add.var.list, it = 50, ntree3 = 50)
+perm.add.var <- perm_add_var_randomforest(data = toy.data, it = 50, ntree1 = 50, ntree2 = 50, ntree3 = 50, replace = FALSE)
+rf_plot_var_imp(perm.add.var)
+rf_added_var_plot(perm.add.var)
+perm.add.var[[1]]
+perm.add.var[[3]]
+
+```
+
 
 Now ready to run simulations. First and second simulated datasets are from Strobl (2008). 
 First simulated dataset is Strobl's with iid variables.
@@ -196,14 +284,14 @@ Both are cases of a response in which the effect of added variables is linear.
 
 ```{r}
 
-set.seed(15)
+set.seed(13)
 #iid
 #n1 is number of observations in dataset
 n1 <- 2000
 #p1 is number of variables
 p1 <- 12
 #our weights are given by wt_vec <- c(5,5,2,0,-5,-5,-2,0,0,0,0,0) 
-err1 <- rnorm(n1, mean = 0, sd = 0.25)
+err1 <- rnorm(n1, mean = 0, sd = 0.05)
 siml.data1 <- as.data.frame(matrix(rnorm(n1*p1, mean = 0, sd = 1), nrow = n1))
 siml.data1 <- siml.data1 %>% 
   mutate(Y = 5*V1+5*V2+2*V3+-5*V5+-5*V6+-2*V7+err1)
@@ -231,7 +319,7 @@ u8 <- c(rep(0, times = 11), 1)
 
 Sigma2 <- matrix(c(v1,w,v2,w,v3,w,v4,w,
                    u1,u2,u3,u4,u5,u6,u7,u8), nrow = 12, ncol = 12)
-err2 <- rnorm(n2, mean = 0, sd = 0.25)
+err2 <- rnorm(n2, mean = 0, sd = 0.05)
 siml.data2 <- as.data.frame(rmvnorm(n = n2, mean = rep(0, times = 12), sigma = Sigma2))
 siml.data2 <- siml.data2 %>% 
   mutate(Y = 5*V1+5*V2+2*V3+-5*V5+-5*V6+-2*V7+err2)
@@ -292,14 +380,14 @@ n3 <- 2000
 #p3 is numberof variables
 p3 <- 12
 #some error to add in 
-err3 <- rnorm(n3, mean = 0, sd = 0.25)
+err3 <- rnorm(n3, mean = 0, sd = 0.05)
 siml.data3 <- as.data.frame(matrix(rnorm(n3*p3, mean = 0, sd = 1), nrow = n3))
 siml.data3 <- siml.data3 %>% 
   mutate(Y = 5*V1^4+5*V2^3+6*V3^4+5*V5^3+err3)
 
 #correlated variables with a non-linear response
 n4 <- 2000
-err4 <- rnorm(n4, mean = 0, sd = 0.25)
+err4 <- rnorm(n4, mean = 0, sd = 0.05)
 siml.data4 <- as.data.frame(rmvnorm(n = n4, mean = rep(0, times = 12), sigma = Sigma2))
 siml.data4 <- siml.data4 %>%
   mutate(Y = 5*V1^4+5*V2^3+6*V3^4+5*V5^3+err4)
@@ -308,8 +396,6 @@ siml3.wrep.results <- add_var_randomforest(data = siml.data3, ntree1 = 1000, ntr
 siml3.worep.results <- add_var_randomforest(data = siml.data3, ntree1 = 1000, ntree2 = 1000, replace = FALSE)
 siml4.wrep.results <- add_var_randomforest(data = siml.data4, ntree1 = 1000, ntree2 = 1000)
 siml4.worep.results <- add_var_randomforest(data = siml.data4, ntree1 = 1000, ntree2 = 1000, replace = FALSE)
-
-
 
 ```
 
@@ -367,7 +453,7 @@ rf_added_var_plot(siml4.worep.results)
 #iid dataset for interactions 
 n5 <- 2000
 p5 <- 12
-err5 <- rnorm(n5, mean = 0, sd = 0.25)
+err5 <- rnorm(n5, mean = 0, sd = 0.05)
 siml.data5 <- as.data.frame(matrix(rnorm(n5*p5, mean = 0, sd = 1), nrow = n5))
 siml.data5 <- siml.data5 %>%
   mutate(Y = 8*V1*V2+7*V5*V6+err5)
@@ -375,7 +461,7 @@ siml.data5 <- siml.data5 %>%
 
 #Correlated variables for interactions 
 n6 <- 2000
-err6 <- rnorm(n6, mean = 0 , sd = 0.25)
+err6 <- rnorm(n6, mean = 0 , sd = 0.05)
 siml.data6 <- as.data.frame(rmvnorm(n = n6, mean = rep(0, times = 12), sigma = Sigma2))
 siml.data6 <- siml.data6 %>%
   mutate(Y = 8*V1*V2+7*V5*V6+err6)
@@ -434,4 +520,12 @@ rf_added_var_plot(siml6.worep.results)
 
 With interacting terms using correlated predictors, the random forest seems to overinflate of the irrelevant predictors that are correlated with variables 1 and 2 (which are actually important). In this regard, the added variable importance correctly deflates the importance of the irrelevant correlated predictors. Sampling with and without replacement seem to offer similar performance in this scenario. 
 
+
+```{r}
+siml7.worep.results <- shallow_add_var_randomforest(data = siml.data2, ntree1 = 1000, 
+                                                    ntree2 = 1000)
+siml8.worep.results <- shallow_add_var_randomforest(data = siml.data2, ntree1 = 1000, 
+                                                    ntree2 = 1000, replace = FALSE)
+
+```
 

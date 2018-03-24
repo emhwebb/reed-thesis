@@ -188,7 +188,7 @@ add_var_randomforest <- function(data, ntree1, ntree2, replace = TRUE){
 
 #perm_add_var_randomforest is a wrapper for previous functions (including rf_perm_add_var)
 perm_add_var_randomforest <- function(data, it, ntree1, ntree2, ntree3, replace = TRUE){
-   df.list <- df_combs(data)
+  df.list <- df_combs(data)
   #running initial randomFoest on each data frame
   rf.list <- each_pred_rf(df.list, ntree1 = ntree1, replace = replace)
   #tidying the data to compute added variable plots
@@ -202,7 +202,7 @@ perm_add_var_randomforest <- function(data, it, ntree1, ntree2, ntree3, replace 
   #distribution of importance values
   rf.perm.add.var.list <- rf_perm_add_var(data.list = rf.add.var.list, 
                                           it = it, ntree3 = ntree3, replace = replace)
-  list(add.var.imp, rf.add.var.list, rf.list[[2]], rf.perm.add.var)
+  list(add.var.imp, rf.add.var.list, rf.list[[2]], rf.perm.add.var.list)
 }
 
 #input for rf_added_var_plot is output of 
@@ -233,7 +233,7 @@ plot_var_imp <- function(i, df.list, add.var.imp){
   x.name <- colnames(df)
   obs.add.var <- add.var.imp[i,1]
   plot.obj <- ggplot(df, aes_string(x = x.name))+
-    geom_histogram()+
+    geom_histogram(bins = 50)+
     geom_vline(xintercept = obs.add.var, col = "Red", size = 1)
   plot.obj
 }
@@ -247,6 +247,28 @@ rf_plot_var_imp <- function(data.list){
  do.call("grid.arrange", c(gg.list, ncol = nCol))
 }
 
+#Next define a function which takes the output of perm_add_var_randomforest
+#and computes p-values of variable importances.
+
+perm_pval <- function(i, var.imp.df, var.imp.list){
+  obs.var.imp <- var.imp.df[i,1]
+  perm.var.imp <- var.imp.list[[i]]
+  n.perm <- nrow(perm.var.imp)
+  right.tail <- (sum(obs.var.imp <= perm.var.imp)+1)/(n.perm+1)
+  left.tail <- (sum(perm.var.imp <= obs.var.imp)+1)/(n.perm+1)
+  p.val <- ifelse(right.tail<=left.tail, 2*right.tail, 2*left.tail)
+  p.val <- ifelse(1<p.val, 1, p.val)
+  names(p.val) <- paste("p.val.Var.", as.character(i), sep = "")
+  p.val
+}
+
+add_var_pval <- function(data.list){
+  var.imp.df <- data.list[[1]]
+  var.imp.list <- data.list[[4]]
+  pval.df <- sapply(1:p, perm_pval, var.imp.df = var.imp.df, var.imp.list = var.imp.list)
+  as.data.frame(pval.df)
+}
+
 ```
 
 
@@ -256,13 +278,26 @@ Second simulated dataset is Strobl's with correlated variables.
 Both are cases of a response in which the effect of added variables is linear. 
 
 ```{r}
+#variables for simulations
+
+n <- 500
+p <- 12
+ntree.sim1 <- 300
+ntree.sim2 <- 300
+ntree.sim3 <- 300
+it.sim <- 1000
+
+```
+
+
+```{r}
 
 set.seed(13)
 #iid
 #n1 is number of observations in dataset
-n1 <- 2000
+n1 <- n
 #p1 is number of variables
-p1 <- 12
+p1 <- p
 #our weights are given by wt_vec <- c(5,5,2,0,-5,-5,-2,0,0,0,0,0) 
 err1 <- rnorm(n1, mean = 0, sd = 0.05)
 siml.data1 <- as.data.frame(matrix(rnorm(n1*p1, mean = 0, sd = 1), nrow = n1))
@@ -271,7 +306,7 @@ siml.data1 <- siml.data1 %>%
 
 #correlated
 #n2 is number of observations in dataset
-n2 <- 2000
+n2 <- n
 #p2 is number of variables
 #p2 <- 12
 #our weights are given by wt_vec <- c(5,5,2,0,-5,-5,-2,0,0,0,0,0) 
@@ -298,14 +333,14 @@ siml.data2 <- siml.data2 %>%
   mutate(Y = 5*V1+5*V2+2*V3+-5*V5+-5*V6+-2*V7+err2)
 
 #run the simulations with and without replacement for bootstrapping
-siml1.wrep.results <- perm_add_var_randomforest(data = siml.data1, it = 1000, ntree1 = 1000, 
-                                                ntree2 = 1000, ntree3 = 1000)
-siml1.worep.results <- perm_add_var_randomforest(data = siml.data1, it = 1000, ntree1 = 1000, 
-                                                 ntree2 = 1000, ntree3 = 1000, replace = FALSE)
-siml2.wrep.results <- perm_add_var_randomforest(data = siml.data2, it = 1000, ntree1 = 1000, 
-                                                ntree2 = 1000, ntree3 = 1000)
-siml2.worep.results <- perm_add_var_randomforest(data = siml.data2, it = 1000, ntree1 = 1000, 
-                                                 ntree2 = 1000, ntree3 = 1000, replace = FALSE)
+siml1.wrep.results <- perm_add_var_randomforest(data = siml.data1, it = it.sim, ntree1 = ntree.sim1, 
+                                                ntree2 = ntree.sim2, ntree3 = ntree.sim3)
+siml1.worep.results <- perm_add_var_randomforest(data = siml.data1, it = it.sim, ntree1 = ntree.sim1, 
+                                                 ntree2 = ntree.sim2, ntree3 = ntree.sim3, replace = FALSE)
+siml2.wrep.results <- perm_add_var_randomforest(data = siml.data2, it = it.sim, ntree1 = ntree.sim1, 
+                                                ntree2 = ntree.sim2, ntree3 = ntree.sim3)
+siml2.worep.results <- perm_add_var_randomforest(data = siml.data2, it = it.sim, ntree1 = ntree.sim1, 
+                                                 ntree2 = ntree.sim2, ntree3 = ntree.sim3, replace = FALSE)
 
 
 ```
@@ -316,6 +351,7 @@ siml1.wrep.results[[1]]
 siml1.wrep.results[[3]]
 rf_added_var_plot(siml1.wrep.results)
 rf_plot_var_imp(siml1.wrep.results)
+add_var_pval(siml1.wrep.results)
 
 ```
 
@@ -326,6 +362,7 @@ siml1.worep.results[[1]]
 siml1.worep.results[[3]]
 rf_added_var_plot(siml1.worep.results)
 rf_plot_var_imp(siml1.worep.results)
+add_var_pval(siml1.worep.results)
 
 ```
 
@@ -337,6 +374,7 @@ siml2.wrep.results[[1]]
 siml2.wrep.results[[3]]
 rf_added_var_plot(siml2.wrep.results)
 rf_plot_var_imp(siml2.wrep.results)
+add_var_pval(siml2.wrep.results)
 
 ```
 
@@ -348,6 +386,7 @@ siml2.worep.results[[1]]
 siml2.worep.results[[3]]
 rf_added_var_plot(siml2.worep.results)
 rf_plot_var_imp(siml2.worep.results)
+add_var_pval(siml2.worep.results)
 
 ```
 
@@ -357,9 +396,9 @@ Sampling without replacement improves the performance of the added variable then
 
 #independent variables with a non-linear response
 #n3 is number of observations
-n3 <- 2000
+n3 <- n
 #p3 is numberof variables
-p3 <- 12
+p3 <- p
 #some error to add in 
 err3 <- rnorm(n3, mean = 0, sd = 0.05)
 siml.data3 <- as.data.frame(matrix(rnorm(n3*p3, mean = 0, sd = 1), nrow = n3))
@@ -367,20 +406,20 @@ siml.data3 <- siml.data3 %>%
   mutate(Y = 5*V1^4+5*V2^3+6*V3^4+5*V5^3+err3)
 
 #correlated variables with a non-linear response
-n4 <- 2000
+n4 <- 500
 err4 <- rnorm(n4, mean = 0, sd = 0.05)
 siml.data4 <- as.data.frame(rmvnorm(n = n4, mean = rep(0, times = 12), sigma = Sigma2))
 siml.data4 <- siml.data4 %>%
   mutate(Y = 5*V1^4+5*V2^3+6*V3^4+5*V5^3+err4)
 
-siml3.wrep.results <- perm_add_var_randomforest(data = siml.data3, it = 1000, ntree1 = 1000, 
-                                                ntree2 = 1000, ntree3 = 1000)
-siml3.worep.results <- perm_add_var_randomforest(data = siml.data3, it = 1000, ntree1 = 1000, 
-                                                 ntree2 = 1000, ntree3 = 1000, replace = FALSE)
-siml4.wrep.results <- perm_add_var_randomforest(data = siml.data4, it = 1000, ntree1 = 1000, 
-                                                ntree2 = 1000, ntree3 = 1000)
-siml4.worep.results <- perm_add_var_randomforest(data = siml.data4, it = 1000, ntree1 = 1000, 
-                                                 ntree2 = 1000, ntree3 = 1000, replace = FALSE)
+siml3.wrep.results <- perm_add_var_randomforest(data = siml.data3, it = it.sim, ntree1 = ntree.sim1, 
+                                                ntree2 = ntree.sim2, ntree3 = ntree.sim3)
+siml3.worep.results <- perm_add_var_randomforest(data = siml.data3, it = it.sim, ntree1 = ntree.sim1, 
+                                                 ntree2 = ntree.sim2, ntree3 = ntree.sim3, replace = FALSE)
+siml4.wrep.results <- perm_add_var_randomforest(data = siml.data4, it = it.sim, ntree1 = ntree.sim1, 
+                                                ntree2 = ntree.sim2, ntree3 = ntree.sim3)
+siml4.worep.results <- perm_add_var_randomforest(data = siml.data4, it = it.sim, ntree1 = ntree.sim1, 
+                                                 ntree2 = ntree.sim2, ntree3 = ntree.sim3, replace = FALSE)
 
 ```
 
@@ -393,6 +432,7 @@ siml3.wrep.results[[1]]
 siml3.wrep.results[[3]]
 rf_added_var_plot(siml3.wrep.results)
 rf_plot_var_imp(siml3.wrep.results)
+add_var_pval(siml3.wrep.results)
 
 ```
 Appears to be in this scenario, that full random forest offers better interpretation of important variables than added variable importance scheme. This is likely due to variability introduced by bootstrap resampling with replacement, 
@@ -405,6 +445,7 @@ siml3.worep.results[[1]]
 siml3.worep.results[[3]]
 rf_added_var_plot(siml3.worep.results)
 rf_plot_var_imp(siml3.worep.results)
+add_var_pval(siml3.worep.results)
 
 ```
 
@@ -418,6 +459,7 @@ siml4.wrep.results[[1]]
 siml4.wrep.results[[3]]
 rf_added_var_plot(siml4.wrep.results)
 rf_plot_var_imp(siml4.wrep.results)
+add_var_pval(siml4.wrep.results)
 
 ```
 
@@ -431,6 +473,7 @@ siml4.worep.results[[1]]
 siml4.worep.results[[3]]
 rf_added_var_plot(siml4.worep.results)
 rf_plot_var_imp(siml4.worep.results)
+add_var_pval(siml4.worep.results)
 
 ```
 
@@ -440,8 +483,8 @@ rf_plot_var_imp(siml4.worep.results)
 #Interactions 
 
 #iid dataset for interactions 
-n5 <- 2000
-p5 <- 12
+n5 <- n
+p5 <- p
 err5 <- rnorm(n5, mean = 0, sd = 0.05)
 siml.data5 <- as.data.frame(matrix(rnorm(n5*p5, mean = 0, sd = 1), nrow = n5))
 siml.data5 <- siml.data5 %>%
@@ -449,20 +492,20 @@ siml.data5 <- siml.data5 %>%
 
 
 #Correlated variables for interactions 
-n6 <- 2000
+n6 <- n
 err6 <- rnorm(n6, mean = 0 , sd = 0.05)
 siml.data6 <- as.data.frame(rmvnorm(n = n6, mean = rep(0, times = 12), sigma = Sigma2))
 siml.data6 <- siml.data6 %>%
   mutate(Y = 8*V1*V2+7*V5*V6+err6)
 
-siml5.wrep.results <- perm_add_var_randomforest(data = siml.data5, it = 1000, ntree1 = 1000, 
-                                                ntree2 = 1000, ntree3 = 1000)
-siml5.worep.results <- perm_add_var_randomforest(data = siml.data5, it = 1000, ntree1 = 1000, 
-                                                 ntree2 = 1000, ntree3 = 1000, replace = FALSE)
-siml6.wrep.results <- perm_add_var_randomforest(data = siml.data6, it = 1000, ntree1 = 1000, 
-                                                ntree2 = 1000, ntree3 = 1000)
-siml6.worep.results <- perm_add_var_randomforest(data = siml.data6, it = 1000, ntree1 = 1000, 
-                                                 ntree2 = 1000, ntree3 = 1000, replace = FALSE)
+siml5.wrep.results <- perm_add_var_randomforest(data = siml.data5, it = it.sim, ntree1 = ntree.sim1, 
+                                                ntree2 = ntree.sim2, ntree3 = ntree.sim3)
+siml5.worep.results <- perm_add_var_randomforest(data = siml.data5, it = it.sim, ntree1 = ntree.sim1, 
+                                                 ntree2 = ntree.sim2, ntree3 = ntree.sim3, replace = FALSE)
+siml6.wrep.results <- perm_add_var_randomforest(data = siml.data6, it = it.sim, ntree1 = ntree.sim1, 
+                                                ntree2 = ntree.sim2, ntree3 = ntree.sim3)
+siml6.worep.results <- perm_add_var_randomforest(data = siml.data6, it = it.sim, ntree1 = ntree.sim1, 
+                                                 ntree2 = ntree.sim2, ntree3 = ntree.sim3, replace = FALSE)
 
 ```
 
@@ -474,6 +517,7 @@ siml5.wrep.results[[1]]
 siml5.wrep.results[[3]]
 rf_added_var_plot(siml5.wrep.results)
 rf_plot_var_imp(siml5.wrep.results)
+add_var_pval(siml5.wrep.results)
 
 ```
 
@@ -487,6 +531,7 @@ siml5.worep.results[[1]]
 siml5.worep.results[[3]]
 rf_added_var_plot(siml5.worep.results)
 rf_plot_var_imp(siml5.worep.results)
+add_var_pval(siml5.worep.results)
 
 ```
 
@@ -500,6 +545,7 @@ siml6.wrep.results[[1]]
 siml6.wrep.results[[3]]
 rf_added_var_plot(siml6.wrep.results)
 rf_plot_var_imp(siml6.wrep.results)
+add_var_pval(siml6.wrep.results)
 
 ```
 
@@ -512,6 +558,7 @@ siml6.worep.results[[1]]
 siml6.worep.results[[3]]
 rf_added_var_plot(siml6.worep.results)
 rf_plot_var_imp(siml6.worep.results)
+add_var_pval(siml6.worep.results)
 
 ```
 
@@ -520,16 +567,16 @@ With interacting terms using correlated predictors, the random forest seems to o
 ```{r}
 
 #independent non-linear Predictors
-n7 <- 2000
-p7 <- 12
+n7 <- n
+p7 <- p
 err7 <- rnorm(n7, mean = 0, sd = 0.05)
 siml.data7 <- as.data.frame(matrix(rnorm(n7*p7, mean = 0, sd = 1), nrow = n7))
 siml.data7 <- siml.data7 %>%
-  mutate(Y = 3^V1+2^V24^V5+err7)
+  mutate(Y = 3^V1+2^V2+4^V5+err7)
 
 
 #Correlated variables for strongly non-linear predictors 
-n8 <- 2000
+n8 <- n
 err8 <- rnorm(n8, mean = 0 , sd = 0.05)
 siml.data8 <- as.data.frame(rmvnorm(n = n8, mean = rep(0, times = 12), sigma = Sigma2))
 siml.data8 <- siml.data8 %>%
@@ -541,14 +588,14 @@ siml.data8 <- siml.data8 %>%
 
 ```{r}
 
-siml7.wrep.results <- perm_add_var_randomforest(data = siml.data7, it = 1000, ntree1 = 1000, 
-                                                ntree2 = 1000, ntree3 = 1000)
-siml7.worep.results <- perm_add_var_randomforest(data = siml.data7, it = 1000, ntree1 = 1000, 
-                                                 ntree2 = 1000, ntree3 = 1000, replace = FALSE)
-siml8.wrep.results <- perm_add_var_randomforest(data = siml.data8, it = 1000, ntree1 = 1000, 
-                                                ntree2 = 1000, ntree3 = 1000)
-siml8.worep.results <- perm_add_var_randomforest(data = siml.data8, it = 1000, ntree1 = 1000, 
-                                                 ntree2 = 1000, ntree3 = 1000, replace = FALSE)
+siml7.wrep.results <- perm_add_var_randomforest(data = siml.data7, it = it.sim, ntree1 = ntree.sim1, 
+                                                ntree2 = ntree.sim2, ntree3 = ntree.sim3)
+siml7.worep.results <- perm_add_var_randomforest(data = siml.data7, it = it.sim, ntree1 = ntree.sim1, 
+                                                 ntree2 = ntree.sim2, ntree3 = ntree.sim3, replace = FALSE)
+siml8.wrep.results <- perm_add_var_randomforest(data = siml.data8, it = it.sim, ntree1 = ntree.sim1, 
+                                                ntree2 = ntree.sim2, ntree3 = ntree.sim3)
+siml8.worep.results <- perm_add_var_randomforest(data = siml.data8, it = it.sim, ntree1 = ntree.sim1, 
+                                                 ntree2 = ntree.sim2, ntree3 = ntree.sim3, replace = FALSE)
 
 ```
 
@@ -560,6 +607,7 @@ siml7.wrep.results[[1]]
 siml7.wrep.results[[3]]
 rf_added_var_plot(siml7.wrep.results)
 rf_plot_var_imp(siml7.wrep.results)
+add_var_pval(siml7.wrep.results)
 
 ```
 
@@ -571,6 +619,7 @@ siml7.worep.results[[1]]
 siml7.worep.results[[3]]
 rf_added_var_plot(siml7.worep.results)
 rf_plot_var_imp(siml7.worep.results)
+add_var_pval(siml7.worep.results)
 
 ```
 
@@ -582,6 +631,7 @@ siml8.wrep.results[[1]]
 siml8.wrep.results[[3]]
 rf_added_var_plot(siml8.wrep.results)
 rf_plot_var_imp(siml8.wrep.results)
+add_var_pval(siml8.wrep.results)
 
 ```
 
@@ -593,83 +643,7 @@ siml8.worep.results[[1]]
 siml8.worep.results[[1]]
 rf_added_var_plot(siml8.worep.results)
 rf_plot_var_imp(siml8.worep.results)
+add_var_pval(siml8.worep.results)
 
 ```
 
-
-```{r}
-
-#independent non-linear interactions
-n9 <- 2000
-p9 <- 12
-err9 <- rnorm(n9, mean = 0, sd = 0.05)
-siml.data9 <- as.data.frame(matrix(rnorm(n9*p9, mean = 0, sd = 1), nrow = n9))
-siml.data9 <- siml.data9 %>%
-  mutate(Y = 5*V1^V2+5*V5^V6+err9)
-
-
-#Correlated  non-linear interactions 
-n20 <- 2000
-err20 <- rnorm(n10, mean = 0 , sd = 0.05)
-siml.data10 <- as.data.frame(rmvnorm(n = n10, mean = rep(0, times = 12), sigma = Sigma2))
-siml.data10 <- siml.data10 %>%
-  mutate(Y = 5*V1^V2+5*V5^V6+err10)
-
-```
-
-```{r}
-
-siml9.wrep.results <- perm_add_var_randomforest(data = siml.data9, it = 1000, ntree1 = 1000, 
-                                                ntree2 = 1000, ntree3 = 1000)
-siml9.worep.results <- perm_add_var_randomforest(data = siml.data9, it = 1000, ntree1 = 1000, 
-                                                 ntree2 = 1000, ntree3 = 1000, replace = FALSE)
-siml10.wrep.results <- perm_add_var_randomforest(data = siml.data10, it = 1000, ntree1 = 1000, 
-                                                ntree2 = 1000, ntree3 = 1000)
-siml10.worep.results <- perm_add_var_randomforest(data = siml.data10, it = 1000, ntree1 = 1000, 
-                                                 ntree2 = 1000, ntree3 = 1000, replace = FALSE)
-
-```
-
-```{r}
-
-#independent non-linear interactions
-#with sampling with replacement
-siml9.wrep.results[[1]]
-siml9.wrep.results[[3]]
-rf_added_var_plot(siml9.wrep.results)
-rf_plot_var_imp(siml9.wrep.results)
-
-```
-
-```{r}
-
-#independent non-linear interactions 
-#with sampling without replacement
-siml9.worep.results[[1]]
-siml9.worep.results[[3]]
-rf_added_var_plot(siml9.worep.results)
-rf_plot_var_imp(siml9.worep.results)
-
-```
-
-```{r}
-
-#correlated non-linear interactions 
-#with sampling with replacement
-siml10.wrep.results[[1]]
-siml10.wrep.results[[3]]
-rf_added_var_plot(siml10.wrep.results)
-rf_plot_var_imp(siml10.wrep.results)
-
-```
-
-```{r}
-
-#correlated non-linear interactions 
-#with sampling without replacement
-siml10.worep.results[[1]]
-siml10.worep.results[[1]]
-rf_added_var_plot(siml10.worep.results)
-rf_plot_var_imp(siml10.worep.results)
-
-```

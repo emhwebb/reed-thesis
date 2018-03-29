@@ -117,7 +117,7 @@ One issue with infforest variable importance is the steep computational cost of 
               \State Compute $RSS(T_b,\overline{Z}_b^*)$.
               \State Compute the infforest variable importance of $X_j$ in $T_b$ to be $VI_b(X_j)=\frac{1}{\overline{Z}_b}\left(RSS(T_b,\overline{Z}_b)-RSS(T_b,\overline{Z}_b^*)\right)$.  
             \EndFor
-            \State Test the null hypothesis that the variable importance of $X_j$ is zeror using the distribution of values $VI_b(X_j)$. 
+            \State Test the null hypothesis that the variable importance of $X_j$ is zero using the distribution of values $VI_b(X_j)$. 
           \EndFor
       \end{algorithmic}
   \end{algorithm}

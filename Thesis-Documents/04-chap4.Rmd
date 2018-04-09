@@ -1,3 +1,365 @@
 # Simulation and Results
 
+```{r, include = FALSE, warning = FALSE, message = FALSE, echo = FALSE}
+
+library(randomForest)
+library(tidyverse)
+library(grid)
+library(gridExtra)
+library(mvtnorm)
+library(knitr)
+library(kableExtra)
+
+#first need to take our data frame and make the p+1 datasets that we apply the random forest to
+
+#itr_col takes as input an integer and removes that column from the dataset
+#note: should make itr_col more robust
+itr_col <- function(i, data){
+  select(data,-i)
+}
+
+#df_combs is a function which takes as input a dataframe and returns all iterations of the
+#dataframe where one predictor has been removed. Output is a p+1 element list where each element
+#is a dataframe with the ith variable removed. the last element of the list is the entire dataframe
+df_combs <- function(data){
+  p <- ncol(data)-1
+  df.list <- map(1:p, itr_col, data = data)
+  df.list[[p+1]] <- data
+  df.list
+}
+
+#extract_rf_pred is a function which takes as input 
+#a list of randomforest objects, an index value, 
+#and the number of predictors in the model and 
+#outputs the predicted values of the random forest in 
+#a dataframe. extract_rf_pred is mainly for use in map_dfc, 
+#which binds by column the predicted values in 
+#data.list as a dataframe. Primarily for use in each_pred_rf
+extract_rf_pred <- function(i, data.list, p){
+ new.df <- as.data.frame(data.list[[i]]$predicted) 
+ colnames(new.df) <- ifelse(i <= p, paste("PredWoVar", as.character(i), sep = ""),
+                            "PredFullMod")
+ new.df
+}
+
+#each_pred_rf is a function whose input is a list of dataframes 
+#that come from output of df_combs and runs the 
+#randomForest function on each dataframe using the map function. 
+#Output is dataframe of predicted values along with actual value of Y as last column. 
+#Second to last column is the predicted value of full model. 
+each_pred_rf <- function(data.list, ntree1, replace = TRUE){
+  p <- length(data.list)-1
+  rf.list <- map(.x = data.list, function(x) 
+    randomForest(Y~., data = x, ntree = ntree1, replace = replace, importance = TRUE))
+  rf.df <- map_dfc(1:(p+1), extract_rf_pred, data.list = rf.list, p = p)
+  Y <- data.list[[1]]$Y
+  new.df <- cbind(rf.df, Y)
+  imp <- importance(rf.list[[p+1]])
+  list(new.df, imp)
+}
+
+#extract_add_var takes as input an index value and data frame and 
+#outputs a dataframe of the basic added variable data frame where 
+#x.res is the difference between predicted values of full model and 
+#predicted values of model with out jth variable
+#y.res is the residual of Y and predicted values of model without jth variable.
+#For use with map in rf_add_var
+extract_add_var <-function(i, df){
+  PredFullMod <- as.name("PredFullMod")
+  Y <- as.name("Y")
+  V <- as.name(paste("PredWoVar", as.character(i), sep =""))
+  x.res <- df[[PredFullMod]]-df[[V]]
+  y.res <- df[[Y]]-df[[V]]
+  new.df <- data.frame(x.res, y.res)
+  colnames(new.df) <- c(paste("added.Var", as.character(i), sep = ""), "y.res")
+  new.df
+}
+
+#rf_add_var takes as input the output of each_pred_rf and outputs a list of length p 
+#in which each entry is a data frame corresponding
+#to an added variable plot for the jth predictor in the 
+#data set.
+rf_add_var <- function(data.list){
+  rf.df <- data.list[[1]]
+  p <- length(rf.df)-2
+  add.var.list <- map(1:p, extract_add_var, df = rf.df)
+  add.var.list
+}
+
+#rf_add_var_imp takes as input a list of add_var df's from rf_add_var and runs
+#a random forest on the y-residuals with x-residuals as input.
+#output is a list of random forest objects. \
+#Might change output to be just variable importance values. 
+rf_add_var_imp <- function(data.list, ntree2, replace = TRUE){
+  p <- length(data.list)
+  rf.add.imp.list <- map(.x = data.list, function(x) 
+    randomForest(y.res~., data = x, ntree = ntree2, replace = replace, importance = TRUE))
+  rf.add.imp.list
+}
+
+rf_shallow_add_var_imp <- function(data.list, ntree2, replace = TRUE){
+  p <- length(data.list)
+  rf.add.imp.list <- map(.x = data.list, function(x) 
+    randomForest(y.res~., data = x, ntree = ntree2, replace = replace, importance = TRUE, nodesize = 3))
+  rf.add.imp.list
+}
+
+extract_imp <-function(i, data.list){
+  new.df <- as.data.frame(t(importance(data.list[[i]])))
+  new.df
+}
+
+extract_var_imp <- function(data.list){
+  p <- length(data.list)
+  new.df <- map_dfc(1:p, extract_imp, data.list = data.list)
+  rownames(new.df) <- c("%IncMSE", "IncNodePurity")
+  as.data.frame(t(new.df))
+}
+
+
+#Once rf has been run once on each added variable plot, we can try to assess
+#importance via framework of p-values. In particular, we implement a 
+#permutation test to obtain distribution of variable importance scores 
+#rf_perm takes as input a list of added variable dataframes 
+#(in particular output of rf_add_var
+#and outputs a list of dataframes consisting of variable importance scores 
+#obtained after permuting each added variable dataframe. 
+#number of permutations is it input for rf_perm
+
+#perm_rf takes as input a dataframe, permutes the dataframe
+#runs a randomforest and returns the variable importance score
+#variable importance score is MDA (mean decrease in accuracy) as a percentage change
+perm_rf <-function(df, ntree3, replace){
+  df.names <- colnames(df)
+  df.mat <- as.matrix(df)
+  x <- df.mat[sample(nrow(df.mat),replace = FALSE),1]
+  y <- df.mat[,2]
+  perm.df <- as.data.frame(cbind(x,y))
+  colnames(perm.df) <- df.names
+  perm.rf <- randomForest(y.res~., data = perm.df, replace = replace, importance = TRUE)
+  importance(perm.rf, type = 1)
+}
+
+#perm_add_var takes as input an index value, the data.list, it the number of permutations, 
+#ntree3 the number of trees to grow for each forest on the permuted data
+perm_add_var <- function(i, data.list, it, ntree3, replace){
+  df <- data.list[[i]]
+  new.df <- as.data.frame(replicate(n = it, expr = perm_rf(df = df, 
+                                                           ntree3 = ntree3, replace = replace)))
+  colnames(new.df) <- paste("Var", as.character(i), "VI", sep = "")
+  new.df
+}
+
+rf_perm_add_var <- function(data.list, it, ntree3, replace = TRUE){
+  p <- length(data.list)
+  new.list <- map(1:p, perm_add_var, data.list = data.list, 
+      it = it, ntree3 = ntree3, replace = replace)
+  new.list
+}
+
+#add_var_randomforest is a wrapper for the previous functions (exluding rf_perm_add_var)
+add_var_randomforest <- function(data, ntree1, ntree2, replace = TRUE){
+  #to get the copy of the data with one predictor removed
+  df.list <- df_combs(data)
+  #running initial randomFoest on each data frame
+  rf.list <- each_pred_rf(df.list, ntree1 = ntree1, replace = replace)
+  #tidying the data to compute added variable plots
+  rf.add.var.list <- rf_add_var(rf.list)
+  #running randomForests on each plot
+  rf.add.imp.list <- rf_add_var_imp(rf.add.var.list, ntree2 = ntree2, replace = replace)
+  #extracts variable importance values for each randomForest ran on added variable plots
+  add.var.imp <- extract_var_imp(rf.add.imp.list)
+  #output is list containing data frame of added variable plot variable importances, 
+  #rf.add.var.list which are dataframe for added variable plots, and 
+  #the variable importances from full model run in each_pred_rf
+  list(add.var.imp, rf.add.var.list, rf.list[[2]])
+}
+
+#perm_add_var_randomforest is a wrapper for previous functions (including rf_perm_add_var)
+perm_add_var_randomforest <- function(data, it, ntree1, ntree2, ntree3, replace = TRUE){
+  df.list <- df_combs(data)
+  #running initial randomFoest on each data frame
+  rf.list <- each_pred_rf(df.list, ntree1 = ntree1, replace = replace)
+  #tidying the data to compute added variable plots
+  rf.add.var.list <- rf_add_var(rf.list)
+  #running randomForests on each plot
+  rf.add.imp.list <- rf_add_var_imp(rf.add.var.list, 
+                                    ntree2 = ntree2, replace = replace)
+  #extracts variable importance values for each randomForest ran on added variable plots
+  add.var.imp <- extract_var_imp(rf.add.imp.list)
+  #run permutations on each dataframe in rf.add.var.list to obtain 
+  #distribution of importance values
+  rf.perm.add.var.list <- rf_perm_add_var(data.list = rf.add.var.list, 
+                                          it = it, ntree3 = ntree3, replace = replace)
+  list(add.var.imp, rf.add.var.list, rf.list[[2]], rf.perm.add.var.list)
+}
+
+#input for rf_added_var_plot is output of 
+#add_var_randomforest. Output is plot of added variable plots for 
+#the random forest arranged in a grid.
+
+plot_add_var <- function(i, df.list){
+  df <- df.list[[i]]
+  x.name <- colnames(df)[1]
+  y.name <- colnames(df)[2]
+  plot.obj <- ggplot(df, aes_string(x = x.name, y = y.name))+geom_point()
+  plot.obj
+}
+
+rf_added_var_plot <- function(data.list){
+    df.list <- data.list[[2]]
+    p <- length(df.list)
+    gg.list <- map(1:p, plot_add_var, df.list = df.list)
+    nCol <- floor(sqrt(p))
+    do.call("grid.arrange", c(gg.list, ncol = nCol))
+}
+
+#next make functions which plot distributions of the added variable importances and 
+#adds in observed variable importance of added variable
+
+plot_var_imp <- function(i, df.list, add.var.imp){
+  df <- df.list[[i]]
+  x.name <- colnames(df)
+  obs.add.var <- add.var.imp[i,1]
+  plot.obj <- ggplot(df, aes_string(x = x.name))+
+    geom_histogram(bins = 50)+
+    geom_vline(xintercept = obs.add.var, col = "Red", size = 1)
+  plot.obj
+}
+
+rf_plot_var_imp <- function(data.list){
+ df.list  <-data.list[[4]]
+ add.var.imp <- data.list[[1]]
+ p <- length(df.list)
+ gg.list <- map(1:p, plot_var_imp, df.list = df.list, add.var.imp = add.var.imp)
+ nCol <- floor(sqrt(p))
+ do.call("grid.arrange", c(gg.list, ncol = nCol))
+}
+
+#Next define a function which takes the output of perm_add_var_randomforest
+#and computes p-values of variable importances.
+
+perm_pval <- function(i, var.imp.df, var.imp.list){
+  obs.var.imp <- var.imp.df[i,1]
+  perm.var.imp <- var.imp.list[[i]]
+  n.perm <- nrow(perm.var.imp)
+  right.tail <- (sum(obs.var.imp <= perm.var.imp)+1)/(n.perm+1)
+  left.tail <- (sum(perm.var.imp <= obs.var.imp)+1)/(n.perm+1)
+  p.val <- ifelse(right.tail<=left.tail, 2*right.tail, 2*left.tail)
+  p.val <- ifelse(1<p.val, 1, p.val)
+  names(p.val) <- paste("p.val.Var.", as.character(i), sep = "")
+  p.val
+}
+
+add_var_pval <- function(data.list){
+  var.imp.df <- data.list[[1]]
+  var.imp.list <- data.list[[4]]
+  pval.df <- sapply(1:p, perm_pval, var.imp.df = var.imp.df, var.imp.list = var.imp.list)
+  as.data.frame(pval.df)
+}
+
+
+```
+
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.cap = "testing"}
+load(file = "data/MarChp4SimlResults.Rdata")
+list.siml.results <- list.siml.data.results[9:24]
+
+siml1.wrep <- list.siml.results[[1]]
+siml1.worep <- list.siml.results[[2]]
+siml2.wrep <- list.siml.results[[3]]
+siml2.worep <- list.siml.results[[4]]
+siml3.wrep <- list.siml.results[[5]]
+siml3.worep <- list.siml.results[[6]]
+siml4.wrep <- list.siml.results[[7]]
+siml4.worep <- list.siml.results[[8]]
+siml5.wrep <- list.siml.results[[9]]
+siml5.worep <- list.siml.results[[10]]
+siml6.wrep <- list.siml.results[[11]]
+siml6.worep <- list.siml.results[[12]]
+siml7.wrep <- list.siml.results[[13]]
+siml7.worep <- list.siml.results[[14]]
+siml8.wrep <- list.siml.results[[15]]
+siml8.worep <- list.siml.results[[16]]
+
+list.wrep <- list(siml1.wrep,siml2.wrep, siml3.wrep,siml4.wrep,siml5.wrep,siml6.wrep,siml7.wrep, siml8.wrep)
+list.worep <- list(siml1.worep, siml2.worep, siml3.worep, siml4.worep, siml5.worep, siml6.worep, siml7.worep, siml8.worep)
+
+var_name <- sapply(1:12, FUN = function(i) paste("Variable", as.character(i), sep = " "))
+siml_name <- sapply(1:8, FUN = function(i) paste("Simulation", as.character(i), sep = " "))
+
+extract_table_col <- function(i, data.list,rf.type){
+ data.col <- data.list[[i]][[rf.type]][,1] 
+ names(data.col) <- paste("Simulation", as.character(i), sep = "")
+ data.col
+}
+
+extract_matrix <- function(numvar, numsiml, data.list, rf.type){
+  mat <- matrix(NA, ncol = numsiml, nrow = numvar)
+  for(i in 1:numsiml){
+    mat[,i] <- extract_table_col(i, data.list, rf.type) 
+  }
+  
+  var_name <- sapply(1:numvar, FUN = function(i) paste("Variable", as.character(i), sep = " "))
+  siml_name <- sapply(1:numsiml, FUN = function(i) paste("Simulation", as.character(i), sep = " "))
+  
+  colnames(mat) <- siml_name
+  rownames(mat) <- var_name
+  mat
+}
+
+
+```
+
+```{r kable, results="asis", echo = FALSE, warning = FALSE, message = FALSE}
+
+#addvarwo replacement
+
+kable(extract_matrix(numvar = 12, numsiml = 8, data.list = list.wrep, rf.type = 1),
+      format = "latex", booktabs = TRUE,
+      caption = "Simulation Results for Added Variable Plot Importances with Sampling with Replacement") %>%
+          kable_styling(latex_options = "scale_down")
+
+```
+
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE}
+
+#mda wo replacement
+
+kable(extract_matrix(numvar = 12, numsiml = 8, data.list = list.wrep, rf.type = 3),
+      format = "latex", booktabs = TRUE,
+      caption = "Simulation Results for MDA Variable Importances with Sampling with Replacement") %>%
+          kable_styling(latex_options = "scale_down")
+
+```
+
+
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE}
+
+#addvar wo replacement
+
+kable(extract_matrix(numvar = 12, numsiml = 8, data.list = list.worep,rf.type = 1),
+      format = "latex", booktabs = TRUE,
+      caption = "Simulation Results for Added Variable Plot Importances with Sampling without Replacement") %>%
+          kable_styling(latex_options = "scale_down")
+
+```
+
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE}
+
+#MDA wo replacement 
+
+kable(extract_matrix(numvar = 12, numsiml = 8, data.list = list.worep, rf.type = 3),
+      format = "latex", booktabs = TRUE,
+      caption = "Simulation Results for MDA Variable Importances with Sampling without Replacement") %>%
+          kable_styling(latex_options = "scale_down")
+
+```
+
+```{r results="asis", echo = FALSE, warning = FALSE}
+
+
+
+```
 

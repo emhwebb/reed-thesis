@@ -1798,7 +1798,106 @@ sampling distributions of \(VI_{AVP}(X_k)\) for each predictor \(X_k\)
 are easily attainable.
 
 \chapter{Simulation and Results}\label{simulation-and-results}
+\begin{table}
 
+\caption{\label{tab:kable}Simulation Results for Added Variable Plot Importances with Sampling with Replacement}
+\centering
+\resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
+\toprule
+  & Simulation 1 & Simulation 2 & Simulation 3 & Simulation 4 & Simulation 5 & Simulation 6 & Simulation 7 & Simulation 8\\
+\midrule
+Variable 1 & 452.93528 & 209.19947 & 184.29378 & 115.75481 & 348.0641 & 110.911944 & 200.25310 & 60.67242\\
+Variable 2 & 436.50160 & 200.30775 & 164.79733 & 49.30234 & 355.2946 & 121.012598 & 90.09198 & 33.95596\\
+Variable 3 & 176.15493 & 76.12612 & 141.20267 & 127.73681 & 186.0916 & 4.438317 & 68.25077 & 47.94023\\
+Variable 4 & 69.71643 & 14.09013 & 62.70999 & 44.32338 & 190.2879 & 29.697785 & 60.86136 & 52.56689\\
+Variable 5 & 453.05254 & 479.75299 & 160.85322 & 196.06473 & 324.4524 & 245.731616 & 92.18312 & 124.80432\\
+\addlinespace
+Variable 6 & 437.09922 & 479.78513 & 44.56070 & 39.21142 & 325.6628 & 239.388844 & 60.91802 & 32.09565\\
+Variable 7 & 214.78673 & 270.27051 & 70.79758 & 30.53213 & 171.8441 & 32.679916 & 41.70790 & 38.16311\\
+Variable 8 & 94.67066 & 127.68758 & 63.23303 & 53.12418 & 182.5039 & 46.141387 & 46.65001 & 41.45022\\
+Variable 9 & 69.99713 & 104.23646 & 56.13219 & 39.10399 & 215.7042 & 22.064169 & 53.65208 & 41.27242\\
+Variable 10 & 70.13127 & 80.45368 & 70.77256 & 54.45881 & 152.4064 & 21.740682 & 44.84663 & 34.90679\\
+\addlinespace
+Variable 11 & 70.51321 & 91.39784 & 65.78904 & 44.82417 & 185.0719 & 17.999310 & 60.45611 & 50.53217\\
+Variable 12 & 68.49742 & 88.75896 & 75.87031 & 26.68245 & 200.3480 & 39.174289 & 53.36817 & 41.62424\\
+\bottomrule
+\end{tabular}}
+\end{table}
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-3}Simulation Results for MDA Variable Importances with Sampling with Replacement}
+\centering
+\resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
+\toprule
+  & Simulation 1 & Simulation 2 & Simulation 3 & Simulation 4 & Simulation 5 & Simulation 6 & Simulation 7 & Simulation 8\\
+\midrule
+Variable 1 & 205.7751162 & 43.5875638 & 87.9694096 & 39.6267348 & 51.3775666 & 68.0344640 & 45.2615577 & 16.5658513\\
+Variable 2 & 182.7953452 & 45.3203038 & 47.4985731 & 22.9426251 & 51.3756589 & 59.7224401 & 6.6095155 & 13.8717953\\
+Variable 3 & 43.3705524 & 31.7206332 & 88.2067658 & 46.1139125 & -1.8420809 & 19.5960032 & -0.6160646 & 10.7902908\\
+Variable 4 & -0.8467650 & 22.5345613 & -1.5190519 & 21.3672088 & 0.7655721 & 31.1151525 & 0.7265404 & 7.7755666\\
+Variable 5 & 179.2816368 & 210.5278772 & 42.5696986 & 52.9141820 & 54.3017177 & 44.2205811 & 73.4474491 & 90.0099288\\
+\addlinespace
+Variable 6 & 190.1979559 & 199.6886106 & 3.2962175 & -1.8198516 & 50.3953957 & 49.1162744 & -0.1722575 & 0.2080882\\
+Variable 7 & 49.7942892 & 54.4672557 & -1.4994542 & -1.9087069 & 0.1191700 & -2.0071842 & -0.2548386 & -2.8897482\\
+Variable 8 & 1.8630745 & -0.4211499 & -1.9256818 & -2.5463545 & -0.2674365 & 0.4980884 & -0.2709784 & 0.7483121\\
+Variable 9 & -1.7072270 & -0.3489273 & 1.0810682 & 0.9995826 & 4.1857040 & -2.7534240 & 0.6012231 & -0.3862685\\
+Variable 10 & 0.1434588 & 0.0824640 & 1.8700646 & 2.1839565 & -0.9314400 & -2.0090863 & 1.0238239 & 0.6847400\\
+\addlinespace
+Variable 11 & 0.2220114 & -1.1905073 & -0.2861896 & -1.3776237 & 1.6749594 & -3.2776029 & 0.9792522 & -1.9566093\\
+Variable 12 & 0.2826006 & 1.1815968 & -0.4752267 & -0.8640204 & 1.6851063 & -0.2720373 & 1.7977126 & -2.4189332\\
+\bottomrule
+\end{tabular}}
+\end{table}
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-4}Simulation Results for Added Variable Plot Importances with Sampling without Replacement}
+\centering
+\resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
+\toprule
+  & Simulation 1 & Simulation 2 & Simulation 3 & Simulation 4 & Simulation 5 & Simulation 6 & Simulation 7 & Simulation 8\\
+\midrule
+Variable 1 & 457.02513 & 212.352368 & 213.84990 & 110.83360 & 348.6451 & 110.453492 & 167.41957 & 89.34318\\
+Variable 2 & 457.77972 & 214.188658 & 199.28552 & 69.19798 & 356.4324 & 105.020452 & 52.91816 & 48.21518\\
+Variable 3 & 189.22857 & 98.922942 & 134.35239 & 129.33500 & 209.8724 & 17.446615 & 51.80081 & 59.05998\\
+Variable 4 & 80.11575 & 5.013828 & 77.20821 & 50.00432 & 214.4154 & -3.569032 & 50.94663 & 44.88170\\
+Variable 5 & 453.78943 & 492.412633 & 131.13573 & 158.58779 & 320.5315 & 237.079037 & 97.21665 & 114.92600\\
+\addlinespace
+Variable 6 & 443.55902 & 489.822741 & 84.87764 & 44.53580 & 334.8463 & 251.124465 & 36.56998 & 41.09561\\
+Variable 7 & 201.05497 & 275.682102 & 66.14043 & 43.32284 & 259.2078 & 73.023361 & 47.50904 & 48.39331\\
+Variable 8 & 68.14961 & 106.313016 & 66.00254 & 54.50657 & 198.7929 & 70.151875 & 47.72055 & 56.38571\\
+Variable 9 & 78.26486 & 77.371760 & 92.99772 & 50.10961 & 235.0376 & 49.483426 & 51.44996 & 32.54249\\
+Variable 10 & 68.90864 & 83.184212 & 80.70935 & 60.96954 & 206.1605 & 42.379239 & 49.53081 & 48.48468\\
+\addlinespace
+Variable 11 & 88.57084 & 90.243103 & 79.04303 & 41.84311 & 176.4355 & 39.551375 & 49.41950 & 63.93243\\
+Variable 12 & 80.23029 & 64.317099 & 76.45756 & 61.39489 & 195.9230 & 39.499604 & 62.14501 & 54.62036\\
+\bottomrule
+\end{tabular}}
+\end{table}
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-5}Simulation Results for MDA Variable Importances with Sampling without Replacement}
+\centering
+\resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
+\toprule
+  & Simulation 1 & Simulation 2 & Simulation 3 & Simulation 4 & Simulation 5 & Simulation 6 & Simulation 7 & Simulation 8\\
+\midrule
+Variable 1 & 203.8974116 & 43.2217090 & 86.6974491 & 38.6782561 & 47.7410796 & 67.0884007 & 47.9127054 & 18.8238892\\
+Variable 2 & 184.7896642 & 44.8711037 & 48.5145679 & 22.8629478 & 47.0771667 & 60.8648352 & 11.1373919 & 14.1609495\\
+Variable 3 & 47.5925671 & 31.5300753 & 97.4263019 & 48.4838317 & -2.4682257 & 19.4952466 & -2.4124545 & 10.9352715\\
+Variable 4 & -1.5370464 & 23.4295635 & -2.4456640 & 20.0982113 & 1.9451710 & 34.5067380 & 0.2163598 & 10.1516919\\
+Variable 5 & 184.7704998 & 204.5983543 & 54.0176344 & 57.6470636 & 52.0030374 & 39.3199135 & 76.8657131 & 93.1538797\\
+\addlinespace
+Variable 6 & 188.1526981 & 205.5292797 & 2.0321326 & -0.6121418 & 48.3237316 & 43.7043053 & 0.3913965 & 1.8169532\\
+Variable 7 & 51.9308522 & 51.0196417 & -1.4260717 & -2.1457808 & -1.4728311 & -1.0650397 & 1.8925123 & -1.5395390\\
+Variable 8 & -0.1434761 & -0.4393610 & -0.1664074 & -3.3893701 & -0.3444081 & 0.2141649 & -0.5496865 & -0.6005596\\
+Variable 9 & -1.7221738 & -0.1948834 & 0.8563617 & 0.7584246 & 2.9144231 & -1.0565879 & 0.7799837 & -0.7651692\\
+Variable 10 & -1.3463022 & 0.3026227 & 1.1876820 & 2.7230832 & 1.4493889 & -2.0950498 & 0.2778606 & 2.8284927\\
+\addlinespace
+Variable 11 & 0.1626804 & -1.3699901 & -0.3369013 & 0.6452085 & 1.8235057 & -2.8213151 & -1.2349051 & -1.4908094\\
+Variable 12 & -0.5193238 & 2.0094494 & -1.0121098 & 0.4916756 & 3.0198114 & 1.3935243 & -0.1840246 & 1.7284960\\
+\bottomrule
+\end{tabular}}
+\end{table}
 \chapter{Joint Added Variable Plot
 Importance}\label{joint-added-variable-plot-importance}
 
@@ -1849,7 +1948,7 @@ statistic is
 If \(F\) is large when compared to the
 \(F(df_{H_0}-df_{H_1}, df_{H_1})\) distribution, then there is evidence
 against the null hypothesis that the coefficients of
-\(\mathbf{\beta}_2\) shuld be set to zero. In particular, while we
+\(\mathbf{\beta}_2\) should be set to zero. In particular, while we
 cannot compute a test statistic similar to the F-test statistic for
 joint added variable importance, we can take the approach of comparing
 models fit with and without \(\mathbf{X}_2\) to determine the importance
@@ -1955,10 +2054,14 @@ plot. As mentioned previously, the trend in the added variable plot of
 relative aggregated importance of the variables in \(J\) as predictors
 of the response. In particular, higher values of JAVPI for \(J\) should
 indicate that the variables contained in \(J\) are more informative than
-lower values of JAVPI for \(J\). As in the previous section, we also
-recommend that \(VI_{JAVP}(X_{-J})\), the JAVPI of those predictors not
-in \(J\) be concurrently computed to provide a comparison of joint
-importance between sets of predictors.
+lower values of JAVPI for \(J\). That is, the value of JAVPI measures
+the importance of all the predictors in \(J\) to the response \(Y\) via
+the loss in predictive performance in the ensemble when we remove the
+predictors in \(J\) as potential splitting variables in the forest
+growing process. As in the previous section, we also recommend that
+\(VI_{JAVP}(X_{-J})\), the JAVPI of those predictors not in \(J\) be
+concurrently computed to provide a comparison of joint importance
+between sets of predictors.
 \begin{algorithm}
     \caption{Joint Added Variable Plot Importance (JAVPI)} \label{added variable importance}
       \begin{algorithmic}[1]
@@ -1966,10 +2069,61 @@ importance between sets of predictors.
           \State Grow the random forest ensemble $\hat{\theta}_{RF}(Y|X_{-J})$ predicting $Y$ using the full set of predictors minus the predictors in $J$.
           \State Compute $U_J=\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-J})$ and $W_J=Y-\hat{\theta}_{RF}(Y|X_{-J})).$
           \State Grow the bagged forest ensemble $\hat{\theta}_{BF}(W_J|U_J)$ predicting $W_J$ using $U_J$. 
-          s\State Compute the added variable plot importance of $X_J$ to be the MDA variable importance of $U_J$: $VI_{JAVP}(X_J)=VI_{MDA}(U_J)$.
+          \State Compute the added variable plot importance of $X_J$ to be the MDA variable importance of $U_J$: $VI_{JAVP}(X_J)=VI_{MDA}(U_J)$.
           
       \end{algorithmic}
   \end{algorithm}
+\section{Permutation Tests Using Joint Added Variable Plot
+Importance}\label{permutation-tests-using-joint-added-variable-plot-importance}
+
+Once we have computed \(VI_{JAVP}(X_J)\), we can again take a simulation
+approach to generating a sampling distribution for \(VI_{JAVP}(X_J)\).
+The process is essentially analogous to computing sampling distributions
+of single added variable plots. To compute \(VI_{JAVP}(X_J)\), we
+require the joint added variable plot \((U_J,W_J)\), where
+\(U_J=\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-J})\) and
+\(W_J=Y-\hat{\theta}_{RF}(Y|X_{-J})\). Permute \(U_J\) to obtain
+\(U_J^*\) and grow the bagged forest \(\hat{\theta}_{BF}(W_J|U_J^*)\)
+using the permuted \(U_J^*\) as the predictor. We then use the resulting
+ensemble to compute \(VI_{MDA}(U_J^*)=VI_{JAVP}^*(X_J)\) as the permuted
+JAVPI of \(J\). Once we have ran enough iterations of permutations of
+\(U_J^*\) and computation \(VI_{JAVP}^*(X_J)\), we can compute a
+two-sided p-value using \(VI_{JAVP}(X_J)\) as our test statistic.
+
+If we have a collection \(J_1,\ldots, J_q\) of subsets of the
+predictors, we could simulate sampling distributions of
+\(VI_{JAVP}(X_{J_i})\) for each \(i=1,\ldots,q\) and compute two-sided
+p-values for each subset \(J_i\). We could then enter into a hypothesis
+testing framework. We do offer some words of caution here with respect
+to using joint added variable plot importances in a hypothesis test
+framework with multiple subsets. In particular, due to sensitivity of
+permutation tests using JAVPI to type-I errors and due to possible
+overlap of predictors in the \(J_i\), we would recommend most certainly
+using a multiple comparisons procedure such as the Bonferonni
+correction. Furthermore, we would like to emphasize the use of JAVPI and
+AVPI as variable selection tools and diagnostic tools for random
+forests, rather than tools purely of inferential statistics and
+hypothesis testing.
+
+With the JAVPI, in particular, our intention in introducing the JAVPI
+variable importance measure was to offer a method that utilizes the
+random forest mechanism to measure the importance of a subset \(J\) of
+predictors while taking into account the effect of the predictors not in
+\(J\). However, as we have noted above, if the subset \(J\) of
+predictors consists of a mixture of informative and uninformative
+predictors, then a finer analysis of the variables in \(J\) may be
+required if the JAVPI of \(J\) is high. Concluding that each variable in
+\(J\) is informative based on a high JAVPI value or low p-value from
+simulation would be erronuous if \(J\) is a mixture of informative and
+uninformative. We would also like to emphasize that it is important to
+check the fit and residual sum of squares of the random forest model if
+using the JAVPI or AVPI to see if conclusions drawn from JAVPI or AVPI
+are valid. Furthermore, we would like to remind the reader that
+inference based on residuals as we are describing with JAVPI and AVPI
+can be sensitive to outliers and extreme points such that statistically
+significant results from JAVPI or AVPI should be examined with some
+scrutiny.
+
 \section{Simulation and Results of Joint Added Variable Plot
 Importance}\label{simulation-and-results-of-joint-added-variable-plot-importance}
 

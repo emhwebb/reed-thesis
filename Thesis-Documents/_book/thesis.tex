@@ -178,6 +178,7 @@ Second paragraph of abstract starts here.
 
 	\usepackage{tikz, algorithm}
 	\usepackage[noend]{algpseudocode}
+	\usepackage{float}
 % End of CII addition
 %%
 %% End Preamble
@@ -1798,9 +1799,14 @@ sampling distributions of \(VI_{AVP}(X_k)\) for each predictor \(X_k\)
 are easily attainable.
 
 \chapter{Simulation and Results}\label{simulation-and-results}
+
+\section{Introduction}\label{introduction-3}
+
+In this chapter, we present simulation results of the random forest
+added variable plot and added variable plot importance methods.
 \begin{table}
 
-\caption{\label{tab:kable}Simulation Results for Added Variable Plot Importances with Sampling with Replacement}
+\caption{\label{tab:kable}Simulation Results for Added Variable Plot Importances for Sampling with Replacement}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
 \toprule
@@ -1825,7 +1831,7 @@ Variable 12 & 68.49742 & 88.75896 & 75.87031 & 26.68245 & 200.3480 & 39.174289 &
 \end{table}
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-3}Simulation Results for MDA Variable Importances with Sampling with Replacement}
+\caption{\label{tab:unnamed-chunk-3}Simulation Results for MDA Variable Importances for Sampling with Replacement}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
 \toprule
@@ -1850,7 +1856,7 @@ Variable 12 & 0.2826006 & 1.1815968 & -0.4752267 & -0.8640204 & 1.6851063 & -0.2
 \end{table}
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-4}Simulation Results for Added Variable Plot Importances with Sampling without Replacement}
+\caption{\label{tab:unnamed-chunk-4}Simulation Results for Added Variable Plot Importances for Sampling without Replacement}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
 \toprule
@@ -1875,7 +1881,7 @@ Variable 12 & 80.23029 & 64.317099 & 76.45756 & 61.39489 & 195.9230 & 39.499604 
 \end{table}
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-5}Simulation Results for MDA Variable Importances with Sampling without Replacement}
+\caption{\label{tab:unnamed-chunk-5}Simulation Results for MDA Variable Importances for Sampling without Replacement}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
 \toprule
@@ -1898,10 +1904,62 @@ Variable 12 & -0.5193238 & 2.0094494 & -1.0121098 & 0.4916756 & 3.0198114 & 1.39
 \bottomrule
 \end{tabular}}
 \end{table}
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-6}Added Variable Importance P-values for Sampling with Replacement}
+\centering
+\resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
+\toprule
+  & Simulation 1 & Simulation 2 & Simulation 3 & Simulation 4 & Simulation 5 & Simulation 6 & Simulation 7 & Simulation 8\\
+\midrule
+Variable 1 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0019980 & 0.001998 & 0.001998\\
+Variable 2 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0019980 & 0.001998 & 0.001998\\
+Variable 3 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.6573427 & 0.001998 & 0.001998\\
+Variable 4 P-Value & 0.001998 & 0.1398601 & 0.001998 & 0.001998 & 0.001998 & 0.0059940 & 0.001998 & 0.001998\\
+Variable 5 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0019980 & 0.001998 & 0.001998\\
+\addlinespace
+Variable 6 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0019980 & 0.001998 & 0.001998\\
+Variable 7 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0019980 & 0.001998 & 0.001998\\
+Variable 8 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0019980 & 0.001998 & 0.001998\\
+Variable 9 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0279720 & 0.001998 & 0.001998\\
+Variable 10 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0219780 & 0.001998 & 0.001998\\
+\addlinespace
+Variable 11 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0439560 & 0.001998 & 0.001998\\
+Variable 12 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0019980 & 0.001998 & 0.001998\\
+\bottomrule
+\end{tabular}}
+\end{table}
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-7}Added Variable Importance P-values for Sampling without Replacement}
+\centering
+\resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
+\toprule
+  & Simulation 1 & Simulation 2 & Simulation 3 & Simulation 4 & Simulation 5 & Simulation 6 & Simulation 7 & Simulation 8\\
+\midrule
+Variable 1 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0019980 & 0.001998 & 0.001998\\
+Variable 2 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0019980 & 0.001998 & 0.001998\\
+Variable 3 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.6573427 & 0.001998 & 0.001998\\
+Variable 4 P-Value & 0.001998 & 0.1398601 & 0.001998 & 0.001998 & 0.001998 & 0.0059940 & 0.001998 & 0.001998\\
+Variable 5 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0019980 & 0.001998 & 0.001998\\
+\addlinespace
+Variable 6 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0019980 & 0.001998 & 0.001998\\
+Variable 7 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0019980 & 0.001998 & 0.001998\\
+Variable 8 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0019980 & 0.001998 & 0.001998\\
+Variable 9 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0279720 & 0.001998 & 0.001998\\
+Variable 10 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0219780 & 0.001998 & 0.001998\\
+\addlinespace
+Variable 11 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0439560 & 0.001998 & 0.001998\\
+Variable 12 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.0019980 & 0.001998 & 0.001998\\
+\bottomrule
+\end{tabular}}
+\end{table}
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-8-1.pdf}
+
 \chapter{Joint Added Variable Plot
 Importance}\label{joint-added-variable-plot-importance}
 
-\section{Introduction}\label{introduction-3}
+\section{Introduction}\label{introduction-4}
 
 In the previous chapters, we introduced the added variable plot
 importance (AVPI) of a predictor in the random forest ensemble.

@@ -1907,7 +1907,35 @@ For each simulated dataset, we drew 2000 entries. We then ran the added
 variable plot importance scheme with the permutation scheme. For each
 stage of AVPI, we trained forest ensembles with 1000 trees, and to
 generate simulated null distributions of AVPI, we ran 1000 iterations of
-AVPI with permuted values for the x-axis of AVPI.
+AVPI with permuted values for the x-axis of the added variable plot.
+\par
+
+\section{Simulation Results}\label{simulation-results}
+
+In the table below, we have the results of running the added variable
+plot importances on simulated data sets when sampling with replacement.
+We first note that the AVPI is quite noisy in this case. For example, in
+the first simulation, the relevant variables were variables 1, 2, 3, 5,
+6, and 7. The AVPI reflects the importance of these variables by
+assigning high AVPI scores to these variables. However, irrelevant
+variables also had AVPI scores between 70 and 95. Simulation 2 is a
+similar set-up as Simulation 1, except that the predictors have the
+correlation structure discussed above. We see that in this case that
+confounding between correlated predictors is still an issue as variable
+3 is assigned a AVPI score of 76 -- which is lower than the scores
+assigned to variables 8 through 12. We also extracted the MDA variable
+importance values for each simulation as a comparison to the AVPI
+values. In particular, we note that in simulation 1, the MDA variable
+importance values and AVPI values more or less agree on which variables
+are more important to the response. Looking at the MDA variable
+importance values for simulation 2, we see that the full random forest
+model assigned MDA scores of around zero to variables 8 through 12, so
+we would be disinclined to believe in the AVPI scores for those
+variables. However, we see that there is some confounding between
+variables 1 through 4 due to the correlation structure betweeen those
+variables. In this case, the AVPI properly deflates the importance of
+variable 4 in comparison to variables 1, 2, and 3, which is what we
+would have expected.
 \begin{table}
 
 \caption{\label{tab:unnamed-chunk-5}Simulation Results for Added Variable Plot Importances for Sampling with Replacement}

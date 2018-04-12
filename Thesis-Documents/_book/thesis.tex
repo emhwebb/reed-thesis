@@ -178,7 +178,6 @@ Second paragraph of abstract starts here.
 
 	\usepackage{tikz, algorithm}
 	\usepackage[noend]{algpseudocode}
-	\usepackage{float}
 % End of CII addition
 %%
 %% End Preamble
@@ -1803,10 +1802,115 @@ are easily attainable.
 \section{Introduction}\label{introduction-3}
 
 In this chapter, we present simulation results of the random forest
-added variable plot and added variable plot importance methods.
+added variable plot and added variable plot importance methods. The
+design of our simulation follows closely to Strobl et al. (2008).
+
+\section{Simulation Design}\label{simulation-design}
+
+We set up a simulation to test the added variable plot importance method
+on several different regression models. In particular, we were
+interested in how the added variable plot importance method would
+perform in situations where the relationship of the response to the
+predictors was linear, polynomial, and non-linear, and when there was
+and was not a correlation structure in the predictor. In addition, we
+were interested in comparing the effect of sampling with replacement
+versus sampling without replacement in the forest growing process. In
+the case of the independent random variables, we drew twelve predictors
+from a standard normal distribution. For the case of random variables
+with a correlation structure, we drew \(X_1,\ldots,X_{12}\) from a
+multivariate normal distribution with mean 0 and covariance matrix
+\(\Sigma\) where the first four variables \(X_1,\ldots,X_4\) are
+block-correlated with a value of 0.9, and with the other eight variables
+independent. \par 
 \begin{table}
 
-\caption{\label{tab:kable}Simulation Results for Added Variable Plot Importances for Sampling with Replacement}
+\caption{\label{tab:kable}Covariance Matrix for Correlated Predictors}
+\centering
+\resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrrrrrr}
+\toprule
+  & X1 & X2 & X3 & X4 & X5 & X6 & X7 & X8 & X9 & X10 & X11 & X12\\
+\midrule
+X1 & 1.0 & 0.9 & 0.9 & 0.9 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+X2 & 0.9 & 1.0 & 0.9 & 0.9 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+X3 & 0.9 & 0.9 & 1.0 & 0.9 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+X4 & 0.9 & 0.9 & 0.9 & 1.0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+X5 & 0.0 & 0.0 & 0.0 & 0.0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+\addlinespace
+X6 & 0.0 & 0.0 & 0.0 & 0.0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
+X7 & 0.0 & 0.0 & 0.0 & 0.0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0\\
+X8 & 0.0 & 0.0 & 0.0 & 0.0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0\\
+X9 & 0.0 & 0.0 & 0.0 & 0.0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0\\
+X10 & 0.0 & 0.0 & 0.0 & 0.0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\
+\addlinespace
+X11 & 0.0 & 0.0 & 0.0 & 0.0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0\\
+X12 & 0.0 & 0.0 & 0.0 & 0.0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
+\bottomrule
+\end{tabular}}
+\end{table}
+We note that our covariance is the same covariance matrix used by Strobl
+et al. (2008) for their simulation study on the effect of correlation on
+variable selection in random forests in the regression setting. We
+tested the AVPI on four scenario. The first was when the response was a
+linear combination of some of the predictors. The second scenario was
+when the response was a sum of polynomial terms of the predictors. The
+third scenario was when the response was the sum of two interaction
+terms. The fourth scenario was when the response was a sum of non-linear
+terms involving some of the predictors. In each scenario, we added
+gaussian noise \(N(0, 0.05)\) to the response. We ran each scenario, in
+effect, four times. Once with independent predictors and sampling with
+replacement, then with independent predictors and sampling without
+replacement. We then ran the simulation on correlated predictors and
+sampling with replacement, then with correlated predictors and sampling
+without replacement. We illustrate the relationship between predictors
+and response for each of the four scenarios below. \par
+\begin{table}[H]
+\centering
+\resizebox{\linewidth}{!}{\begin{tabular}{ll}
+\toprule
+  & Relationship Between Predictors and Response\\
+\midrule
+Scenario 1 & Y=5*X1+5*X2+2*X3-5*X5-5*X6-2*V7+err\\
+Scenario 2 & Y = 5*X1\textasciicircum{}4+5*X2\textasciicircum{}3+6*X3\textasciicircum{}4+5*X5\textasciicircum{}3+err\\
+Scenario 3 & Y=8*X1*X2+7*X5*X6+err\\
+Scenario 4 & Y = 3\textasciicircum{}X1+2\textasciicircum{}X2+4\textasciicircum{}X5+err\\
+\bottomrule
+\end{tabular}}
+\end{table}
+In each scenario, variables 1 and 2 are always informative towards the
+predictor. In scenarios 1 and 2, variable 3 is informative to the
+predictor, while it is not informative for the scenario 3 and 4. In all
+scenarios, variable 4 is uninformative. In this way, we can see the
+effect of correlated predictors on AVPI. For variables 5 through 12,
+variable 5 is informative for each scenario, while variable 6 is
+informative in scenarios 1 and 2. Variable 7 is informative only in the
+scenario 1. Variables 8 through 12 are uninformative for each scenario.
+For reference, we illustrate which variables are informative and
+uninformative for each scenario. An \(X\) indicates that a variable is
+informative for that scenario while a \(-\) indicates that a variable is
+uninformative. \par
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-4}Informative and Uninformative Variables For Each Scenario}
+\centering
+\resizebox{\linewidth}{!}{\begin{tabular}[t]{lllllllllllll}
+\toprule
+  & Var1 & Var2 & Var3 & Var4 & Var5 & Var6 & Var7 & Var8 & Var9 & Var10 & Var11 & Var12\\
+\midrule
+Scenario 1 & X & X & X & - & X & X & X & - & - & - & - & -\\
+Scenario 2 & X & X & X & - & X & - & - & - & - & - & - & -\\
+Scenario 3 & X & X & - & - & X & X & - & - & - & - & - & -\\
+Scenario 4 & X & X & - & - & X & - & - & - & - & - & - & -\\
+\bottomrule
+\end{tabular}}
+\end{table}
+For each simulated dataset, we drew 2000 entries. We then ran the added
+variable plot importance scheme with the permutation scheme. For each
+stage of AVPI, we trained forest ensembles with 1000 trees, and to
+generate simulated null distributions of AVPI, we ran 1000 iterations of
+AVPI with permuted values for the x-axis of AVPI.
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-5}Simulation Results for Added Variable Plot Importances for Sampling with Replacement}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
 \toprule
@@ -1831,7 +1935,7 @@ Variable 12 & 68.49742 & 88.75896 & 75.87031 & 26.68245 & 200.3480 & 39.174289 &
 \end{table}
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-3}Simulation Results for MDA Variable Importances for Sampling with Replacement}
+\caption{\label{tab:unnamed-chunk-6}Simulation Results for MDA Variable Importances for Sampling with Replacement}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
 \toprule
@@ -1856,7 +1960,7 @@ Variable 12 & 0.2826006 & 1.1815968 & -0.4752267 & -0.8640204 & 1.6851063 & -0.2
 \end{table}
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-4}Simulation Results for Added Variable Plot Importances for Sampling without Replacement}
+\caption{\label{tab:unnamed-chunk-7}Simulation Results for Added Variable Plot Importances for Sampling without Replacement}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
 \toprule
@@ -1881,7 +1985,7 @@ Variable 12 & 80.23029 & 64.317099 & 76.45756 & 61.39489 & 195.9230 & 39.499604 
 \end{table}
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-5}Simulation Results for MDA Variable Importances for Sampling without Replacement}
+\caption{\label{tab:unnamed-chunk-8}Simulation Results for MDA Variable Importances for Sampling without Replacement}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
 \toprule
@@ -1906,7 +2010,7 @@ Variable 12 & -0.5193238 & 2.0094494 & -1.0121098 & 0.4916756 & 3.0198114 & 1.39
 \end{table}
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-6}Added Variable Importance P-values for Sampling with Replacement}
+\caption{\label{tab:unnamed-chunk-9}Added Variable Importance P-values for Sampling with Replacement}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
 \toprule
@@ -1931,7 +2035,7 @@ Variable 12 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.
 \end{table}
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-7}Added Variable Importance P-values for Sampling without Replacement}
+\caption{\label{tab:unnamed-chunk-10}Added Variable Importance P-values for Sampling without Replacement}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
 \toprule
@@ -1954,7 +2058,7 @@ Variable 12 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.
 \bottomrule
 \end{tabular}}
 \end{table}
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-8-1.pdf}
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-11-1.pdf}
 
 \chapter{Joint Added Variable Plot
 Importance}\label{joint-added-variable-plot-importance}

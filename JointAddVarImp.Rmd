@@ -319,8 +319,8 @@ joint_perm_add_var_rf <- function(data, it, pred.part, ntree1, ntree2, ntree3, r
 ```
 
 ```{r}
-set.seed(100)
-n1 <- 500
+set.seed(10)
+n1 <- 2000
 #p1 is number of variables
 p1 <- 5
 #our weights are given by wt_vec <- c(5,5,2,0,-5,-5,-2,0,0,0,0,0) 
@@ -338,27 +338,46 @@ Sigma3 <- matrix(c(w1,w2,w3,w4,w5), nrow = 5, ncol = 5)
 err2 <- rnorm(n1, mean = 0, sd = 22)
 siml.corr <- as.data.frame(rmvnorm(n = n1, mean = rep(0, times = 5), sigma = Sigma3))
 siml.corr <- siml.corr %>% 
-  mutate(Y = 20*V1*V2+20*2^V5+err2)
+  mutate(Y = 20*V1*V2+20*2^V3+err2)
 
-part1 <- c("V1", "V2")
-part2 <- c("V1", "V3")
-part3 <- c("V3","V4")
+u1 <- c(1,0.9,0.9,0.9,0,0,0)
+u2 <- c(0.9,1,0.9,0.9,0,0,0)
+u3 <- c(0.9,0.9,1,0.9,0,0,0)
+u4 <- c(0.9,0.9,0.9,1,0,0,0)
+u5 <- c(0,0,0,0,1,0,0)
+u6 <- c(0,0,0,0,0,1,0)
+u7 <- c(0,0,0,0,0,0,1)
+
+Sigma4 <- matrix(c(u1,u2,u3,u4,u5,u6,u7), nrow = 7, ncol = 7)
+err3 <- rnorm(n1, mean = 0, sd = 0.05)
+siml.corr1 <- as.data.frame(rmvnorm(n = n1, mean = rep(0, times = 5), sigma = Sigma3))
+siml.corr1 <- siml.corr1 %>% 
+mutate(V6 = rgamma(n = n1, shape = 10, rate = 0.1)) %>% 
+mutate(V7 = 1/(1+exp(-rexp(n = n1, rate = 10)))) %>% 
+mutate(Y = 150*V1*V2+15*V6+err3)
+
+#20*V1*V2+20*2^V3+
+
+part1 <- c("V1", "V2", "V6")
+part2 <- c("V1", "V6")
+part3 <- c("V3","V7")
 part4 <- c("V3", "V4", "V5")
-part5 <- c("V1", "V2", "V5")
-part6<- "V5"
+part5 <- c("V1", "V2", "V7")
+part6<- c("V6", "V7")
 
-joint.add.var.test1 <- joint_add_var_rf(data = siml.corr, pred.part = part1, 
-                                      ntree1 = 500, ntree2 = 500, replace = FALSE)
-joint.add.var.test2 <- joint_add_var_rf(data = siml.corr, pred.part = part2, 
-                                      ntree1 = 500, ntree2 = 500, replace = FALSE)
-joint.add.var.test3 <- joint_add_var_rf(data = siml.corr, pred.part = part3, 
-                                      ntree1 = 500, ntree2 = 500, replace = FALSE)
-joint.add.var.test4 <- joint_add_var_rf(data = siml.corr, pred.part = part4, 
-                                      ntree1 = 500, ntree2 = 500, replace = FALSE)
-joint.add.var.test5 <- joint_add_var_rf(data = siml.corr, pred.part = part5, 
-                                      ntree1 = 500, ntree2 = 500, replace = FALSE)
-joint.add.var.test6 <- joint_add_var_rf(data = siml.corr, pred.part = part6, 
-                                      ntree1 = 500, ntree2 = 500, replace = FALSE)
+
+joint.add.var.test1 <- joint_add_var_rf(data = siml.corr1, pred.part = part1, 
+                                      ntree1 = 750, ntree2 = 750, replace = FALSE)
+joint.add.var.test2 <- joint_add_var_rf(data = siml.corr1, pred.part = part2, 
+                                      ntree1 = 750, ntree2 = 750, replace = FALSE)
+joint.add.var.test3 <- joint_add_var_rf(data = siml.corr1, pred.part = part3, 
+                                      ntree1 = 750, ntree2 = 750, replace = FALSE)
+joint.add.var.test4 <- joint_add_var_rf(data = siml.corr1, pred.part = part4, 
+                                      ntree1 = 750, ntree2 = 750, replace = FALSE)
+joint.add.var.test5 <- joint_add_var_rf(data = siml.corr1, pred.part = part5, 
+                                      ntree1 = 750, ntree2 = 750, replace = FALSE)
+joint.add.var.test6 <- joint_add_var_rf(data = siml.corr1, pred.part = part6, 
+                                      ntree1 = 750, ntree2 = 750, replace = FALSE)
 
 joint.perm.add.var.test1 <- joint_perm_add_var_rf(data = siml.corr, pred.part = part3, it = 500, 
                                       ntree1 = 200, ntree2 = 100, ntree3 = 100, replace = FALSE)
@@ -371,6 +390,14 @@ rf_added_var_plot(joint.add.var.test3)
 rf_added_var_plot(joint.add.var.test4)
 rf_added_var_plot(joint.add.var.test5)
 rf_added_var_plot(joint.add.var.test6)
+
+joint.add.var.test1[[3]]
+joint.add.var.test1[[1]]
+joint.add.var.test2[[1]]
+joint.add.var.test3[[1]]
+joint.add.var.test4[[1]]
+joint.add.var.test5[[1]]
+joint.add.var.test6[[1]]
 
 rf_added_var_plot(joint.perm.add.var.test1)
 rf_plot_var_imp(joint.perm.add.var.test1)

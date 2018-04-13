@@ -315,6 +315,23 @@ joint_perm_add_var_rf <- function(data, it, pred.part, ntree1, ntree2, ntree3, r
   list(add.var.imp, rf.add.var.list, rf.list[[2]], rf.perm.add.var.list)
 }
 
+plot_jt_add_var <- function(i, df.list){
+  df <- df.list[[i]]
+  x.lab <- paste("Added Variable Plot With", ifelse(i == 1, "out Partition", " Partition"), sep = "")
+  x.name <- colnames(df)[1]
+  y.name <- colnames(df)[2]
+  plot.obj <- ggplot(df, aes_string(x = x.name, y = y.name))+geom_point()+xlab(x.lab)
+  plot.obj
+}
+
+rf_jt_added_var_plot <- function(data.list){
+    df.list <- data.list[[2]]
+    p <- length(df.list)
+    gg.list <- map(1:p, plot_jt_add_var, df.list = df.list)
+    nCol <- floor(sqrt(p))
+    do.call("grid.arrange", c(gg.list, ncol = nCol))
+}
+
 
 ```
 
@@ -394,8 +411,8 @@ joint.perm.add.var.test2 <- joint_perm_add_var_rf(data = siml.corr, pred.part = 
 
 #plot on top is added variable plot for subset of predictors of interest
 #plot on bottom is added variable plot for the predictors not in the subset of interest
-rf_added_var_plot(joint.add.var.test1)
-rf_added_var_plot(joint.add.var.test2)
+rf_jt_added_var_plot(joint.add.var.test1)
+rf_jt_added_var_plot(joint.add.var.test2)
 rf_added_var_plot(joint.add.var.test3)
 rf_added_var_plot(joint.add.var.test4)
 rf_added_var_plot(joint.add.var.test5)
@@ -417,7 +434,7 @@ rf_added_var_plot(joint.perm.add.var.test2)
 rf_plot_var_imp(joint.perm.add.var.test2)
 add_var_pval(joint.perm.add.var.test2)
 
-
+rf_jt_added_var_plot(testing.list[,2])
 
 ```
 

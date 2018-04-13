@@ -486,7 +486,7 @@ add_var_pval(siml4.worep.results)
 #iid dataset for interactions 
 n5 <- n
 p5 <- p
-err5 <- rnorm(n5, mean = 0, sd = 0.05)
+err5 <- rnorm(n5, mean = 0, sd = err.sim)
 siml.data5 <- as.data.frame(matrix(rnorm(n5*p5, mean = 0, sd = 1), nrow = n5))
 siml.data5 <- siml.data5 %>%
   mutate(Y = 8*V1*V2+7*V5*V6+err5)
@@ -494,7 +494,7 @@ siml.data5 <- siml.data5 %>%
 
 #Correlated variables for interactions 
 n6 <- n
-err6 <- rnorm(n6, mean = 0 , sd = 0.05)
+err6 <- rnorm(n6, mean = 0 , sd = err.sim)
 siml.data6 <- as.data.frame(rmvnorm(n = n6, mean = rep(0, times = 12), sigma = Sigma2))
 siml.data6 <- siml.data6 %>%
   mutate(Y = 8*V1*V2+7*V5*V6+err6)
@@ -570,7 +570,7 @@ With interacting terms using correlated predictors, the random forest seems to o
 #independent non-linear Predictors
 n7 <- n
 p7 <- p
-err7 <- rnorm(n7, mean = 0, sd = 0.05)
+err7 <- rnorm(n7, mean = 0, sd = err.sim)
 siml.data7 <- as.data.frame(matrix(rnorm(n7*p7, mean = 0, sd = 1), nrow = n7))
 siml.data7 <- siml.data7 %>%
   mutate(Y = 3^V1+2^V2+4^V5+err7)
@@ -578,7 +578,7 @@ siml.data7 <- siml.data7 %>%
 
 #Correlated variables for strongly non-linear predictors 
 n8 <- n
-err8 <- rnorm(n8, mean = 0 , sd = 0.05)
+err8 <- rnorm(n8, mean = 0 , sd = err.sim)
 siml.data8 <- as.data.frame(rmvnorm(n = n8, mean = rep(0, times = 12), sigma = Sigma2))
 siml.data8 <- siml.data8 %>%
   mutate(Y = 3^V1+2^V2+4^V5+err8)

@@ -3,12 +3,12 @@ author: 'Emerson H. Webb'
 date: 'May 2018'
 institution: 'Reed College'
 division: 'Mathematics and Natural Sciences'
-advisor: 'Advisor F. Name'
+advisor: 'Andrew Bray'
 #altadvisor: 'Your Other Advisor'
 # Delete line 6 if you only have one advisor
 department: 'Mathematics'
 degree: 'Bachelor of Arts'
-title: 'My Final College Paper'
+title: 'Added Variable Plot Importance and Joint Added Variable Plot Importance Measures for Random Forests'
 knit: "bookdown::render_book"
 site: bookdown::bookdown_site
 output: 

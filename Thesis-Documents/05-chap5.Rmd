@@ -2,7 +2,7 @@
 
 ## Introduction
 
-In the previous chapters, we introduced the added variable plot importance (AVPI) of a predictor in the random forest ensemble. Simulation results showed.. 
+In the previous chapters, we introduced the added variable plot importance (AVPI) of a predictor in the random forest ensemble. Simulation results showed that while
 
 One direction we can extend our framework of added variable plot importances is to compute the joint added variable plot importance for a set of predictors. We would like to capture the joint effect of sets of predictors on the performance of the random forest ensemble in predicting the response. One scenario in which we might want to capture the joint effect of sets of predictors is if out of a set of correlated predictors, we believe that only a subset of the correlated predictors are informative to the response. In such a scenario, we would like a quantitative measure to compare the joint importance of the subset of correlated informative predictors with the subset of correlated uninformative predictors. 
 

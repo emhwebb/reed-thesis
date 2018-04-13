@@ -352,8 +352,8 @@ Sigma4 <- matrix(c(u1,u2,u3,u4,u5,u6,u7), nrow = 7, ncol = 7)
 err3 <- rnorm(n1, mean = 0, sd = 0.5)
 siml.corr1 <- as.data.frame(rmvnorm(n = n1, mean = rep(0, times = 5), sigma = Sigma3))
 siml.corr1 <- siml.corr1 %>% 
-#mutate(V6 = rgamma(n = n1, shape = 10, rate = 0.1)) %>% 
-#mutate(V7 = 1/(1+exp(-rexp(n = n1, rate = 10)))) %>% 
+mutate(V6 = rgamma(n = n1, shape = 10, rate = 0.1)) %>% 
+mutate(V7 = 1/(1+exp(-rexp(n = n1, rate = 10)))) %>% 
 mutate(Y = 20*V1+20*V2+15*V5+err3)
 
 #+20*V1*V2+10*2^V3

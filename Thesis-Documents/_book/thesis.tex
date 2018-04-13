@@ -69,54 +69,15 @@
 % \usepackage{times} % other fonts are available like times, bookman, charter, palatino
 
 % Syntax highlighting #22
-  \usepackage{color}
-  \usepackage{fancyvrb}
-  \newcommand{\VerbBar}{|}
-  \newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
-  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
-  % Add ',fontsize=\small' for more characters per line
-  \usepackage{framed}
-  \definecolor{shadecolor}{RGB}{248,248,248}
-  \newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
-  \newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-  \newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
-  \newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-  \newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-  \newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-  \newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-  \newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-  \newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-  \newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-  \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-  \newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-  \newcommand{\ImportTok}[1]{#1}
-  \newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-  \newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-  \newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-  \newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-  \newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
-  \newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-  \newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-  \newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-  \newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
-  \newcommand{\BuiltInTok}[1]{#1}
-  \newcommand{\ExtensionTok}[1]{#1}
-  \newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-  \newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
-  \newcommand{\RegionMarkerTok}[1]{#1}
-  \newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-  \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-  \newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
-  \newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
-  \newcommand{\NormalTok}[1]{#1}
 
 % To pass between YAML and LaTeX the dollar signs are added by CII
-\title{My Final College Paper}
+\title{Added Variable Plot Importance and Joint Added Variable Plot Importance
+Measures for Random Forests}
 \author{Emerson H. Webb}
 % The month and year that you submit your FINAL draft TO THE LIBRARY (May or December)
 \date{May 2018}
 \division{Mathematics and Natural Sciences}
-\advisor{Advisor F. Name}
+\advisor{Andrew Bray}
 \institution{Reed College}
 \degree{Bachelor of Arts}
 %If you have two advisors for some reason, you can use the following
@@ -1903,6 +1864,30 @@ Scenario 4 & X & X & - & - & X & - & - & - & - & - & - & -\\
 \bottomrule
 \end{tabular}}
 \end{table}
+Each simulation corresponds to a particular scenario and type of
+predictors. We ran each scenario with first independent predictors then
+predictors with the correlation structure from above. In addition, we
+first ran each simulation using sampling with replacement in the random
+forest ensemble, then re-ran the simulation using sampling without
+replacement. \par
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-5}Which Scenario and Set of Predictors Each Simulation Corresponds to}
+\centering
+\resizebox{\linewidth}{!}{\begin{tabular}[t]{ll}
+\toprule
+Simulation 1 & Scenario 1 with independent predictors\\
+Simulation 2 & Scenario 1 with correlated predictors\\
+Simulation 3 & Scenario 2 with independent predictors\\
+Simulation 4 & Scenario 2 with correlated predictors\\
+Simulation 5 & Scenario 3 with independent predictors\\
+\addlinespace
+Simulation 6 & Scenario 3 with correlated predictors\\
+Simulation 7 & Scenario 4 with independent predictors\\
+Simulation 8 & Scenario 4 with correlated predictors\\
+\bottomrule
+\end{tabular}}
+\end{table}
 For each simulated dataset, we drew 2000 entries. We then ran the added
 variable plot importance scheme with the permutation scheme. For each
 stage of AVPI, we trained forest ensembles with 1000 trees, and to
@@ -1938,7 +1923,7 @@ variable 4 in comparison to variables 1, 2, and 3, which is what we
 would have expected.
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-5}Simulation Results for Added Variable Plot Importances for Sampling with Replacement}
+\caption{\label{tab:unnamed-chunk-6}Simulation Results for Added Variable Plot Importances for Sampling with Replacement}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
 \toprule
@@ -1963,7 +1948,7 @@ Variable 12 & 68.49742 & 88.75896 & 75.87031 & 26.68245 & 200.3480 & 39.174289 &
 \end{table}
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-6}Simulation Results for MDA Variable Importances for Sampling with Replacement}
+\caption{\label{tab:unnamed-chunk-7}Simulation Results for MDA Variable Importances for Sampling with Replacement}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
 \toprule
@@ -1986,9 +1971,24 @@ Variable 12 & 0.2826006 & 1.1815968 & -0.4752267 & -0.8640204 & 1.6851063 & -0.2
 \bottomrule
 \end{tabular}}
 \end{table}
+For simulation 3 we see that AVPI matches with the MDA variable
+importance in matching which variables are informative. However, with
+simulation 4, while variable 2 has a higher score than variable 4 with
+AVPI and MDA variable importance, both variables have similar scores
+with respect to AVPI and MDA variable importance. For simulation 5, the
+AVPI scores for variables 1, 2, 5, and 6 were highest although the
+uninformative predicotrs had relatively high AVPI scores. For simulation
+6, which was the interaction terms with correlated predictors, the AVPI
+correctly downweights the importance of variables 3 and 4, while
+accounting for the importance of variables 1 and 2. With simulation 7
+and 8, which was a highly non-linear response, there was small signal
+with respect to variable 2, so both AVPI and MDA importance computed low
+scores for variable 2. In particular, variable 2 in simulation 8 for
+AVPI has a particularly low score. However, for variables 1 and 5 have
+high AVPI scores as expected. \par 
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-7}Simulation Results for Added Variable Plot Importances for Sampling without Replacement}
+\caption{\label{tab:unnamed-chunk-8}Simulation Results for Added Variable Plot Importances for Sampling without Replacement}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
 \toprule
@@ -2013,7 +2013,7 @@ Variable 12 & 80.23029 & 64.317099 & 76.45756 & 61.39489 & 195.9230 & 39.499604 
 \end{table}
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-8}Simulation Results for MDA Variable Importances for Sampling without Replacement}
+\caption{\label{tab:unnamed-chunk-9}Simulation Results for MDA Variable Importances for Sampling without Replacement}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
 \toprule
@@ -2036,9 +2036,46 @@ Variable 12 & -0.5193238 & 2.0094494 & -1.0121098 & 0.4916756 & 3.0198114 & 1.39
 \bottomrule
 \end{tabular}}
 \end{table}
+Overall, simulation results indicate that AVPI can determine the
+informativeness of predictors with fairly strong signal, although in
+general MDA variable importance will offer similar results without the
+addition of uninformative variables receiving non-zero scores. In some
+situations with correlated predictors, the AVPI appears to find which of
+the correlated predictors are informative, so long as the signal in the
+informative predictor is relatively strong. This indicates that AVPI may
+be most effective as a tool employed alongside MDA variable importance
+when there is some correlation structure present in the predictors. In
+general, MDA variable importance will be able to evaluate the importance
+of independent predictors, and if there is some correlation structure
+that leads to unstable MDA variable importance values of the correlated
+predictors, then AVPI can be used on just the correlated predictors to
+determine which of the correlated predictors are important. \par 
+
+One issue with the AVPI method is the relative noisiness of the method.
+As observed in the simulation using sampling with replacement,
+uninformative variables can be assigned positive AVPI scores. Looking at
+results from re-running the simulation using sampling without
+replacement, we see that the same sort-of noisiness is also present in
+AVPI computed via random forests using sampling without replacement.
+Therefore the issue of noisiness for the AVPI method is not simply a
+matter of sampling with replacement versus sampling without replacement.
+The particular issue with the noisiness of the AVPI method is that it
+prevents us from readily employing permutation tests to determine
+importance of variables using AVPI as a test statistic in a hypothesis
+testing framework. In particular, looking at the tables of AVPI p-values
+for both sampling with replacement and sampling without replacement, we
+see that both tables are essentially identical, and that under a
+hypothesis testing framework, we would be committing type I errors
+across all simulations using a significance level of \(\alpha = 0.05\).
+Furthermore, looking at the simulated null distribution of AVPI values,
+we see that the null distributions are generally quite similar. The
+simulated null distribution of AVPI values is generally symmetric with
+the lower end of the tails at around an importance score of 25. So any
+AVPI score above 30 would likely appear statistically significant using
+a permutation test with AVPI as the test statistic. \par
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-9}Added Variable Importance P-values for Sampling with Replacement}
+\caption{\label{tab:unnamed-chunk-10}Added Variable Importance P-values for Sampling with Replacement}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
 \toprule
@@ -2063,7 +2100,7 @@ Variable 12 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.
 \end{table}
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-10}Added Variable Importance P-values for Sampling without Replacement}
+\caption{\label{tab:unnamed-chunk-11}Added Variable Importance P-values for Sampling without Replacement}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
 \toprule
@@ -2086,7 +2123,13 @@ Variable 12 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.
 \bottomrule
 \end{tabular}}
 \end{table}
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-11-1.pdf}
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-12-1.pdf}
+
+Thus while the AVPI may not be a stable test statistic for use in a
+hypothesis testing framework, our simulation results suggest that when
+used in conjunction with the MDA variable importance, the AVPI can be a
+useful tool for dealing with correlated predictors in a regression
+setting. \par
 
 \chapter{Joint Added Variable Plot
 Importance}\label{joint-added-variable-plot-importance}
@@ -2320,42 +2363,9 @@ Importance}\label{simulation-and-results-of-joint-added-variable-plot-importance
 \chapter*{Conclusion}\label{conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
 
-If we don't want Conclusion to have a chapter number next to it, we can
-add the \texttt{\{-\}} attribute.
-
-\textbf{More info}
-
-And here's some other random info: the first paragraph after a chapter
-title or section head \emph{shouldn't be} indented, because indents are
-to tell the reader that you're starting a new paragraph. Since that's
-obvious after a chapter or section title, proper typesetting doesn't add
-an indent there.
-
 \appendix
 
 \chapter{The First Appendix}\label{the-first-appendix}
-
-This first appendix includes all of the R chunks of code that were
-hidden throughout the document (using the \texttt{include\ =\ FALSE}
-chunk tag) to help with readibility and/or setup.
-
-\textbf{In the main Rmd file}
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{# This chunk ensures that the thesisdown package is}
-\CommentTok{# installed and loaded. This thesisdown package includes}
-\CommentTok{# the template files for the thesis.}
-\ControlFlowTok{if}\NormalTok{(}\OperatorTok{!}\KeywordTok{require}\NormalTok{(devtools))}
-  \KeywordTok{install.packages}\NormalTok{(}\StringTok{"devtools"}\NormalTok{, }\DataTypeTok{repos =} \StringTok{"http://cran.rstudio.com"}\NormalTok{)}
-\ControlFlowTok{if}\NormalTok{(}\OperatorTok{!}\KeywordTok{require}\NormalTok{(thesisdown))}
-\NormalTok{  devtools}\OperatorTok{::}\KeywordTok{install_github}\NormalTok{(}\StringTok{"ismayc/thesisdown"}\NormalTok{)}
-\KeywordTok{library}\NormalTok{(thesisdown)}
-\end{Highlighting}
-\end{Shaded}
-\textbf{In Chapter \ref{ref-labels}:}
-
-\chapter{The Second Appendix, for
-Fun}\label{the-second-appendix-for-fun}
 
 \backmatter
 

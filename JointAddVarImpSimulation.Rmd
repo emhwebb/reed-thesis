@@ -340,7 +340,8 @@ rf_jt_added_var_plot <- function(data.list){
 ```
 
 ```{r}
-set.seed(3)
+#set.seed(3)
+set.seed(11)
 n <- 2000
 p <- 12
 ntree.sim1 <- 1000
@@ -500,7 +501,7 @@ rf.88 <- joint_add_var_rf(data = siml.data8, pred.part = part8,
 jt_siml_list1 <- list(rf.1, rf.2, rf.3, rf.4, rf.5, rf.6, rf.7, rf.8)
 jt_siml_list2 <- list(rf.11, rf.22, rf.33, rf.44, rf.55, rf.66, rf.77, rf.88)
 
-save(starting.values, file="fname.RData")
+
 
 
 ```

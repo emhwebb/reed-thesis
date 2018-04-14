@@ -2137,12 +2137,10 @@ Importance}\label{joint-added-variable-plot-importance}
 \section{Introduction}\label{introduction-4}
 
 In the previous chapters, we introduced the added variable plot
-importance (AVPI) of a predictor in the random forest ensemble.
-Simulation results showed..
-
-One direction we can extend our framework of added variable plot
-importances is to compute the joint added variable plot importance for a
-set of predictors. We would like to capture the joint effect of sets of
+importance (AVPI) of a predictor in the random forest ensemble. One
+direction we can extend our framework of added variable plot importances
+is to compute the joint added variable plot importance for a set of
+predictors. We would like to capture the joint effect of sets of
 predictors on the performance of the random forest ensemble in
 predicting the response. One scenario in which we might want to capture
 the joint effect of sets of predictors is if out of a set of correlated
@@ -2150,7 +2148,7 @@ predictors, we believe that only a subset of the correlated predictors
 are informative to the response. In such a scenario, we would like a
 quantitative measure to compare the joint importance of the subset of
 correlated informative predictors with the subset of correlated
-uninformative predictors.
+uninformative predictors. \par
 
 \section{Partial F-Test}\label{partial-f-test}
 
@@ -2185,7 +2183,7 @@ against the null hypothesis that the coefficients of
 cannot compute a test statistic similar to the F-test statistic for
 joint added variable importance, we can take the approach of comparing
 models fit with and without \(\mathbf{X}_2\) to determine the importance
-of \(\mathbf{X}_2\) in the random forest context.
+of \(\mathbf{X}_2\) in the random forest context. \par
 
 \section{Joint Added Variable Plots}\label{joint-added-variable-plots}
 
@@ -2205,7 +2203,7 @@ and a random forest excluding the variables in \(H\). From there we can
 compute and compare added variable plots and added variable plot
 importances for predictors in the set \(K\), the set \(H\setminus K\),
 and the set \(H\), respectively, as we would in the single variable
-added variable plot scenario.
+added variable plot scenario. \par
 
 More generally, suppose we have a subset
 \(J=\{X_{\alpha_1},\ldots, X_{\alpha_m}\}\subseteq \{X_1,\ldots,X_p\}\),
@@ -2243,7 +2241,7 @@ centered about the origin and have no significant trend. If there are a
 mixture of informative and uninformative variables contained in \(J\),
 then the joint added variable plot of \(J\) would have a non-zero trend
 although the magnitude and direction of the trend would depend on the
-composition of the variables in \(J\).
+composition of the variables in \(J\). \par
 
 Depending on the number of predictors in \(J\) relative to number of
 predictors not in \(J\), computing the joint added variable plot for
@@ -2257,7 +2255,7 @@ also compute the joint added variable plot of the predictors not in
 \(\hat{\theta}_{RF}(Y|X_J)\). Doing so allows us to compare the
 predictive value of \(\hat{\theta}_{RF}(Y|X_{-J})\) and
 \(\hat{\theta}_{RF}(Y|X_J)\), while allowing us to also compare the
-added variable effect of \(J\) versus the complement of \(J\).
+added variable effect of \(J\) versus the complement of \(J\). \par
 
 {[}Have examples here. One of correlated predictors, another of
 uncorrelated predictors{]}
@@ -2294,7 +2292,7 @@ predictors in \(J\) as potential splitting variables in the forest
 growing process. As in the previous section, we also recommend that
 \(VI_{JAVP}(X_{-J})\), the JAVPI of those predictors not in \(J\) be
 concurrently computed to provide a comparison of joint importance
-between sets of predictors.
+between sets of predictors. \par
 \begin{algorithm}
     \caption{Joint Added Variable Plot Importance (JAVPI)} \label{added variable importance}
       \begin{algorithmic}[1]
@@ -2321,7 +2319,7 @@ using the permuted \(U_J^*\) as the predictor. We then use the resulting
 ensemble to compute \(VI_{MDA}(U_J^*)=VI_{JAVP}^*(X_J)\) as the permuted
 JAVPI of \(J\). Once we have ran enough iterations of permutations of
 \(U_J^*\) and computation \(VI_{JAVP}^*(X_J)\), we can compute a
-two-sided p-value using \(VI_{JAVP}(X_J)\) as our test statistic.
+two-sided p-value using \(VI_{JAVP}(X_J)\) as our test statistic. \par
 
 If we have a collection \(J_1,\ldots, J_q\) of subsets of the
 predictors, we could simulate sampling distributions of
@@ -2336,7 +2334,7 @@ using a multiple comparisons procedure such as the Bonferonni
 correction. Furthermore, we would like to emphasize the use of JAVPI and
 AVPI as variable selection tools and diagnostic tools for random
 forests, rather than tools purely of inferential statistics and
-hypothesis testing.
+hypothesis testing. \par
 
 With the JAVPI, in particular, our intention in introducing the JAVPI
 variable importance measure was to offer a method that utilizes the
@@ -2355,10 +2353,201 @@ are valid. Furthermore, we would like to remind the reader that
 inference based on residuals as we are describing with JAVPI and AVPI
 can be sensitive to outliers and extreme points such that statistically
 significant results from JAVPI or AVPI should be examined with some
-scrutiny.
+scrutiny. \par
 
 \section{Simulation and Results of Joint Added Variable Plot
 Importance}\label{simulation-and-results-of-joint-added-variable-plot-importance}
+
+\section{Simulation Design}\label{simulation-design-1}
+
+For our simulation of JAVPI, we used our simulation set-up from chapter
+4 with some changes. That is we ran the 8 simulations from chapter 4
+where we have independent and correlated predictors for each scenario.
+Rather than test both sampling with replacement and sampling without
+replacement for JAVPI, we chose to run our simulation on JAVPI with just
+sampling without replacement. In addition, we ran two sets of
+simulations for JAVPI to illustrate different features of the method.
+The first simulation was a simulation where we partitioned out all of
+the informative predictors to the response, leaving no signal in the
+remaining data. For the second simulation, we partitioned out our
+predictors such that both partitions of the set of predictors contained
+informative predictors. In the tables below we show the partitions of
+our simulated data sets for both the first round and second round of
+simulations. All other settings for the simulations are the same as
+those for chapter 4: we drew 2000 samples and grew 1000 tree ensembles
+for both stages of JAVPI. \par 
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-16}Partitions for Simulation Runs 1 and 2, respectively}
+\centering
+\resizebox{\linewidth}{!}{\begin{tabular}[t]{lll}
+\toprule
+  & Partition of Predictors & Partition of Predictors\\
+\midrule
+Scenario 1 & V1, V2, V3, V5, V6, V7 & V1, V2, V3\\
+Scenario 2 & V1, V2, V3, V5 & V1, V2\\
+Scenario 3 & V1, V2,V5, V6 & V1, V2\\
+Scenario 4 & V1, V2, V5 & V1, V2\\
+\bottomrule
+\end{tabular}}
+\end{table}
+\section{Simulation Results}\label{simulation-results-1}
+
+Below are simulation results of JAVPI for the first simulation run. We
+find that, in general, JAVPI is relatively stable at distinguishing
+between the set of predictors containing all the signal and the set of
+predictors that are noise. In particular, in all cases the JAVPI values
+are much higher for the set of informative predictors than for the set
+of uninformative predictors, which is what we expected. We do note that
+in simulations 1, 2, and 6, the JAVPI value for the uninformative
+predictors is quite high. Some possible reasons for this are monte carlo
+variability and relatively weak signal in the predictors allowing for
+some masking between variables. \par 
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-17}JAVPI values from first simulation run}
+\centering
+\resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
+\toprule
+  & Simulation 1 & Simulation 2 & Simulation 3 & Simulation 4 & Simulation 5 & Simulation 6 & Simulation 7 & Simulation 8\\
+\midrule
+JAVPI of Important Variables & 568.2903 & 569.6116 & 235.87012 & 134.14193 & 404.18337 & 300.9952 & 201.1710904 & 149.257206\\
+JAVPI of Unimportant Variables & 211.0352 & 111.8445 & 44.38363 & -10.39641 & 49.85753 & 142.9379 & -0.0920535 & -5.136049\\
+\bottomrule
+\end{tabular}}
+\end{table}
+We examine the joint added variable plots for simulations 1, then
+simulation 2. \par 
+
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-18-1.pdf}
+
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-19-1.pdf}
+
+We see that there is a weak negative trend among the uninformative
+variables. This structure is somewhat hard to explain, although it is
+most likely due to noise or masking among variables. We do note that the
+informative predictors have a strongly positive trend in contrast to the
+uninformative predictors. This is in contrast to the joint added
+variable plots for simulations 5 below. \par 
+
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-20-1.pdf}
+
+For simulation 5, the uninformative variables had no trend while the
+informative variables had a strong positive trend. This at least
+indicates that the JAVPI score captures the relative structure present
+in the joint added variable plot. For lower values of JAVPI, we do not
+expect there to be much structure in the joint added variable plot,
+indicating uninformativeness of those variables. Higher values of JAVPI
+indicate that there is structure in data. In the case of higher JAVPI
+scores, combining the JAVPI score with the joint added variable plot
+should allow us to figure out where the signal is present. For example,
+with simulations 1 and 2, the trend of the joint added variable plot for
+the informative variables is much stronger than the trend for the
+uninformative variables. Furthermore, the JAVPI score for the
+informative variables is much higher than the JAVPI scores for the
+uninformative variables. Some further testing, such as examining the MDA
+variable importance for the full set of predictors may then allow us to
+conclude that the set of uninformative variables are truly
+uninformative. If the set of uninformative variables is not too large,
+we could also try computing the JAVPI for each predictor in the set of
+uninformative variables individually. If there is some signal in those
+predictors, then we would expect there to be some non-zero trend in the
+resulting joint added variable plot, otherwise, there would be no trend
+in the joint added variable plot. \par 
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-21}MDA values from simulation}
+\centering
+\resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
+\toprule
+  & Simulation 1 & Simulation 2 & Simulation 3 & Simulation 4 & Simulation 5 & Simulation 6 & Simulation 7 & Simulation 8\\
+\midrule
+Variable 1 & 188.1888678 & 47.1926527 & 100.8388218 & 45.8739444 & 49.8330100 & 60.3014150 & 97.4525023 & 35.5213870\\
+Variable 2 & 183.9331088 & 42.3528994 & 57.0499686 & 20.1793932 & 46.0267772 & 62.1985986 & 17.1483163 & 20.0409958\\
+Variable 3 & 47.8805940 & 31.5347670 & 122.3218877 & 45.5134733 & 0.8178339 & 28.6188130 & 1.7064178 & 12.8387238\\
+Variable 4 & 0.4348930 & 22.5308924 & -3.6214354 & 21.7646631 & -4.4166351 & 29.7790428 & 3.5294348 & 15.8408558\\
+Variable 5 & 182.6877989 & 204.0699535 & 74.4365140 & 34.1681806 & 45.6762506 & 47.8119596 & 114.5667087 & 112.4815954\\
+\addlinespace
+Variable 6 & 189.2256503 & 220.9777395 & -0.7850783 & -0.9356090 & 46.6726578 & 41.6750750 & -2.5949381 & 0.3172609\\
+Variable 7 & 50.7460484 & 54.7815450 & -1.0197109 & -0.8578919 & 1.6056351 & -3.9313599 & -1.5027717 & 1.5332838\\
+Variable 8 & -0.8234221 & -0.4184271 & -1.3429475 & 4.3664364 & -1.1567691 & -1.2540680 & 4.0916913 & -1.2552874\\
+Variable 9 & -0.1655688 & 2.2750281 & 0.0633036 & -0.8092386 & -0.4823417 & -2.7060695 & -1.9964930 & -0.2097589\\
+Variable 10 & -0.3009937 & -0.0311815 & 0.8882865 & -1.6703332 & 2.3257047 & -0.4336373 & -0.2211797 & 0.6841876\\
+\addlinespace
+Variable 11 & -2.0581010 & -0.6666150 & 3.6348060 & -1.7513438 & -0.7229380 & -2.9624221 & 0.4981721 & 0.6507235\\
+Variable 12 & 0.4734702 & -1.8529851 & -1.0845957 & -0.0398239 & 1.1590781 & 0.0759028 & -0.4632472 & 4.1315394\\
+\bottomrule
+\end{tabular}}
+\end{table}
+For the second simulation run, where there was signal in both partitions
+of the predictors, we find that, in general, the JAVPI scores for both
+partitions in each simulation is high, as we expected. When we include
+signal in both partitions, the JAVPI will generally pick up on the
+signal, and we can examine the joint added variable plots for visual
+confirmation of what is going on. In particular, we display the joint
+added variable plot for simulation 1. \par 
+\begin{table}[H]
+\centering
+\resizebox{\linewidth}{!}{\begin{tabular}{lrrrrrrrr}
+\toprule
+  & Simulation 1 & Simulation 2 & Simulation 3 & Simulation 4 & Simulation 5 & Simulation 6 & Simulation 7 & Simulation 8\\
+\midrule
+JAVPI of Predictors in Partition & 512.2771 & 419.6027 & 137.0338 & 116.9519 & 290.84010 & 193.3554 & 170.3404 & 133.4510\\
+JAVPI of Predictors Not in Partition & 492.8947 & 548.7029 & 190.8555 & 189.6105 & 67.05666 & 196.4716 & 167.9322 & 159.1351\\
+\bottomrule
+\end{tabular}}
+\end{table}
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-23-1.pdf}
+
+For simulation 1, we found the JAVPI scores for both partitions is quite
+similar (around 512 versus 492), which makes sense given that we split
+the informative predictors evenly between both predictors. The joint
+added variable plot for simulation 1 is a strong positive trend as
+expected given the size of the JAVPI scores. \par 
+
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-24-1.pdf}
+
+On the other hand, examining the table of JAVPI values for the second
+simulation run, it seems that in simulation 5, the second partition had
+a much lower JAVPI score than the first partition. Examining the joint
+added variable plots for simulation 5 immediately above, we see that
+while the joint added variable plot for the first partition is strongly
+positive, we can only describe the trend in the joint added variable
+plot for the second partition as being weakly positive. The JAVPI score
+for the second partition is high enough to suggest that there is signal
+in the second partition, but is much lower than the JAVPI score for the
+first partition. This seems very likely to be due to monte carlo
+variability. Choosing a different seed and re-running simulation 5
+results in a appropriately high JAVPI value for the second partition,
+which is what we had expected. \par 
+
+We conclude this chapter by noting that throughout our simulations for
+JAVPI, the conclusions we reached with respect to independent versus
+correlated predictors were quite similar. Since with JAVPI, we are
+interested in the aggregated effect of a set of predictors, this means
+that we are really testing whether or not the subset of predictors
+contains a discernable signal. The particular usefulness of JAVPI is not
+necessarily detecting where there is a signal, but detecting where there
+is not a signal. If a subset of predictors produce a low JAVPI score,
+then it is quite possible that there is very little to no signal in that
+subset. Hence in this manner, we could in theory test each correlated
+variable in a data set to try to figure out if any correlated predictors
+are informative to the response. Of course, such a method can be
+computationally intractible and impractical for data sets with many
+predictors, so computing the JAVPI score of different combinations of
+subsets could be more efficient than testing each predictor one by one.
+Furthermore, the JAVPI score is more computationally efficient to
+compute than the AVPI score since for each JAVPI score we train 5 forest
+ensembles, while for AVPI, if \(p\) is the number of predictors in the
+data set, then to compute the AVPI scores of a data set we would have to
+train \(2p+1\) many forest ensembles. This suggests that for
+applications to permutation tests when the AVPI and JAVPI scores are not
+too noisy, the JAVPI score would be more efficient to compute a
+permutation test for. We do note that JAVPI is sensitive to the strength
+of the signal in the response. If the signal is weak, then the AVPI and
+JAVPI methods will be sensitive to noise, but if the signal in the
+response is strong, the AVPI and JAVPI methods will be less sensitive to
+noise in the data. \par 
 
 \chapter*{Conclusion}\label{conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}

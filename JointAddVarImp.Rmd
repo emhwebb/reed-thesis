@@ -336,15 +336,15 @@ rf_jt_added_var_plot <- function(data.list){
 ```
 
 ```{r}
-set.seed(10)
+set.seed(1003)
 n1 <- 2000
 #p1 is number of variables
-p1 <- 5
+p1 <- 3
 #our weights are given by wt_vec <- c(5,5,2,0,-5,-5,-2,0,0,0,0,0) 
-err1 <- rnorm(n1, mean = 0, sd = 0.05)
+err1 <- rnorm(n1, mean = 0, sd = 3)
 siml.data1 <- as.data.frame(matrix(rnorm(n1*p1, mean = 0, sd = 1), nrow = n1))
 siml.data1 <- siml.data1 %>% 
-  mutate(Y = 5*V1+5*V2+err1)
+  mutate(Y = 5*V1-5*V2+err1)
 
 w1 <- c(1,0.9,0.9,0.9,0)
 w2 <- c(0.9,1,0.9,0.9,0)
@@ -435,6 +435,31 @@ rf_plot_var_imp(joint.perm.add.var.test2)
 add_var_pval(joint.perm.add.var.test2)
 
 rf_jt_added_var_plot(testing.list[,2])
+
+full.lm <- lm(Y~V1+V2+V3, data = siml.data1)
+min1.lm <- lm(Y~V2+V3, data = siml.data1)
+min2.lm <- lm(Y~V1+V3, data = siml.data1)
+min3.lm <- lm(Y~V1+V2, data = siml.data1)
+y.res1 <- siml.data1$Y-min1.lm$fitted.values
+x.res1 <- full.lm$fitted.values-min1.lm$fitted.values
+avp.df1 <- data.frame(x.res1, y.res1)
+
+y.res2 <- siml.data1$Y-min2.lm$fitted.values
+x.res2 <- full.lm$fitted.values-min2.lm$fitted.values
+avp.df2 <- data.frame(x.res2, y.res2)
+
+y.res3 <- siml.data1$Y-min3.lm$fitted.values
+x.res3 <- full.lm$fitted.values-min3.lm$fitted.values
+avp.df3 <- data.frame(x.res3, y.res3)
+
+ggplot(avp.df1, aes(x = x.res1, y = y.res1))+geom_point()
+ggplot(avp.df2, aes(x = x.res2, y = y.res2))+geom_point()
+ggplot(avp.df3, aes(x = x.res3, y = y.res3))+geom_point()
+
+summary(lm(y.res2~., data = avp.df2))
+
+comp.w.lin. <- add_var_randomforest(data = siml.data1, ntree1 = 500, ntree2 = 500)
+rf_added_var_plot(comp.w.lin.)
 
 ```
 

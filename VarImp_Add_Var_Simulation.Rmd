@@ -25,6 +25,7 @@ Next want to write a function which takes a dataframe and applys the added-varia
 
 #itr_col takes as input an integer and removes that column from the dataset
 #note: should make itr_col more robust
+
 itr_col <- function(i, data){
   select(data,-i)
 }
@@ -69,6 +70,30 @@ each_pred_rf <- function(data.list, ntree1, replace = TRUE){
   list(new.df, imp)
 }
 
+#res_rf_pred runs random forest with each predictor as response and outputs 
+#predicted values in a dataframe (for use with map_dfc)
+res_rf_pred <- function(i, df, ntree1, replace = replace){
+  form <- reformulate(termlabels = names(df[-i]), response = paste0("V", as.character(i)))
+  var.rf <- randomForest(form, data = df, ntree = ntree1, replace = replace)
+  var.rf.pred <- as.data.frame(var.rf$predicted)
+  colnames(var.rf.pred) <- paste("PredWoVar", as.character(i), sep = "")
+  var.rf.pred
+}
+
+res_each_pred_rf <- function(data.list, ntree1, replace = TRUE){
+  p <- length(data.list)-1
+  rf.list <- map(.x = data.list, function(x) 
+    randomForest(Y~., data = x, ntree = ntree1, replace = replace, importance = TRUE))
+  rf.df <- map_dfc(1:(p+1), extract_rf_pred, data.list = rf.list, p = p)
+  Y <- data.list[[1]]$Y
+  new.df <- cbind(rf.df, Y)
+  imp <- importance(rf.list[[p+1]])
+  pred.df <- select(data.list[[(p+1)]], -Y)
+  rf.df.2 <- map_dfc(1:p, res_rf_pred, df = pred.df, ntree1 = ntree1, replace = replace)
+  x.rf.df <- cbind(rf.df.2, pred.df)
+  list(new.df, x.rf.df, imp) 
+}
+
 #extract_add_var takes as input an index value and data frame and 
 #outputs a dataframe of the basic added variable data frame where 
 #x.res is the difference between predicted values of full model and 
@@ -97,6 +122,29 @@ rf_add_var <- function(data.list){
   add.var.list
 }
 
+#res_extract_add_var is like extract_add_var, but is for when 
+#plotting actual x-residuals
+#df1 is data frame with y-pred and df2 is dataframe with x-pred
+res_extract_add_var <- function(i, df1, df2){
+  Y <- as.name("Y")
+  V <- as.name(paste0("V", as.character(i)))
+  M <- as.name(paste0("PredWoVar", as.character(i)))
+  x.res <- df2[[V]]-df2[[M]]
+  y.res <- df1[[Y]]-df1[[M]]
+  new.df <- data.frame(x.res, y.res)
+  colnames(new.df) <- c(paste0("added.Var", as.character(i)), "y.res")
+  new.df
+}
+
+#res_rf_add_var is rf_add_var for when plotting actual x-residuals in added variable plots
+res_rf_add_var <- function(data.list){
+ df1 <- data.list[[1]]
+ df2 <- data.list[[2]]
+ p <- length(df1)-2
+ add.var.list <- map(1:p, res_extract_add_var, df1 = df1, df2 = df2)
+ add.var.list
+}
+
 #rf_add_var_imp takes as input a list of add_var df's from rf_add_var and runs
 #a random forest on the y-residuals with x-residuals as input.
 #output is a list of random forest objects. \
@@ -105,13 +153,6 @@ rf_add_var_imp <- function(data.list, ntree2, replace = TRUE){
   p <- length(data.list)
   rf.add.imp.list <- map(.x = data.list, function(x) 
     randomForest(y.res~., data = x, ntree = ntree2, replace = replace, importance = TRUE))
-  rf.add.imp.list
-}
-
-rf_shallow_add_var_imp <- function(data.list, ntree2, replace = TRUE){
-  p <- length(data.list)
-  rf.add.imp.list <- map(.x = data.list, function(x) 
-    randomForest(y.res~., data = x, ntree = ntree2, replace = replace, importance = TRUE, nodesize = 3))
   rf.add.imp.list
 }
 
@@ -184,6 +225,51 @@ add_var_randomforest <- function(data, ntree1, ntree2, replace = TRUE){
   #rf.add.var.list which are dataframe for added variable plots, and 
   #the variable importances from full model run in each_pred_rf
   list(add.var.imp, rf.add.var.list, rf.list[[2]])
+}
+
+#model_add_var_randomforest is identical to add_var_randomforest, but is for use in 
+#randomforest_avp
+model_add_var_randomforest <- function(data, ntree1, ntree2, replace = TRUE){
+  #to get the copy of the data with one predictor removed
+  df.list <- df_combs(data)
+  #running initial randomForest on each data frame
+  rf.list <- each_pred_rf(df.list, ntree1 = ntree1, replace = replace)
+  #tidying the data to compute added variable plots
+  rf.add.var.list <- rf_add_var(rf.list)
+  #running randomForests on each plot
+  rf.add.imp.list <- rf_add_var_imp(rf.add.var.list, ntree2 = ntree2, replace = replace)
+  #extracts variable importance values for each randomForest ran on added variable plots
+  add.var.imp <- extract_var_imp(rf.add.imp.list)
+  #output is list containing data frame of added variable plot variable importances, 
+  #rf.add.var.list which are dataframe for added variable plots, and 
+  #the variable importances from full model run in each_pred_rf
+  list(add.var.imp, rf.add.var.list, rf.list[[2]])
+}
+
+#residual_add_var_randomforest is add_var_randomforest ran on actual x-residuals
+residual_add_var_randomforest <- function(data, ntree1, ntree2, replace = TRUE){
+  #to get the copy of the data with one predictor removed with last entry the data set without the predictor
+  df.list <- df_combs(data)
+  #to get randomforests on each dataframe and on each predictor
+  rf.list <- res_each_pred_rf(df.list, ntree1 = ntree1, replace = replace)
+  #tidying up data for added variable plots
+  rf.add.var.list <- res_rf_add_var(rf.list)
+  #running randomForests on each plot
+  rf.add.imp.list <- rf_add_var_imp(rf.add.var.list, ntree2 = ntree2, replace = replace)
+  #extracts variable importance values for each randomForest ran on added variable plots
+  add.var.imp <- extract_var_imp(rf.add.imp.list)
+  #output is list containing data frame of added variable plot variable importances, 
+  #rf.add.var.list which are dataframe for added variable plots, and 
+  #the variable importances from full model run in each_pred_rf
+  list(add.var.imp, rf.add.var.list, rf.list[[3]])
+}
+
+#randomforest_avp is a wrapper for model_add_var_randomforest and 
+#residual_add_var_randomforest, x.res = FALSE indicates using model_add_var_randomforest
+randomforest_avp <- function(data, ntree1, ntree2, replace = TRUE, x.res = FALSE){
+  if(x.res == FALSE) model_add_var_randomforest(data = data, ntree1 = ntree1, 
+                                                    ntree2 = ntree2, replace = replace)
+  else residual_add_var_randomforest(data = data, ntree1 = ntree1, ntree2 = ntree2, replace = replace)
 }
 
 #perm_add_var_randomforest is a wrapper for previous functions (including rf_perm_add_var)
@@ -270,6 +356,8 @@ add_var_pval <- function(data.list){
   as.data.frame(pval.df)
 }
 
+
+
 ```
 
 
@@ -283,8 +371,8 @@ Both are cases of a response in which the effect of added variables is linear.
 
 n <- 2000
 p <- 12
-ntree.sim1 <- 300
-ntree.sim2 <- 300
+ntree.sim1 <- 1000
+ntree.sim2 <- 1000
 ntree.sim3 <- 300
 it.sim <- 1000
 
@@ -293,7 +381,7 @@ it.sim <- 1000
 
 ```{r}
 
-set.seed(13)
+set.seed(130874235)
 #iid
 #n1 is number of observations in dataset
 n1 <- n
@@ -303,7 +391,7 @@ p1 <- p
 err1 <- rnorm(n1, mean = 0, sd = 0.05)
 siml.data1 <- as.data.frame(matrix(rnorm(n1*p1, mean = 0, sd = 1), nrow = n1))
 siml.data1 <- siml.data1 %>% 
-  mutate(Y = 5*V1+5*V2+2*V3+-5*V5+-5*V6+-2*V7+err1)
+  mutate(Y = 50*V1+50*V2+-50*V5+-50*V6+err1)
 
 #correlated
 #n2 is number of observations in dataset
@@ -336,12 +424,15 @@ siml.data2 <- siml.data2 %>%
 #run the simulations with and without replacement for bootstrapping
 siml1.wrep.results <- perm_add_var_randomforest(data = siml.data1, it = it.sim, ntree1 = ntree.sim1, 
                                                 ntree2 = ntree.sim2, ntree3 = ntree.sim3)
-siml1.worep.results <- perm_add_var_randomforest(data = siml.data1, it = it.sim, ntree1 = ntree.sim1, 
-                                                 ntree2 = ntree.sim2, ntree3 = ntree.sim3, replace = FALSE)
+siml1.worep.results <- add_var_randomforest(data = siml.data1, ntree1 = ntree.sim1, 
+                                                 ntree2 = ntree.sim2, replace = FALSE)
 siml2.wrep.results <- perm_add_var_randomforest(data = siml.data2, it = it.sim, ntree1 = ntree.sim1, 
                                                 ntree2 = ntree.sim2, ntree3 = ntree.sim3)
-siml2.worep.results <- perm_add_var_randomforest(data = siml.data2, it = it.sim, ntree1 = ntree.sim1, 
-                                                 ntree2 = ntree.sim2, ntree3 = ntree.sim3, replace = FALSE)
+siml2.worep.results <- add_var_randomforest(data = siml.data2, ntree1 = ntree.sim1, 
+                                                 ntree2 = ntree.sim2, replace = FALSE)
+part_test <- c("V1", "V2", "V3", "V5", "V6", 'V7')
+test_jt <- joint_add_var_rf(data = siml.data1, pred.part = "V4", 
+                            ntree1 = 1000, ntree2 = 1000, replace = FALSE)
 
 
 ```
@@ -728,34 +819,34 @@ map_dfr(1:length(rand.for.siml.6[[2]]), add.var.list = rand.for.siml.6[[2]], add
 ```
 
 ```{r}
-set.seed(7)
-n9 <- 100
+set.seed(1003)
+n9 <- 2000
 #p1 is number of variables
-p9 <- 4
+p9 <- 3
 #our weights are given by wt_vec <- c(5,5,2,0,-5,-5,-2,0,0,0,0,0) 
-err9 <- rnorm(n9, mean = 0, sd = 100)
+err9 <- rnorm(n9, mean = 0, sd = 3)
 siml.data9 <- as.data.frame(matrix(rnorm(n9*p9, mean = 0, sd = 1), nrow = n9))
 siml.data9 <- siml.data9 %>% 
-  mutate(Y = 20*V1+20*V2-14*V3-2*V4^12+err9)
-
+  mutate(Y = 3*V1+5*V1*V2+err9)
+#20*V1+20*V2-14*V3-2*V4^12
 full.rf <- randomForest(Y~., data = siml.data9, ntree = 1000, importance = TRUE, replace = FALSE)
-wo.v1 <- randomForest(Y~V2+V3+V4, data = siml.data9, ntree = 1000, importance = TRUE, replace = FALSE)
-wo.v2 <- randomForest(Y~V1+V3+V4, data = siml.data9, ntree = 1000, importance = TRUE, replace = FALSE)
-wo.v3 <- randomForest(Y~V1+V2+V4, data = siml.data9, ntree = 1000, importance = TRUE, replace = FALSE)
-wo.v4 <- randomForest(Y~V1+V2+V3, data = siml.data9, ntree = 1000, importance = TRUE, replace = FALSE)
-of.v1 <- randomForest(V1~V2+V3+V4, data = siml.data9, ntree = 1000, importance = TRUE, replace = FALSE)
-of.v2 <- randomForest(V2~V1+V3+V4, data = siml.data9, ntree = 1000, importance = TRUE, replace = FALSE)
-of.v3 <- randomForest(V3~V1+V2+V4, data = siml.data9, ntree = 1000, importance = TRUE, replace = FALSE)
+wo.v1 <- randomForest(Y~V2+V3, data = siml.data9, ntree = 1000, importance = TRUE, replace = FALSE)
+wo.v2 <- randomForest(Y~V1+V3, data = siml.data9, ntree = 1000, importance = TRUE, replace = FALSE)
+wo.v3 <- randomForest(Y~V1+V2, data = siml.data9, ntree = 1000, importance = TRUE, replace = FALSE)
+wo.v4 <- randomForest(Y~V1+V2, data = siml.data9, ntree = 1000, importance = TRUE, replace = FALSE)
+of.v1 <- randomForest(V1~V2+V3, data = siml.data9, ntree = 1000, importance = TRUE, replace = FALSE)
+of.v2 <- randomForest(V2~V1+V3, data = siml.data9, ntree = 1000, importance = TRUE, replace = FALSE)
+of.v3 <- randomForest(V3~V1+V2, data = siml.data9, ntree = 1000, importance = TRUE, replace = FALSE)
 of.v4 <- randomForest(V4~V1+V2+V3, data = siml.data9, ntree = 1000, importance = TRUE, replace = FALSE)
 
 full.lm <- lm(Y~., data = siml.data9)
-lm.wo.v1 <- lm(Y~V2+V3+V4, data = siml.data9)
-lm.wo.v2 <- lm(Y~V1+V3+V4, data = siml.data9)
-lm.wo.v3 <- lm(Y~V1+V2+V4, data = siml.data9)
+lm.wo.v1 <- lm(Y~V2+V3, data = siml.data9)
+lm.wo.v2 <- lm(Y~V1+V3, data = siml.data9)
+lm.wo.v3 <- lm(Y~V1+V2, data = siml.data9)
 lm.wo.v4 <- lm(Y~V1+V2+V3, data = siml.data9)
-lm.of.v1 <- lm(V1~V2+V3+V4, data = siml.data9)
-lm.of.v2 <- lm(V2~V1+V3+V4, data = siml.data9)
-lm.of.v3 <- lm(V3~V1+V2+V4, data = siml.data9)
+lm.of.v1 <- lm(V1~V2+V3, data = siml.data9)
+lm.of.v2 <- lm(V2~V1+V3, data = siml.data9)
+lm.of.v3 <- lm(V3~V1+V2, data = siml.data9)
 lm.of.v4 <- lm(V4~V1+V2+V3, data = siml.data9)
 
 v1 <- siml.data9$V1
@@ -763,17 +854,17 @@ v2 <- siml.data9$V2
 v3 <- siml.data9$V3
 v4 <- siml.data9$V4
 
-df.v1 <- as.data.frame(cbind(v1-of.v1$predicted, full$predicted-wo.v1$predicted))
-df.v2 <- as.data.frame(cbind(v2-of.v2$predicted, full$predicted-wo.v2$predicted))
-df.v3 <- as.data.frame(cbind(v3-of.v3$predicted, full$predicted-wo.v3$predicted))
-df.v4 <- as.data.frame(cbind(v4-of.v4$predicted, full$predicted-wo.v4$predicted))
+df.v1 <- as.data.frame(cbind(v1-of.v1$predicted, full.rf$predicted-wo.v1$predicted))
+df.v2 <- as.data.frame(cbind(v2-of.v2$predicted, full.rf$predicted-wo.v2$predicted))
+df.v3 <- as.data.frame(cbind(v3-of.v3$predicted, full.rf$predicted-wo.v3$predicted))
+df.v4 <- as.data.frame(cbind(v4-of.v4$predicted, full.rf$predicted-wo.v4$predicted))
 
 colnames(df.v1) <- c("x.res", "y.res")
 colnames(df.v2) <- c("x.res", "y.res")
 colnames(df.v3) <- c("x.res", "y.res")
 colnames(df.v4) <- c("x.res", "y.res")
 
-dfalt.list <- list(df.v1,df.v2,df.v3,df.v4)
+dfalt.list <- list(df.v1,df.v2,df.v3)
 
 rfalt.list <- rf_add_var_imp(dfalt.list, ntree2 = 1000, replace = FALSE) 
 
@@ -781,7 +872,10 @@ ggv1 <- ggplot(df.v1, aes(x = x.res, y = y.res))+geom_point()
 ggv2 <- ggplot(df.v2, aes(x = x.res, y = y.res))+geom_point()
 ggv3 <- ggplot(df.v3, aes(x = x.res, y = y.res))+geom_point()
 ggv4 <- ggplot(df.v4, aes(x = x.res, y = y.res))+geom_point()
-do.call("grid.arrange", c(list(ggv1,ggv2,ggv3,ggv4), ncol = 2))
+do.call("grid.arrange", c(list(ggv1,ggv2,ggv3), ncol = 2))
+
+rendahl_form <- add_var_randomforest(data = siml.data9, ntree1 = 1000, ntree2 = 1000, replace = FALSE)
+rf_added_var_plot(rendahl_form)
 
 extract_var_imp(rfalt.list)
 importance(full.rf)
@@ -806,7 +900,11 @@ ggv1.lm <- ggplot(lm.df.v1, aes(x = x.res, y = y.res))+geom_point()
 ggv2.lm <- ggplot(lm.df.v2, aes(x = x.res, y = y.res))+geom_point()
 ggv3.lm <- ggplot(lm.df.v3, aes(x = x.res, y = y.res))+geom_point()
 ggv4.lm <- ggplot(lm.df.v4, aes(x = x.res, y = y.res))+geom_point()
-do.call("grid.arrange", c(list(ggv1.lm,ggv2.lm,ggv3.lm,ggv4.lm), ncol = 2))
+do.call("grid.arrange", c(list(ggv1.lm,ggv2.lm,ggv3.lm), ncol = 2))
+
+avp.lm.v1 <- lm(y.res~., data =lm.df.v1)
+avp.lm.v2 <- lm(y.res~., data =lm.df.v2)
+avp.lm.v3 <- lm(y.res~., data =lm.df.v3)
 
 ```
 

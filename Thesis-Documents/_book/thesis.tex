@@ -1679,12 +1679,16 @@ replacement. We then ran the simulation on correlated predictors and
 sampling with replacement, then with correlated predictors and sampling
 without replacement. We illustrate the relationship between predictors
 and response for each of the four scenarios below. \par
+\begin{figure}[h]
 \begin{align}
 \text{Scenario 1: } & Y=5X_1+5X_2+2X_3-5X_5-5X_6-2X_7+\varepsilon \nonumber \\
 \text{Scenario 2: } & Y=5X_1^4+5X_2^3+6X_3^4+5X_5^3+\varepsilon \nonumber \\
 \text{Scenario 3: } & Y=8X_1X_2+7X_5X_6+\varepsilon \nonumber \\
 \text{Scenario 4: } & Y=3^{X_1}+2^{X_2}+4^{X_5}+\varepsilon \nonumber
 \end{align}
+\caption{Functional Form of the Response With Respect to the Predictors}
+\label{ScenarioForms}
+\end{figure}
 In each scenario, variables 1 and 2 are always informative towards the
 predictor. In scenarios 1 and 2, variable 3 is informative to the
 predictor, while it is not informative for the scenario 3 and 4. In all
@@ -1718,8 +1722,8 @@ predictors with the correlation structure from above. In addition, we
 first ran each simulation using sampling with replacement in the random
 forest ensemble, then re-ran the simulation using sampling without
 replacement. \par
+\begin{figure}[h]
 \begin{align}
-\textbf{Which Scenario and } &\textbf{Set of Predictors Each Simulation Corresponds to } \nonumber \\
 \text{ Simulation 1: } & \text{ Scenario 1 with Independent Predictors} \nonumber \\
 \text{ Simulation 2: } & \text{ Scenario 1 with Correlated Predictors} \nonumber \\
 \text{ Simulation 3: } & \text{ Scenario 2 with Independent Predictors} \nonumber \\
@@ -1729,6 +1733,9 @@ replacement. \par
 \text{ Simulation 7: } & \text{ Scenario 4 with Independent Predictors} \nonumber \\
 \text{ Simulation 8: } & \text{ Scenario 4 with Correlated Predictors} \nonumber
 \end{align}
+\caption{Which Scenario and Set of Predictors Each Simulation Corresponds to}
+\label{ScenarioPredictors}
+\end{figure}
 For each simulated dataset, we drew 2000 entries. We then ran the added
 variable plot importance scheme with the permutation scheme. For each
 stage of AVPI, we trained forest ensembles with 1000 trees, and to
@@ -1762,11 +1769,18 @@ variables 1 through 4 due to the correlation structure betweeen those
 variables. In this case, the AVPI properly deflates the importance of
 variable 4 in comparison to variables 1, 2, and 3, which is what we
 would have expected. \par
-
+\begin{figure}
+\centering
 \includegraphics{thesis_files/figure-latex/unnamed-chunk-5-1.pdf}
-
+\caption{\label{fig:unnamed-chunk-5}\label{AVPIwrep}Model-based AVPI
+Simulation Results Using Sampling With Replacement}
+\end{figure}
+\begin{figure}
+\centering
 \includegraphics{thesis_files/figure-latex/unnamed-chunk-6-1.pdf}
-
+\caption{\label{fig:unnamed-chunk-6}\label{MDAwrep}MDA Simulation Results
+Using Sampling With Replacement}
+\end{figure}
 For simulation 3 we see that AVPI matches with the MDA variable
 importance in matching which variables are informative. However, with
 simulation 4, while variable 2 has a higher score than variable 4 with
@@ -1782,11 +1796,18 @@ with respect to variable 2, so both AVPI and MDA importance computed low
 scores for variable 2. In particular, variable 2 in simulation 8 for
 AVPI has a particularly low score. However, for variables 1 and 5 have
 high AVPI scores as expected. \par 
-
+\begin{figure}
+\centering
 \includegraphics{thesis_files/figure-latex/unnamed-chunk-7-1.pdf}
-
+\caption{\label{fig:unnamed-chunk-7}\label{AVPIworep}Model-based AVPI
+Simulation Results Using Sampling Without Replacement}
+\end{figure}
+\begin{figure}
+\centering
 \includegraphics{thesis_files/figure-latex/unnamed-chunk-8-1.pdf}
-
+\caption{\label{fig:unnamed-chunk-8}\label{MDAworep1}MDA Simulation Results
+Using Sampling Without Replacement}
+\end{figure}
 Overall, simulation results indicate that AVPI can determine the
 informativeness of predictors with fairly strong signal, although in
 general MDA variable importance will offer similar results without the
@@ -1801,11 +1822,19 @@ of independent predictors, and if there is some correlation structure
 that leads to unstable MDA variable importance values of the correlated
 predictors, then AVPI can be used on just the correlated predictors to
 determine which of the correlated predictors are important. \par 
-
+\begin{figure}
+\centering
 \includegraphics{thesis_files/figure-latex/unnamed-chunk-9-1.pdf}
-
+\caption{\label{fig:unnamed-chunk-9}\label{resAVPI}Residuals-based AVPI
+Simulation Results Using Sampling Without Replacement}
+\end{figure}
+\begin{figure}
+\centering
 \includegraphics{thesis_files/figure-latex/unnamed-chunk-10-1.pdf}
-
+\caption{\label{fig:unnamed-chunk-10}\label{MDAwrep2}MDA Simulation Results
+Using Sampling Without Replacement on same data as in Figure
+\ref{resAVPI}}
+\end{figure}
 One issue with the AVPI method is the relative noisiness of the method.
 As observed in the simulation using sampling with replacement,
 uninformative variables can be assigned positive AVPI scores. Looking at
@@ -1878,8 +1907,13 @@ Variable 12 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.
 \bottomrule
 \end{tabular}}
 \end{table}
+\begin{figure}
+\centering
 \includegraphics{thesis_files/figure-latex/unnamed-chunk-13-1.pdf}
-
+\caption{\label{fig:unnamed-chunk-13}\label{AVPIdistsiml}Simulated Null
+Distributions of AVPI for Each Predictor of Simulation 1 When Sampling
+Without Replacement}
+\end{figure}
 Thus while the AVPI may not be a stable test statistic for use in a
 hypothesis testing framework, our simulation results suggest that when
 used in conjunction with the MDA variable importance, the AVPI can be a
@@ -2158,24 +2192,26 @@ in simulations 1, 2, and 6, the JAVPI value for the uninformative
 predictors is quite high. Some possible reasons for this are monte carlo
 variability and relatively weak signal in the predictors allowing for
 some masking between variables. \par 
-
+\begin{figure}
+\centering
 \includegraphics{thesis_files/figure-latex/unnamed-chunk-18-1.pdf}
-
+\caption{\label{fig:unnamed-chunk-18}\label{JAVPIonesig}JAVPI Simulation
+Results When All the Signal is Contained in the Partition}
+\end{figure}
 We examine the joint added variable plots for simulations 1, then
 simulation 2. \par 
-
+\begin{figure}
+\centering
 \includegraphics{thesis_files/figure-latex/unnamed-chunk-19-1.pdf}
-
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-20-1.pdf}
-
+\caption{\label{fig:unnamed-chunk-19}\label{siml1to5plots}JAVP for
+Simulations 1, 2, and 5, Respectively, for First Simulation Run}
+\end{figure}
 We see that there is a weak negative trend among the uninformative
 variables. This structure is somewhat hard to explain, although it is
 most likely due to noise or masking among variables. We do note that the
 informative predictors have a strongly positive trend in contrast to the
 uninformative predictors. This is in contrast to the joint added
 variable plots for simulations 5 below. \par 
-
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-21-1.pdf}
 
 For simulation 5, the uninformative variables had no trend while the
 informative variables had a strong positive trend. This at least
@@ -2199,9 +2235,12 @@ uninformative variables individually. If there is some signal in those
 predictors, then we would expect there to be some non-zero trend in the
 resulting joint added variable plot, otherwise, there would be no trend
 in the joint added variable plot. \par 
-
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-22-1.pdf}
-
+\begin{figure}
+\centering
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-20-1.pdf}
+\caption{\label{fig:unnamed-chunk-20}\label{MDAforJAVPI} MDA Simulation
+Results for JAVPI Simulated Datasets}
+\end{figure}
 For the second simulation run, where there was signal in both partitions
 of the predictors, we find that, in general, the JAVPI scores for both
 partitions in each simulation is high, as we expected. When we include
@@ -2209,18 +2248,23 @@ signal in both partitions, the JAVPI will generally pick up on the
 signal, and we can examine the joint added variable plots for visual
 confirmation of what is going on. In particular, we display the joint
 added variable plot for simulation 1. \par 
-
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-23-1.pdf}
-
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-24-1.pdf}
-
+\begin{figure}
+\centering
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-21-1.pdf}
+\caption{\label{fig:unnamed-chunk-21}\label{JAVPItwosig}JAVPI Simulation
+Results When Signal is Contained in Both Partitions of the Predictors}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-22-1.pdf}
+\caption{\label{fig:unnamed-chunk-22}\label{siml1and5plots}JAVP for
+Simulations 1 and 5, Respectively, for Second Simulation Run}
+\end{figure}
 For simulation 1, we found the JAVPI scores for both partitions is quite
 similar (around 512 versus 492), which makes sense given that we split
 the informative predictors evenly between both predictors. The joint
 added variable plot for simulation 1 is a strong positive trend as
 expected given the size of the JAVPI scores. \par 
-
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-25-1.pdf}
 
 On the other hand, examining the table of JAVPI values for the second
 simulation run, it seems that in simulation 5, the second partition had

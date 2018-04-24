@@ -8,6 +8,13 @@ The {#rmd-basics} text after the chapter declaration will allow us to link throu
 
 # Introduction to Trees, Random Forests, and the Bootstrap {#rmd-basics}
 
+```{r}
+
+library(rpart)
+
+```
+
+
 ## CART
 
   We begin our discussion of CART (Classification and Regression Trees) by considering the following problem. Suppose we have data generated from the piecewise function $Y=f(X)+\varepsilon$ where [at this point insert a very non-linear piecewise function.] with Gaussian error $\varepsilon$. One approach to fitting a model to this data would be to fit a linear regression model. However, the particular form of the data is not well suited for linear regression due to the non-linearity of the data. Another approach we might try as follows. We might try to find a method that can fit a regression line to each piecewise component of the data. One such method is to fit CART trees. We fit a CART tree to the data and perform cost-complexity pruning to output the model shown in figure [figure not yet made]. In this example, we produced a regression surface which was able to take into account the piecewise, non-linear nature of the data and produce a reasonable estimate of the underlying data generating mechanism. \par

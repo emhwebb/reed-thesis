@@ -555,3 +555,53 @@ rf.888[[3]]
 
 ```
 
+```{r}
+
+n.ex<- 2000
+#p1 is number of variables
+p.ex <- 3
+#our weights are given by wt_vec <- c(5,5,2,0,-5,-5,-2,0,0,0,0,0) 
+err.ex <- rnorm(n.ex, mean = 0, sd = 1)
+siml.data.ex <- as.data.frame(matrix(rnorm(n.ex*p.ex, mean = 0, sd = 1), nrow = n.ex))
+siml.data.ex <- siml.data.ex %>% 
+  mutate(Y = 10*V1-5*V2+err.ex)
+
+tree.ex <- rpart(Y~., data = siml.data.ex)
+#plot(tree)
+#text(tree, cex = 0.8, use.n = TRUE, xpd = TRUE)
+
+rf.ex <- randomForest(Y~.,data = siml.data.ex, ntree = 1000, 
+                      replace = TRUE, importance = TRUE)
+lm.ex <- lm(Y~., data = siml.data.ex)
+
+lm.wo.v1 <- lm(Y~V2+V3, data = siml.data.ex)
+lm.wo.v2 <- lm(Y~V1+V3, data = siml.data.ex)
+lm.wo.v3 <- lm(Y~V1+V2, data = siml.data.ex)
+
+lm.of.v1 <- lm(V1~V2+V3, data = siml.data.ex)
+lm.of.v2 <- lm(V2~V1+V3, data = siml.data.ex)
+lm.of.v3 <- lm(V3~V1+V2, data = siml.data.ex)
+               
+lm.df.v1 <- as.data.frame(cbind(siml.data.ex$V1-lm.of.v1$fitted.values, siml.data.ex$Y-lm.wo.v1$fitted.values))
+lm.df.v2 <- as.data.frame(cbind(siml.data.ex$V2-lm.of.v2$fitted.values, siml.data.ex$Y-lm.wo.v2$fitted.values))
+lm.df.v3 <- as.data.frame(cbind(siml.data.ex$V3-lm.of.v3$fitted.values, siml.data.ex$Y-lm.wo.v3$fitted.values))
+
+colnames(lm.df.v1) <- c("x.res", "y.res")
+colnames(lm.df.v2) <- c("x.res", "y.res")
+colnames(lm.df.v3) <- c("x.res", "y.res")
+
+lin.avp.list <- list(lm.df.v1, lm.df.v2, lm.df.v3)
+
+mod.avp.ex <- randomforest_avp(data = siml.data.ex, ntree1 = 1000, ntree2 = 1000, replace = TRUE, x.res = FALSE)
+res.avp.ex <- randomforest_avp(data = siml.data.ex, ntree1 = 1000, ntree2 = 1000, replace = TRUE, x.res = TRUE)
+
+javp.all.sig.ex <- joint_add_var_rf(data = siml.data.ex, pred.part = c('V1', 'V2'), 
+                 ntree1 = 1000, ntree2 = 1000, replace = TRUE)
+javp.some.sig.ex <- joint_add_var_rf(data = siml.data.ex, pred.part = 'V1', 
+                 ntree1 = 1000, ntree2 = 1000, replace = TRUE)
+
+siml.ex.list <- list(siml.data.ex, tree.ex, rf.ex, lm.ex, lin.avp.list, 
+     mod.avp.ex, res.avp.ex, javp.all.sig.ex, javp.some.sig.ex)
+
+```
+

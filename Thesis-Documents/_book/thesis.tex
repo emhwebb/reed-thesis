@@ -127,8 +127,7 @@ You can have a dedication here if you wish.
 }
 
 \Preface{
-This is an example of a thesis setup to use the reed thesis document
-class (for LaTeX) and the R bookdown package, in general.
+
 }
 
 \Abstract{
@@ -169,10 +168,7 @@ Second paragraph of abstract starts here.
   \begin{acknowledgements}
     I want to thank a few people.
   \end{acknowledgements}
-  \begin{preface}
-    This is an example of a thesis setup to use the reed thesis document
-    class (for LaTeX) and the R bookdown package, in general.
-  \end{preface}
+
   \hypersetup{linkcolor=black}
   \setcounter{tocdepth}{2}
   \tableofcontents
@@ -322,6 +318,39 @@ algorithm. \par
             \EndWhile
         \end{algorithmic}
     \end{algorithm}
+\subsection{Example of Regression
+Tree}\label{example-of-regression-tree}
+
+We now provide an example of a regression tree using a simulated data
+set we will use throughout this thesis to illustrate important examples.
+We made 2000 draws of 3 independent standard normals
+\(X_1,X_2,X_3\sim N(0,1)\) and defined the response by the linear
+equation \[Y=10X_1-5X_2+\varepsilon,\] where \(\varepsilon\sim N(0,1)\).
+Our data set is thus a \(2000\times 4\) array where each row is of the
+form \((X_1,X_2,X_3,Y)\). Hence we have two informative predictors
+(\(X_1\) and \(X_2\)) and one uninformative predictor (\(X_3\)) in our
+simulated data set. For this data set, we ran CART to produce Figure
+\ref{tree_ex}. \par  
+\begin{figure}
+\centering
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-2-1.pdf}
+\caption{\label{fig:unnamed-chunk-2}\label{tree_ex}Example of a Regression
+Tree}
+\end{figure}
+We would like to note that the tree structure produced by CART is quite
+easy to interpret. Given some point \(x=(x_1,x_2,x_3)\) in our feature
+space, to determine what the prediction for \(x\) should be, we simply
+follow the left-right paths down to a terminal node of the tree. We also
+note that this regression tree generally reflects the structure of our
+data set in the sense that important splits near the base of the tree
+tend to be made on \(X_1\), while splits further down in the tree tend
+to be on \(X_2\). Furthermore, no splits are made on \(X_3\). In this
+scenario, we can visually inspect the tree to determine which predictors
+are informative towards predicting the response \(Y\).
+
+\subsection{Classification Trees and Issues with
+CART}\label{classification-trees-and-issues-with-cart}
+
 The construction of classification trees is similar to the construction
 of regression trees except a different impurity measure must be used.
 For the node \(t\) containing \(N_t\) observations, let
@@ -439,14 +468,13 @@ collinear, then the bagged forest might consistently choose one
 predictor over another even if the predictor not chosen leads to splits
 that are just as informative. This is due in part to the greedy nature
 of the CART algorithm when searching for optimal splits over the feature
-space (Cite ESL or some similar textbook for this point). The algorithm
-does not take into account the second best or third best splits.
-Furthermore, it is not difficult to see that bagging will generally
-produce an ensemble of trees that are quite similar to one another,
-subject to some perturbations. These trees will be strongly correlated
-with other trees in the ensemble, so if there is a less explored part of
-the feature space, then the ensemble will struggle to produce good
-predictions over that region. \par
+space. The algorithm does not take into account the second best or third
+best splits. Furthermore, it is not difficult to see that bagging will
+generally produce an ensemble of trees that are quite similar to one
+another, subject to some perturbations. These trees will be strongly
+correlated with other trees in the ensemble, so if there is a less
+explored part of the feature space, then the ensemble will struggle to
+produce good predictions over that region. \par
 
 \subsection{The Random Forest
 Algorithm}\label{the-random-forest-algorithm}
@@ -533,6 +561,25 @@ of bag data is permuted. Note that as variable importance measures
 currently defined and used, the threshold for importance of a variable
 is something which the researcher has to decide. \par
 
+\subsection{Example of MDA and MDI variable
+importance}\label{example-of-mda-and-mdi-variable-importance}
+
+We ran a random forest using 1000 trees on our example dataset and
+plotted bar charts of the MDA and MDI variable importance scores,
+respectively, in Figure \ref{mda_ex}. \par
+\begin{figure}
+\centering
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-3-1.pdf}
+\caption{\label{fig:unnamed-chunk-3}\label{mda_ex}Example of MDA and MDI
+Variable Importance}
+\end{figure}
+Note that for both variable importance measures, the contribution of
+each predictor is properly captured. That is, \(X_1\) is the most
+important variable followed by \(X_2\), with \(X_3\) having no
+contribution with the MDA importance measure. With MDI, the contribution
+of \(X_3\) is non-zero likely due to the randomization introduced in the
+splitting variable step.
+
 \subsection{Issues with Random
 Forests}\label{issues-with-random-forests}
 
@@ -562,157 +609,54 @@ Finally, there are situations where the data cannot be bootstrapped.
 This could be due to a number of factors including that the data has a
 heavily-tailed distribution or if there are particularly extreme values.
 In this case, a different bootstrap scheme could perhaps remedy the
-situation where the naive bootstrap fails. One common important
-resampling scheme used within random forests is to use the m-out-of-n
-bootstrap (also referred to subsampling or subagging in the literature).
-The m-out-of-n bootstrap is a resampling scheme which resamples with or
-without replacement \(m\leq n\) observations from the data to form
-datasets with \(m\) many data points to run the bootstrap computation.
-Bickel et al. have shown that in important cases, subsampling can
-succeed where the bootstrap fails. Of course, using less of the
-available data is less efficient, but in the context of random forests
-this loss of efficiency may not be an issue. In Strobl et al. (2008),
-simulation results showed that subsampling instead of using the standard
-nonparametric bootstrap can improve the performance of random forests.
-The authors suggested that subsampling further reduces the variance of
-the ensemble by producing trees that are even more decorrelated. Their
-heuristic is that there is a lower probability of duplicate data points
-being chosen using subsampling (this probability is zero if we are
-subsampling without replacement), furthermore there is a lower
-probability of highly correlated data points being chosen as one of the
-\(m\leq n\) points. This certainly seems plausible, but we would like to
-see further simulation results or a technical result that explains why
-subsampling works well for forests. We would also like to note that most
-consistency results (Biau et al., Scornet et al., Ishwaran et al., and
-Wager et al.) make this subsampling assumption in their analysis of the
-random forest model, as subsampling constructions make the forest
-ensemble more amenable to mathematical analysis. \par
+situation where the naive bootstrap fails. One common resampling scheme
+used within random forests is to use the m-out-of-n bootstrap (also
+referred to subsampling or subagging in the literature). The m-out-of-n
+bootstrap is a resampling scheme which resamples with or without
+replacement \(m\leq n\) observations from the data to form datasets with
+\(m\) many data points to run the bootstrap computation. Of course,
+using less of the available data is less efficient, but in the context
+of random forests this loss of efficiency may not be an issue. In Strobl
+et al. (2008), simulation results showed that subsampling instead of
+using the standard nonparametric bootstrap can improve the performance
+of random forests. The authors suggested that subsampling further
+reduces the variance of the ensemble by producing trees that are even
+more decorrelated. Their heuristic is that there is a lower probability
+of duplicate data points being chosen using subsampling (this
+probability is zero if we are subsampling without replacement),
+furthermore there is a lower probability of highly correlated data
+points being chosen as one of the \(m\leq n\) points. This certainly
+seems plausible, but we would like to see further simulation results or
+a technical result that explains why subsampling works well for forests.
+We would also like to note that consistency results such as from Mentch
+\& Hooker (2016b) and Wager \& Athey (2017) make this subsampling
+assumption in their analysis of the random forest model, as subsampling
+constructions make the forest ensemble more amenable to mathematical
+analysis. \par
 
 \section{Focus of this Thesis}\label{focus-of-this-thesis}
 
-In the previous three sections we discussed the basics of trees, the
-bootstrap, and random forests. We would like to now discuss the
-direction we are going to take this thesis. We are interested in
-developing inferential tools using the random forest algorithm. The
-random forest often produces good predictions out of the box with little
-tuning required except growing a sufficient number of trees and choosing
-a good value of \(m\leq p\) to try at each split in the tree growing
-process. The ease of fitting random forests is one of the advantages of
-the random forest compared to more complex methods like neural networks
-or support vector machines. Even if the random forest is easier to fit
-than neural nets or SVMs, the underlying random forest mechanism is
-quite complex. This complexity makes developing inferential tools with
-random forests difficult. In the next chapter we will discuss some
-approaches that have been developed recently by researchers. Of
-particular interest for us are the variable importance measures for
-random forests. There is the MDI variable importance and the MDA
-variable importance measure. While there are concerns about the bias in
-the MDI and MDA VI measures with random forests using CART tree's due to
-how CART tree's are constructed (Strobl et al., 2008), we would like to
-extend the inferential capabilities of random forests using CART as this
-is perhaps the most popular version of the algorithm in use. \par
-
-The random forest VI can be viewed as a random variable with an unknown
-probability distribution. While determining the distribution of random
-forest VI's would be ideal towards developing inference for random
-forests, finding the distribution of random forest VI's is difficult and
-unclear in general. However, note that the bootstrap provides a
-computational method of approximating the sampling distribution of
-random forest VI measures. We could then proceed to obtaining estimates
-of the standard error and to form approximate interval estimates. We
-could grow a random forest once, obtain an estimate of the VI of each
-variable \(X_j\) and then run a bootstrap to obtain estimates of the
-standard error of each variable. Inference could then proceed using the
-VI measures along with the estimate of standard error. Note that in this
-scheme there is two levels of bootstrap at play. There is the bootstrap
-within each random forest and then the bootstrapping to obtain the
-standard error estimate. The estimate we produce of the VI of a variable
-\(X_j\) can be erratic. Running the random forest again can produce a
-new estimate of the VI of variable \(X_j\). As Efron suggests in his
-2014 article ``Estimation and Accuracy after Model Selection,'' we could
-remedy the erratic, non-smooth nature of the VI estimate by bagging
-\(VI(X_j)\). However, when we bag \(VI(X_j)\) we would require a
-third-level of bootstrapping to produce an estimate of the standard
-error of the bagged estimate of \(VI(X_j)\). This is computationally
-expensive, especially considering that the computational cost of the
-random forest depends on the number of observations, number of tree's
-grown, and number of variables present. However, applying Efron's
-infinitesimal jackknife (IJ) technique, which we will discuss in the
-next chapter, we can efficiently estimate the standard error of the
-bagged estimate of \(VI(X_j)\) only using the two levels of
-bootstrapping. In this thesis we will be exploring the properties of IJ
-estimates of the standard error of the bagged estimate \(VI(X_j)\)
-utilizing different bootstrap schemes. Utilizing the IJ, we can then
-produce interval estimates and confidence intervals of the variable
-importance of variables in the random forest. This allows us to
-characterize the uncertainty of \(VI(X_j)\) when using variable
-importance measures for description, variable selection, and inference.
+An issue with random forest variable importance measures is bias due to
+the presence of correlated predictors. As will become clearer in the
+next chapter, correlated predictors can lead to unreliable MDA and MDI
+variable importance scores due to confounding between correlated
+predictors. The weakness of commonly used random forest variable
+importance measures to correlated predictors is unfortunate as random
+forests often produce good predictions with little tuning required
+except growing a sufficient number of trees and choosing a good value of
+\(m\leq p\) to try at each split in the tree growing process. The ease
+of fitting random forests is one of the advantages of the random forest
+algorithm compred to more complex methods like neural networks or
+support vector machines. Since the random forest algorithm is a readily
+available and easy to use tool for statistical practitioners, we would
+like to develop random forest variable importance measures which can
+take into account correlated predictors. Our goal with this thesis is
+to:
+\begin{enumerate}
+  \item Develop computationally tractible random forest variable importance measures which can handle correlated predictors in the data. 
+  \item Extend our random forest variable importance measures to a hypothesis testing framework via permutation tests. 
+  \end{enumerate}
 \par
-\#\# Outline of Remaining Chapters
-
-Chapter 2: Inference and variable importance for random forests. In this
-chapter we will discuss the various approaches to inference for random
-forests that have been developed by researchers. These include Ishwaran
-and Louppe's analysis of VI measures of RF. Ishwaran's analysis is of
-the variable importance scheme he devised. Ishwaran's scheme is amenable
-to theoretical analysis and he produces asymptotic results for his
-scheme. Louppe analyzes the MDI variable importance in the context of a
-construction called totally randomized forests in the setting of finite
-sample spaces. Louppe investigates the effect of relevant and irrelevant
-variables to MDI VI in this setting and provides asymptotic results.
-These are two of themain papers investigating properties of VI.
-
-The other schemes include Mentch and Hooker's prediction intervals which
-are produced by interpreting the random forest ensemble as a particular
-type of U-statistic and applying the U-statistics theory to produce
-prediction intervals. They then can produce hypothesis tests and
-confidence intervals in this context.
-
-A second approach towards prediction intervals is Wager's application of
-the IJ to the random forest estimator to produce prediction intervals
-and confidence intervals. Wager has a couple of papers in this area
-which we will discuss. In this part we will also go into greater detail
-about the IJ, it's properties, and why it works.
-
-We will also discuss the conditional inference trees and conditional
-variable importance developed by Strobl, Hothorn, and their colleagues
-to deal with the biased manner in which the trees in random forests are
-constructed. In this part we will also discuss the Infforest variable
-importance measure developed by Aurora.
-
-Chapter 3: In this chapter we will go into great detail about the
-bootstrap and why it works. We will discuss the technical details of
-different methods of estimating the standard error of functional
-statistics, and we will go into the construction of different bootstrap
-confidence intervals along with properties of these confidence
-intervals. We will also discuss different bootstrap schemes and in
-particular subsampling, and why subsampling works well, especially in
-the random forest context.
-
-Chapter 4: We will present our different approaches to bootstrapping
-variable importance measures and provide simulation results. The first
-approach is the cases bootstrap, the second approach is the
-bootstrapping residuals of the random forest approach. Within the cases
-approach, there are two ways we will try to constrain the variability of
-bootstrap replicates. Adopting the notation from general linear models,
-we could fit a pruned tree predicting \(Y\sim X_1,\ldots,X_p\). Then we
-would bootstrap from the terminal nodes of this single tree to try to
-produce bootstrap replicates which capture the relationship between the
-variables. Another approach is for each predictor \(X_j\), fit a single
-well pruned tree \(X_j\sim X_1,\ldots,X_{j-1},X_{j+1},\ldots,X_p\). We
-would then draw bootstrap samples from the terminal nodes of this tree
-which respect the partition produced by these terminal nodes. The idea
-is to fix the relationship between every predictor not \(X_j\) and allow
-the \(X_j\)'s to be exchanged across the bootstrap samples. We would
-produce simulation results of each approach and compare the statistical
-properties of these different constructions.
-
-Chapter 5: If all goes well there might be a chapter 5 where we explore
-large sample properties and distribution of VI measures. This is likely
-going to be a difficult mathematical problem to solve in general, so a
-tangible course of action might be to pick a generating mechanism and
-easy VI measure from which we could figure out the VI distribution under
-some set of strong assumptions.
 
 \chapter{Variable Importance and Inference for Random
 Forests}\label{variable-importance-and-inference-for-random-forests}
@@ -1285,7 +1229,8 @@ want to estimate the linear effect of the variable \(\mathbf{W}\) on the
 linear regression \(\hat{\mathbf{Y}}_1\), we can construct and visually
 inspect the trend of the added variable plot of \(\mathbf{W}\). \par
 
-{[}Added example here{]} \par
+\subsection{Example of Added Variable Plot in Linear Regression
+Setting}\label{example-of-added-variable-plot-in-linear-regression-setting}
 
 \section{Added Variable Plots in Random
 Forests}\label{added-variable-plots-in-random-forests}
@@ -1350,7 +1295,10 @@ response, we would expect the added variable plot of \(X_k\) to be
 de-trended mass of point centered about the origin. While if \(X_k\) is
 informative, we would expect that the added variable plot of \(X_k\) to
 have a non-zero, possibly non-linear trend depending on the conditional
-relationship of \(X_k\) with the response \(Y\).
+relationship of \(X_k\) with the response \(Y\). \par
+
+\subsection{Example of Residual-Based Added Variable
+Plot}\label{example-of-residual-based-added-variable-plot}
 
 \subsection{Model-Based Added Variable
 Plot}\label{model-based-added-variable-plot}
@@ -1366,8 +1314,6 @@ In the context of random forests, to obtain the added variable plot of
 the predictor \(X_k\), we would plot
 \[(\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k}), Y-\hat{\theta}_{RF}(Y|X_{-k})).\]
 We denote this method as a model-based added variable plot. \par
-
-{[}Add example here{]} \par
 
 Depending on the relationship between the predictors and the response,
 there are several outputs we might expect from the added variable plots
@@ -1422,6 +1368,12 @@ magnitude than when \(X_k\) is strongly informative. Hence visually the
 trend of the added variable plot of predictors used to grow a random
 forest ensemble offer a method of gauging the informativeness of
 different predictors. \par
+
+\subsection{Example of Model-Based Added Variable
+Plot}\label{example-of-model-based-added-variable-plot}
+
+\subsection{Discussion of Added Variable
+Plot}\label{discussion-of-added-variable-plot}
 
 We note that in the above argument that we made an appeal to the random
 forest estimator \(\hat{\theta}_{RF}(Y|X)\) being a consistent estimator
@@ -1530,23 +1482,31 @@ As discussed in the previous section, depending on the relative
 informativeness of the predictor \(X_k\) there may or may not be a trend
 in the added variable plot for \(X_k\) which we could then attempt to
 model. Let \(W_k=Y-\hat{\theta}_{RF}(Y|X_{-k})\) and
-\(U_k=\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k})\). We propose
-to train a bagged forest ensemble \(\hat{\theta}_{BF}(W_k|U_k)\) and
-compute the MDA variable importance of \(U_k\) in the bagged forest
-ensemble. We call the MDA variable importance of \(U_k\) in the bagged
-forest ensemble \(\hat{\theta}_{BF}(W_k|U_k)\) the added variable plot
-importance (AVPI) of \(X_k\) and denote this quantity by
-\(VI_{AVP}(X_k)\). Our choice of using a bagged forest to predict
-\(W_k\) given \(U_k\) is motivated by the fact that unlike in the linear
-regression setting, there is not a clear parametric model with which to
-predict \(W_k\) given \(U_k\). The bagged forest makes few assumptions
-on the form of the true regression function \(W_k=f(U_k)+\varepsilon\)
-while also providing a metric in the form of MDA variable importance to
-assess the importance of \(U_k\) in predicting \(W_k\) once we have
-grown the ensemble \(\hat{\theta}_{BF}(W_k|U_k)\). Furthermore, the AVPI
-of \(X_k\) should reflect the relative importance of \(X_k\) with
-respect to the response \(Y\) given that the trend of the added variable
-plot, i.e.~the degree to which \(Y-\hat{\theta}_{RF}(Y|X_{-k})\) and
+\(U_k=\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k})\) if we are
+using the model-based AVP. If we are using the residual-based AVP, let
+\(W_k=Y-\hat{\theta}_{RF}(Y|X_{-k})\) and
+\(U_k=X_k-\hat{\theta}_{RF}(X_k|X_{-k})\). For the rest of the chapter,
+we assume that we are working with the model-based AVP. In particular,
+our discussion of AVPI for the model-based AVP should also hold for the
+residual-based AVP. \par 
+
+We propose to train a bagged forest ensemble
+\(\hat{\theta}_{BF}(W_k|U_k)\) and compute the MDA variable importance
+of \(U_k\) in the bagged forest ensemble. We call the MDA variable
+importance of \(U_k\) in the bagged forest ensemble
+\(\hat{\theta}_{BF}(W_k|U_k)\) the added variable plot importance (AVPI)
+of \(X_k\) and denote this quantity by \(VI_{AVP}(X_k)\). Our choice of
+using a bagged forest to predict \(W_k\) given \(U_k\) is motivated by
+the fact that unlike in the linear regression setting, there is not a
+clear parametric model with which to predict \(W_k\) given \(U_k\). The
+bagged forest makes few assumptions on the form of the true regression
+function \(W_k=f(U_k)+\varepsilon\) while also providing a metric in the
+form of MDA variable importance to assess the importance of \(U_k\) in
+predicting \(W_k\) once we have grown the ensemble
+\(\hat{\theta}_{BF}(W_k|U_k)\). Furthermore, the AVPI of \(X_k\) should
+reflect the relative importance of \(X_k\) with respect to the response
+\(Y\) given that the trend of the added variable plot, i.e.~the degree
+to which \(Y-\hat{\theta}_{RF}(Y|X_{-k})\) and
 \(\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k})\) are correlated,
 visually indicates the informativeness of \(X_k\).
 
@@ -1561,7 +1521,19 @@ reflect the importance of correlated predictors with respect to the
 response than the MDA variable importance ran on the predictors in the
 full model \(\hat{\theta}_{RF}(Y|X)\). \par
 \begin{algorithm}
-    \caption{Added Variable Plot Importance (AVPI)} \label{added variable importance}
+    \caption{Residual-Based Added Variable Plot Importance (AVPI)} \label{added variable importance}
+      \begin{algorithmic}[1]
+          \For{ $k=1,\ldots,p$ }
+            \State Grow the random forest ensemble $\hat{\theta}_{RF}(Y|X_{-k})$ predicting $Y$ using the full set of predictors minus the predictor $X_k$.
+            \State Grow the random forest ensemble $\hat{\theta}_{RF}(X_k|X_{-k})$ predicting $X_k$ using the set of predictors not the predictor $X_k$
+            \State Compute $U_k=X_k-\hat{\theta}_{RF}(X_k|X_{-k})$ and $W_k=Y-\hat{\theta}_{RF}(Y|X_{-k})).$
+            \State Grow the bagged forest ensemble $\hat{\theta}_{BF}(W_k|U_k)$ predicting $W_k$ using $U_k$. 
+            \State Compute the added variable plot importance of $X_k$ to be the MDA variable importance of $U_k$: $VI_{AVP}(X_k)=VI_{MDA}(U_K)$.
+          \EndFor
+      \end{algorithmic}
+  \end{algorithm}
+\begin{algorithm}
+    \caption{Model-Based Added Variable Plot Importance (AVPI)} \label{added variable importance}
       \begin{algorithmic}[1]
           \State Grow the random forest ensemble $\hat{\theta}_{RF}(Y|X)$ predicting $Y$ using the full set of predictors. 
           \For{ $k=1,\ldots,p$ }
@@ -1572,6 +1544,9 @@ full model \(\hat{\theta}_{RF}(Y|X)\). \par
           \EndFor
       \end{algorithmic}
   \end{algorithm}
+\subsection{Example of Added Variable Plot
+Importance}\label{example-of-added-variable-plot-importance}
+
 \section{Extensions of Added Variable Plot
 Importance}\label{extensions-of-added-variable-plot-importance}
 
@@ -1583,35 +1558,35 @@ and also the random forest ensemble \(\hat{\theta}_{RF}(Y|X_{-k})\). Let
 \(W_k=Y-\hat{\theta}_{RF}(Y|X_{-k})).\) \par
 
 Once we have computed the AVPI of \(X_k\), \(VI_{AVP}(X_k)\), we can
-take a simulation approach to generating a sampling distribution for
-\(VI_{AVP}(X_k)\). In particular, to generate a sampling distribution
-for the AVPI of \(X_k\), permute \(U_k\) to obtain \(U_k^*\). Then grow
-the bagged forest ensemble \(\hat{\theta}_{BF}(W_k|U_k^*)\) predicting
+take a simulation approach to generating a null distribution for
+\(VI_{AVP}(X_k)\). In particular, to generate a null distribution for
+the AVPI of \(X_k\), permute \(U_k\) to obtain \(U_k^*\). Then grow the
+bagged forest ensemble \(\hat{\theta}_{BF}(W_k|U_k^*)\) predicting
 \(W_k\) using \(U_k^*\), and compute the MDA variable importance of
 \(U_k^*\) to obtain \(VI_{AVP}^*(X_k)\) as the permuted AVPI for
 \(X_k\). After having permuted \(U_k\) and computed \(VI_{AVP}^*(X_k)\)
-for enough iterations to generate a sampling distribution for
+for enough iterations to generate a null distribution for
 \(VI_{AVP}(X_k)\). We can then compute a two-sided p-value using the
 original \(VI_{AVP}(X_k)\) as the observed test statistic. If we compute
 p-values for each predictor, then we could proceed to a hypothesis
-testing framework if we believe that the simulation to generate a
-sampling distribution for the AVPI of each predictor was successful. Of
-course depending on the number of predictors in the dataset and the
+testing framework if we believe that the simulation to generate a null
+distribution for the AVPI of each predictor was successful. Of course
+depending on the number of predictors in the dataset and the
 relationship between the predictors, it may be necessary to control for
 multiple comparisons. In our opinion, as simulations in the next chapter
 will indicate, hypothesis testing using the AVPI is likely more
 sensitive to type-I errors than type-II errors, so an adjustment such as
 the Bonferroni correction may be appropriate. \par
 
-We also note that while generating adequete sampling distributions of
+We also note that while generating adequete null distributions of
 \(VI_{AVP}(X_k)\) for each predictor \(X_k\) is computationally
 expensive, each step of the process from growing the full ensemble
 \(\hat{\theta}_{RF}(Y|X)\) to growing each
 \(\hat{\theta}_{RF}(Y|X_{-k})\) to permuting \(U_k\) and growing
 \(\hat{\theta}_{BF}(W_k|U_k^*)\) to compute \(VI_{AVP}^*(X_k)\) can be
-coded to run in parallel. So performance gains in generating good
-sampling distributions of \(VI_{AVP}(X_k)\) for each predictor \(X_k\)
-are easily attainable. \par
+coded to run in parallel. So performance gains in generating good null
+distributions of \(VI_{AVP}(X_k)\) for each predictor \(X_k\) are easily
+attainable. \par
 
 \chapter{Simulation and Results}\label{simulation-and-results}
 
@@ -1703,7 +1678,7 @@ informative for that scenario while a \(-\) indicates that a variable is
 uninformative. \par
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-3}Informative and Uninformative Variables For Each Scenario}
+\caption{\label{tab:unnamed-chunk-6}Informative and Uninformative Variables For Each Scenario}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lllllllllllll}
 \toprule
@@ -1771,14 +1746,14 @@ variable 4 in comparison to variables 1, 2, and 3, which is what we
 would have expected. \par
 \begin{figure}
 \centering
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-5-1.pdf}
-\caption{\label{fig:unnamed-chunk-5}\label{AVPIwrep}Model-based AVPI
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-8-1.pdf}
+\caption{\label{fig:unnamed-chunk-8}\label{AVPIwrep}Model-based AVPI
 Simulation Results Using Sampling With Replacement}
 \end{figure}
 \begin{figure}
 \centering
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-6-1.pdf}
-\caption{\label{fig:unnamed-chunk-6}\label{MDAwrep}MDA Simulation Results
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-9-1.pdf}
+\caption{\label{fig:unnamed-chunk-9}\label{MDAwrep}MDA Simulation Results
 Using Sampling With Replacement}
 \end{figure}
 For simulation 3 we see that AVPI matches with the MDA variable
@@ -1798,14 +1773,14 @@ AVPI has a particularly low score. However, for variables 1 and 5 have
 high AVPI scores as expected. \par 
 \begin{figure}
 \centering
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-7-1.pdf}
-\caption{\label{fig:unnamed-chunk-7}\label{AVPIworep}Model-based AVPI
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-10-1.pdf}
+\caption{\label{fig:unnamed-chunk-10}\label{AVPIworep}Model-based AVPI
 Simulation Results Using Sampling Without Replacement}
 \end{figure}
 \begin{figure}
 \centering
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-8-1.pdf}
-\caption{\label{fig:unnamed-chunk-8}\label{MDAworep1}MDA Simulation Results
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-11-1.pdf}
+\caption{\label{fig:unnamed-chunk-11}\label{MDAworep1}MDA Simulation Results
 Using Sampling Without Replacement}
 \end{figure}
 Overall, simulation results indicate that AVPI can determine the
@@ -1824,14 +1799,14 @@ predictors, then AVPI can be used on just the correlated predictors to
 determine which of the correlated predictors are important. \par 
 \begin{figure}
 \centering
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-9-1.pdf}
-\caption{\label{fig:unnamed-chunk-9}\label{resAVPI}Residuals-based AVPI
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-12-1.pdf}
+\caption{\label{fig:unnamed-chunk-12}\label{resAVPI}Residuals-based AVPI
 Simulation Results Using Sampling Without Replacement}
 \end{figure}
 \begin{figure}
 \centering
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-10-1.pdf}
-\caption{\label{fig:unnamed-chunk-10}\label{MDAwrep2}MDA Simulation Results
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-13-1.pdf}
+\caption{\label{fig:unnamed-chunk-13}\label{MDAwrep2}MDA Simulation Results
 Using Sampling Without Replacement on same data as in Figure
 \ref{resAVPI}}
 \end{figure}
@@ -1859,7 +1834,7 @@ AVPI score above 30 would likely appear statistically significant using
 a permutation test with AVPI as the test statistic. \par
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-11}Added Variable Importance P-values for Sampling with Replacement}
+\caption{\label{tab:unnamed-chunk-14}Added Variable Importance P-values for Sampling with Replacement}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
 \toprule
@@ -1884,7 +1859,7 @@ Variable 12 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.
 \end{table}
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-12}Added Variable Importance P-values for Sampling without Replacement}
+\caption{\label{tab:unnamed-chunk-15}Added Variable Importance P-values for Sampling without Replacement}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lrrrrrrrr}
 \toprule
@@ -1909,8 +1884,8 @@ Variable 12 P-Value & 0.001998 & 0.0019980 & 0.001998 & 0.001998 & 0.001998 & 0.
 \end{table}
 \begin{figure}
 \centering
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-13-1.pdf}
-\caption{\label{fig:unnamed-chunk-13}\label{AVPIdistsiml}Simulated Null
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-16-1.pdf}
+\caption{\label{fig:unnamed-chunk-16}\label{AVPIdistsiml}Simulated Null
 Distributions of AVPI for Each Predictor of Simulation 1 When Sampling
 Without Replacement}
 \end{figure}
@@ -2167,7 +2142,7 @@ those for chapter 4: we drew 2000 samples and grew 1000 tree ensembles
 for both stages of JAVPI. \par 
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-17}Partitions for Simulation Runs 1 and 2, respectively}
+\caption{\label{tab:unnamed-chunk-20}Partitions for Simulation Runs 1 and 2, respectively}
 \centering
 \resizebox{\linewidth}{!}{\begin{tabular}[t]{lll}
 \toprule
@@ -2194,16 +2169,16 @@ variability and relatively weak signal in the predictors allowing for
 some masking between variables. \par 
 \begin{figure}
 \centering
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-18-1.pdf}
-\caption{\label{fig:unnamed-chunk-18}\label{JAVPIonesig}JAVPI Simulation
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-21-1.pdf}
+\caption{\label{fig:unnamed-chunk-21}\label{JAVPIonesig}JAVPI Simulation
 Results When All the Signal is Contained in the Partition}
 \end{figure}
 We examine the joint added variable plots for simulations 1, then
 simulation 2. \par 
 \begin{figure}
 \centering
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-19-1.pdf}
-\caption{\label{fig:unnamed-chunk-19}\label{siml1to5plots}JAVP for
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-22-1.pdf}
+\caption{\label{fig:unnamed-chunk-22}\label{siml1to5plots}JAVP for
 Simulations 1, 2, and 5, Respectively, for First Simulation Run}
 \end{figure}
 We see that there is a weak negative trend among the uninformative
@@ -2237,8 +2212,8 @@ resulting joint added variable plot, otherwise, there would be no trend
 in the joint added variable plot. \par 
 \begin{figure}
 \centering
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-20-1.pdf}
-\caption{\label{fig:unnamed-chunk-20}\label{MDAforJAVPI} MDA Simulation
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-23-1.pdf}
+\caption{\label{fig:unnamed-chunk-23}\label{MDAforJAVPI} MDA Simulation
 Results for JAVPI Simulated Datasets}
 \end{figure}
 For the second simulation run, where there was signal in both partitions
@@ -2250,14 +2225,14 @@ confirmation of what is going on. In particular, we display the joint
 added variable plot for simulation 1. \par 
 \begin{figure}
 \centering
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-21-1.pdf}
-\caption{\label{fig:unnamed-chunk-21}\label{JAVPItwosig}JAVPI Simulation
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-24-1.pdf}
+\caption{\label{fig:unnamed-chunk-24}\label{JAVPItwosig}JAVPI Simulation
 Results When Signal is Contained in Both Partitions of the Predictors}
 \end{figure}
 \begin{figure}
 \centering
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-22-1.pdf}
-\caption{\label{fig:unnamed-chunk-22}\label{siml1and5plots}JAVP for
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-25-1.pdf}
+\caption{\label{fig:unnamed-chunk-25}\label{siml1and5plots}JAVP for
 Simulations 1 and 5, Respectively, for Second Simulation Run}
 \end{figure}
 For simulation 1, we found the JAVPI scores for both partitions is quite

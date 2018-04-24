@@ -8,9 +8,19 @@ The {#rmd-basics} text after the chapter declaration will allow us to link throu
 
 # Introduction to Trees, Random Forests, and the Bootstrap {#rmd-basics}
 
-```{r}
+```{r include = FALSE, warning = FALSE, message = FALSE, echo = FALSE}
 
 library(rpart)
+library(randomForest)
+library(tidyverse)
+library(grid)
+library(gridExtra)
+library(mvtnorm)
+library(knitr)
+library(kableExtra)
+library(highlight)
+load(file = "data/siml_examples.Rdata")
+
 
 ```
 
@@ -53,6 +63,24 @@ library(rpart)
 		\end{algorithmic}
 	\end{algorithm}
 	
+  
+### Example of Regression Tree
+
+We now provide an example of a regression tree using a simulated data set we will use throughout this thesis to illustrate important examples. We made 2000 draws of 3 independent standard normals $X_1,X_2,X_3\sim N(0,1)$ and defined the response by the linear equation $$Y=10X_1-5X_2+\varepsilon,$$ where $\varepsilon\sim N(0,1)$. Our data set is thus a $2000\times 4$ array where each row is of the form $(X_1,X_2,X_3,Y)$. Hence we have two informative predictors ($X_1$ and $X_2$) and one uninformative predictor ($X_3$) in our simulated data set. For this data set, we ran CART to produce Figure \ref{tree_ex}. \par  
+
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.env = 'marginfigure', fig.cap= "\\label{tree_ex}Example of a Regression Tree"}
+
+siml_data_ex <- siml.ex.list[[1]]
+tree_ex <- rpart(Y~., data = siml_data_ex)
+plot(tree_ex)
+text(tree_ex, cex = 0.8, use.n = TRUE, xpd = TRUE)
+
+```
+
+We would like to note that the tree structure produced by CART is quite easy to interpret. Given some point $x=(x_1,x_2,x_3)$ in our feature space, to determine what the prediction for $x$ should be, we simply follow the left-right paths down to a terminal node of the tree. We also note that this regression tree generally reflects the structure of our data set in the sense that important splits near the base of the tree tend to be made on $X_1$, while splits further down in the tree tend to be on $X_2$. Furthermore, no splits are made on $X_3$. In this scenario, we can visually inspect the tree to determine which predictors are informative towards predicting the response $Y$. 
+  	
+### Classification Trees and Issues with CART
+
   The construction of classification trees is similar to the construction of regression trees except a different impurity measure must be used. For the node $t$ containing $N_t$ observations, let $$\hat{p}_{tk}=\frac{1}{N_t}\sum_{x_i\in t} \mathbb{I}(y_i=k)$$ where $k=0$ or $k=1$. Then $\hat{p}_{tk}$ measures the proportion of observations of class $k$ in node $t$. Using the two-class example, there are several impurity measures available in the classification setting. The most common measure is perhaps the Gini index  defined by $$2p(1-p).$$ Other options include misclassification error $$1-\max(p,1-p),$$ and cross-entropy $$-p\log(p)-(1-p)\log(1-p).$$ If $t_L$ and $t_R$ are left and right nodes proposed under the split, let $\hat{p}_{tL}$ and $\hat{p}_{tR}$ be proportion of observations falling into $t_L$ and $t_R$, respectively. Denote the Gini index of the left node $t_L$ by $G_{L}$ and denote the Gini index of the right node $t_R$ by $G_{R}$. Then our splitting criterion is to seek the spliting variable and splitting point which minimizes $$\hat{p}_{tL}G_L+\hat{p}_{tR}G_R.$$ The case is similar when using misclassification rate and cross-entropy as the impurity measures. \par
   
   Some issues with CART trees include overfitting and variability. While there is a stopping criterion for growing the CART trees, often times naively growing a tree can result in overfitting to the data. One method of alleviating overfitting is to employ cost-complexity pruning, which searches for an optimal tree that balances fitting a good predicitve tree model with overfitting to the data. We do not go into details here, but point the reader to @esl2009. \par
@@ -87,7 +115,7 @@ library(rpart)
 
   When we bag trees, each observation in the data is not used within each individual tree. A bootstrap replicate $Z_b$ of the data $Z$ will likely exclude some of the observations within the data. The observations used within the bootstrap replicate $Z_b$ is called the in-bag data  while the observations not used within the bootstrap replicate $Z_b$ is called the out-of-bag (OOB) data and is denoted by $\bar{Z}_b$. The OOB data allows us to approximate the test error of the ensemble as follows. For simplicity suppose we are in the regression setting (the classification setting is similar). Then the OOB estimate of the MSE of the bagged forest is given by $$MSE_{\textup{OOB}}(T;Z)=\frac{1}{B}\sum_{b=1}^B MSE(T_b;\bar{Z}_b).$$ As the number of trees in the ensemble grows, the OOB estimate of the MSE for the bagged forest converges to the LOOCV estimate of the MSE for forest @esl2009. \par
 
-  A weakness of bagged forests is collinearity between trees @esl2009. This collinearity between trees grown from the bootstrap sample can be addressed by adding a randomization mechanism in the tree growing process. When we grow a tree from a bootstrap sample, even with the randomness induced by resampling from the data, certain features may be explored at the expense of other just as interesting features. This is a particular issue with collinear predictors. If two predictors are collinear, then the bagged forest might consistently choose one predictor over another even if the predictor not chosen leads to splits that are just as informative. This is due in part to the greedy nature of the CART algorithm when searching for optimal splits over the feature space (Cite ESL or some similar textbook for this point). The algorithm does not take into account the second best or third best splits. Furthermore, it is not difficult to see that bagging will generally produce an ensemble of trees that are quite similar to one another, subject to some perturbations. These trees will be strongly correlated with other trees in the ensemble, so if there is a less explored part of the feature space, then the ensemble will struggle to produce good predictions over that region. \par
+  A weakness of bagged forests is collinearity between trees @esl2009. This collinearity between trees grown from the bootstrap sample can be addressed by adding a randomization mechanism in the tree growing process. When we grow a tree from a bootstrap sample, even with the randomness induced by resampling from the data, certain features may be explored at the expense of other just as interesting features. This is a particular issue with collinear predictors. If two predictors are collinear, then the bagged forest might consistently choose one predictor over another even if the predictor not chosen leads to splits that are just as informative. This is due in part to the greedy nature of the CART algorithm when searching for optimal splits over the feature space. The algorithm does not take into account the second best or third best splits. Furthermore, it is not difficult to see that bagging will generally produce an ensemble of trees that are quite similar to one another, subject to some perturbations. These trees will be strongly correlated with other trees in the ensemble, so if there is a less explored part of the feature space, then the ensemble will struggle to produce good predictions over that region. \par
   
 ### The Random Forest Algorithm
 
@@ -144,6 +172,34 @@ library(rpart)
 	\end{algorithm}
 
   More important variables in the random forests are those for which the variable importance is large, as those are the variables for which the predictive accuracy of the random forest suffers the most when the out of bag data is permuted. Note that as variable importance measures currently defined and used, the threshold for importance of a variable is something which the researcher has to decide.  \par
+  
+### Example of MDA and MDI variable importance
+
+We ran a random forest using 1000 trees on our example dataset and plotted bar charts of the MDA and MDI variable importance scores, respectively, in Figure \ref{mda_ex}. \par
+
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.env = 'marginfigure', fig.cap= "\\label{mda_ex}Example of MDA and MDI Variable Importance", fig.height = 3}
+
+rf_ex <- siml.ex.list[[3]]
+
+rf_ex_imp <- data.frame(Variable = c("V1", "V2", 'V3'), rf_ex$importance)
+
+mda_ex_plot <- ggplot(rf_ex_imp, aes(x = Variable, y = X.IncMSE))+
+  geom_bar(stat = 'identity')+
+  coord_flip()+
+  labs( y = "PercIncMSE")+
+  scale_x_discrete(limits = c("V3", 'V2', 'V1'))
+mdi_ex_plot <- ggplot(rf_ex_imp, aes(x = Variable, y = IncNodePurity))+
+  geom_bar(stat = 'identity')+
+  coord_flip()+
+  labs(y = "IncNodePurity")+
+  scale_x_discrete(limits = c("V3", 'V2', 'V1'))
+
+do.call("grid.arrange", c(list(mda_ex_plot, mdi_ex_plot), nrow = 1, ncol = 2))
+
+
+```
+
+Note that for both variable importance measures, the contribution of each predictor is properly captured. That is, $X_1$ is the most important variable followed by $X_2$, with $X_3$ having no contribution with the MDA importance measure. With MDI, the contribution of $X_3$ is non-zero likely due to the randomization introduced in the splitting variable step. 
 
 ### Issues with Random Forests
 
@@ -151,29 +207,16 @@ library(rpart)
 
   If the predictors are highly correlated, then it has been shown by @strobl2007 and @strobl2008 that the trees within the forest ensemble will be biased and the variable importance measures will not be reliable due to confounding between similar looking variables. While the randomization step in the random forest algorithm can alleviate the correlation between trees in the ensemble, the collinearity between predictors can cause the predictive performance of the random forest to suffer. This is an issue with the underlying CART algorithm. Alternative algorithms from CART exist which try to alleviate issues of collinearity and correlation in predictors, but we focus primarily on the forest ensembles grown using CART in this thesis. \par
 
-  Finally, there are situations where the data cannot be bootstrapped. This could be due to a number of factors including that the data has a heavily-tailed distribution or if there are particularly extreme values. In this case, a different bootstrap scheme could perhaps remedy the situation where the naive bootstrap fails. One common important resampling scheme used within random forests is to use the m-out-of-n bootstrap (also referred to subsampling or subagging in the literature). The m-out-of-n bootstrap is a resampling scheme which resamples with or without replacement $m\leq n$ observations from the data to form datasets with $m$ many data points to run the bootstrap computation. Bickel et al. have shown that in important cases, subsampling can succeed where the bootstrap fails. Of course, using less of the available data is less efficient, but in the context of random forests this loss of efficiency may not be an issue. In @strobl2008, simulation results showed that subsampling instead of using the standard nonparametric bootstrap can improve the performance of random forests. The authors suggested that subsampling further reduces the variance of the ensemble by producing trees that are even more decorrelated. Their heuristic is that there is a lower probability of duplicate data points being chosen using subsampling (this probability is zero if we are subsampling without replacement), furthermore there is a lower probability of highly correlated data points being chosen as one of the $m\leq n$ points. This certainly seems plausible, but we would like to see further simulation results or a technical result that explains why subsampling works well for forests. We would also like to note that most consistency results (Biau et al., Scornet et al., Ishwaran et al., and Wager et al.) make this subsampling assumption in their analysis of the random forest model, as subsampling constructions make the forest ensemble more amenable to mathematical analysis. \par
+  Finally, there are situations where the data cannot be bootstrapped. This could be due to a number of factors including that the data has a heavily-tailed distribution or if there are particularly extreme values. In this case, a different bootstrap scheme could perhaps remedy the situation where the naive bootstrap fails. One common resampling scheme used within random forests is to use the m-out-of-n bootstrap (also referred to subsampling or subagging in the literature). The m-out-of-n bootstrap is a resampling scheme which resamples with or without replacement $m\leq n$ observations from the data to form datasets with $m$ many data points to run the bootstrap computation. Of course, using less of the available data is less efficient, but in the context of random forests this loss of efficiency may not be an issue. In @strobl2008, simulation results showed that subsampling instead of using the standard nonparametric bootstrap can improve the performance of random forests. The authors suggested that subsampling further reduces the variance of the ensemble by producing trees that are even more decorrelated. Their heuristic is that there is a lower probability of duplicate data points being chosen using subsampling (this probability is zero if we are subsampling without replacement), furthermore there is a lower probability of highly correlated data points being chosen as one of the $m\leq n$ points. This certainly seems plausible, but we would like to see further simulation results or a technical result that explains why subsampling works well for forests. We would also like to note that consistency results such as from @mentch2016a and @wager2017 make this subsampling assumption in their analysis of the random forest model, as subsampling constructions make the forest ensemble more amenable to mathematical analysis. \par
 	
 ## Focus of this Thesis
 
-  In the previous three sections we discussed the basics of trees, the bootstrap, and random forests. We would like to now discuss the direction we are going to take this thesis. We are interested in developing inferential tools using the random forest algorithm. The random forest often produces good predictions out of the box with little tuning required except growing a sufficient number of trees and choosing a good value of $m\leq p$ to try at each split in the tree growing process. The ease of fitting random forests is one of the advantages of the random forest compared to more complex methods like neural networks or support vector machines. Even if the random forest is easier to fit than neural nets or SVMs, the underlying random forest mechanism is quite complex. This complexity makes developing inferential tools with random forests difficult. In the next chapter we will discuss some approaches that have been developed recently by researchers. Of particular interest for us are the variable importance measures for random forests. There is the MDI variable importance and the MDA variable importance measure. While there are concerns about the bias in the MDI and MDA VI measures with random forests using CART tree's due to how CART tree's are constructed (Strobl et al., 2008), we would like to extend the inferential capabilities of random forests using CART as this is perhaps the most popular version of the algorithm in use. \par
-
-  The random forest VI can be viewed as a random variable with an unknown probability distribution. While determining the distribution of random forest VI's would be ideal towards developing inference for random forests, finding the distribution of random forest VI's is difficult and unclear in general. However, note that the bootstrap provides a computational method of approximating the sampling distribution of random forest VI measures. We could then proceed to obtaining estimates of the standard error and to form approximate interval estimates. We could grow a random forest once, obtain an estimate of the VI of each variable $X_j$ and then run a bootstrap to obtain estimates of the standard error of each variable. Inference could then proceed using the VI measures along with the estimate of standard error. Note that in this scheme there is two levels of bootstrap at play. There is the bootstrap within each random forest and then the bootstrapping to obtain the standard error estimate. The estimate we produce of the VI of a variable $X_j$ can be erratic. Running the random forest again can produce a new estimate of the VI of variable $X_j$. As Efron suggests in his 2014 article "Estimation and Accuracy after Model Selection," we could remedy the erratic, non-smooth nature of the VI estimate by bagging $VI(X_j)$. However, when we bag $VI(X_j)$ we would require a third-level of bootstrapping to produce an estimate of the standard error of the bagged estimate of $VI(X_j)$. This is computationally expensive, especially considering that the computational cost of the random forest depends on the number of observations, number of tree's grown, and number of variables present. However, applying Efron's infinitesimal jackknife (IJ) technique, which we will discuss in the next chapter, we can efficiently estimate the standard error of the bagged estimate of $VI(X_j)$ only using the two levels of bootstrapping. In this thesis we will be exploring the properties of IJ estimates of the standard error of the bagged estimate $VI(X_j)$ utilizing different bootstrap schemes. Utilizing the IJ, we can then produce interval estimates and confidence intervals of the variable importance of variables in the random forest. This allows us to characterize the uncertainty of $VI(X_j)$ when using variable importance measures for description, variable selection, and inference.
-   \par
-## Outline of Remaining Chapters
-
-  Chapter 2: Inference and variable importance for random forests. In this chapter we will discuss the various approaches to inference for random forests that have been developed by researchers. These include Ishwaran and Louppe's analysis of VI measures of RF. Ishwaran's analysis is of the variable importance scheme he devised. Ishwaran's scheme is amenable to theoretical analysis and he produces asymptotic results for his scheme. Louppe analyzes the MDI variable importance in the context of a construction called totally randomized forests in the setting of finite sample spaces. Louppe investigates the effect of relevant and irrelevant variables to MDI VI in this setting and provides asymptotic results. These are two of themain papers investigating properties of VI.
-
-  The other schemes include Mentch and Hooker's prediction intervals which are produced by interpreting the random forest ensemble as a particular type of U-statistic and applying the U-statistics theory to produce prediction intervals. They then can produce hypothesis tests and confidence intervals in this context. 
-
-  A second approach towards prediction intervals is Wager's application of the IJ to the random forest estimator to produce prediction intervals and confidence intervals. Wager has a couple of papers in this area which we will discuss. In this part we will also go into greater detail about the IJ, it's properties, and why it works. 
-
-  We will also discuss the conditional inference trees and conditional variable importance developed by Strobl, Hothorn, and their colleagues to deal with the biased manner in which the trees in random forests are constructed. In this part we will also discuss the Infforest variable importance measure developed by Aurora.
-
-  Chapter 3: In this chapter we will go into great detail about the bootstrap and why it works. We will discuss the technical details of different methods of estimating the standard error of functional statistics, and we will go into the construction of different bootstrap confidence intervals along with properties of these confidence intervals. We will also discuss different bootstrap schemes and in particular subsampling, and why subsampling works well, especially in the random forest context. 
-
-  Chapter 4: We will present our different approaches to bootstrapping variable importance measures and provide simulation results. The first approach is the cases bootstrap, the second approach is the bootstrapping residuals of the random forest approach. Within the cases approach, there are two ways we will try to constrain the variability of bootstrap replicates. Adopting the notation from general linear models, we could fit a pruned tree predicting $Y\sim X_1,\ldots,X_p$. Then we would bootstrap from the terminal nodes of this single tree to try to produce bootstrap replicates which capture the relationship between the variables. Another approach is for each predictor $X_j$, fit a single well pruned tree $X_j\sim X_1,\ldots,X_{j-1},X_{j+1},\ldots,X_p$. We would then draw bootstrap samples from the terminal nodes of this tree which respect the partition produced by these terminal nodes. The idea is to fix the relationship between every predictor not $X_j$ and allow the $X_j$'s to be exchanged across the bootstrap samples. We would produce simulation results of each approach and compare the statistical properties of these different constructions. 
-
-  Chapter 5: If all goes well there might be a chapter 5 where we explore large sample properties and distribution of VI measures. This is likely going to be a difficult mathematical problem to solve in general, so a tangible course of action might be to pick a generating mechanism and easy VI measure from which we could figure out the VI distribution under some set of strong assumptions.
+  An issue with random forest variable importance measures is bias due to the presence of correlated predictors. As will become clearer in the next chapter, correlated predictors can lead to unreliable MDA and MDI variable importance scores due to confounding between correlated predictors. The weakness of commonly used random forest variable importance measures to correlated predictors is unfortunate as random forests often produce good predictions with little tuning required except growing a sufficient number of trees and choosing a good value of $m\leq p$ to try at each split in the tree growing process. The ease of fitting random forests is one of the advantages of the random forest algorithm compred to more complex methods like neural networks or support vector machines. Since the random forest algorithm is a readily available and easy to use tool for statistical practitioners, we would like to develop random forest variable importance measures which can take into account correlated predictors. Our goal with this thesis is to:
+  \begin{enumerate}
+  \item Develop computationally tractible random forest variable importance measures which can handle correlated predictors in the data. 
+  \item Extend our random forest variable importance measures to a hypothesis testing framework via permutation tests. 
+  \end{enumerate}
+  \par
 
 
 

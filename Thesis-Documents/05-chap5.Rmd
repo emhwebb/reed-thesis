@@ -403,6 +403,43 @@ jt.siml62 <- jt_siml_list2[[6]]
 jt.siml72 <- jt_siml_list2[[7]]
 jt.siml82 <- jt_siml_list2[[8]]
 
+
+plot_JAVPI <-function(i, df){
+  JAVPI_vec <- df[,i]
+  var_name <- c("Important Var", "Unimportant Var")
+    #sapply(1:12, FUN = function(i) paste0("V", as.character(i)))
+  x_axis_order <- c("Unimportant Var", "Important Var")
+    #sapply(1:12, FUN = function(i) paste0("V", as.character(13-i)))
+  plot_df <-data.frame(variable = var_name, JAVPI = JAVPI_vec)
+  
+  plot_obj <- ggplot(plot_df, aes(x = variable, y = JAVPI))+
+  geom_bar(stat = 'identity')+
+  coord_flip()+
+  scale_x_discrete(limits = x_axis_order)+
+  labs(y = paste("Simulation", as.character(i), sep = " "), x = "")+
+  theme(text = element_text(size = 10))
+  #theme(axis.title.y=element_blank())
+  plot_obj
+}
+
+plot_JAVPI_eq <-function(i, df){
+  JAVPI_vec <- df[,i]
+  var_name <- c("Var in Partition", "Var Not in Partition")
+    #sapply(1:12, FUN = function(i) paste0("V", as.character(i)))
+  x_axis_order <- c("Var Not in Partition", "Var in Partition")
+    #sapply(1:12, FUN = function(i) paste0("V", as.character(13-i)))
+  plot_df <-data.frame(variable = var_name, JAVPI = JAVPI_vec)
+  
+  plot_obj <- ggplot(plot_df, aes(x = variable, y = JAVPI))+
+  geom_bar(stat = 'identity')+
+  coord_flip()+
+  scale_x_discrete(limits = x_axis_order)+
+  labs(y = paste("Simulation", as.character(i), sep = " "), x = "")+
+  theme(text = element_text(size = 10))
+  #theme(axis.title.y=element_blank())
+  plot_obj
+}
+
 ```
 
 ### Simulation Design
@@ -437,17 +474,30 @@ kable(partitions_mat,
 
 Below are simulation results of JAVPI for the first simulation run. We find that, in general, JAVPI is relatively stable at distinguishing between the set of predictors containing all the signal and the set of predictors that are noise. In particular, in all cases the JAVPI values are much higher for the set of informative predictors than for the set of uninformative predictors, which is what we expected. We do note that in simulations 1, 2, and 6, the JAVPI value for the uninformative predictors is quite high. Some possible reasons for this are monte carlo variability and relatively weak signal in the predictors allowing for some masking between variables. \par 
 
-```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE}
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 8}
 
 #javpi signal in one partition
 
-jt_siml_mat1 <- extract_matrix(numvar = 2, numsiml = 8, data.list = jt_siml_list1, rf.type = 1)
-rownames(jt_siml_mat1) <- c("JAVPI of Important Variables", "JAVPI of Unimportant Variables")
+jt.siml.df1 <- as.data.frame(extract_matrix(numvar = 2, numsiml = 8, 
+                                             data.list = jt_siml_list1, rf.type = 1))
+#rownames(jt.siml.df1) <- c("JAVPI of Important Variables", "JAVPI of Unimportant Variables")
 
-kable(jt_siml_mat1,
-      format = "latex", booktabs = TRUE,
-      caption = "JAVPI values from first simulation run") %>%
-    kable_styling(latex_options = "scale_down")
+javp.siml.plots1 <- map(1:8, plot_JAVPI, jt.siml.df1)
+javp.siml.plots1[[1]] <- javp.siml.plots1[[1]]+
+  ggtitle("Independent Predictors")+
+  labs(x = "Scenario 1")+
+  theme(plot.title = element_text(hjust = 0.5))
+javp.siml.plots1[[2]] <- javp.siml.plots1[[2]]+
+  ggtitle("Correlated Predictors")+
+  theme(plot.title = element_text(hjust = 0.5))
+javp.siml.plots1[[3]] <- javp.siml.plots1[[3]]+
+  labs(x = "Scenario 2")
+javp.siml.plots1[[5]] <- javp.siml.plots1[[5]]+
+  labs(x = "Scenario 3")
+javp.siml.plots1[[7]] <- javp.siml.plots1[[7]]+
+  labs(x = "Scenario 4")
+
+do.call("grid.arrange", c(javp.siml.plots1, ncol = 2, nrow = 4))
 
 ```
 
@@ -475,30 +525,58 @@ rf_jt_added_var_plot(jt.siml5)
 
 For simulation 5, the uninformative variables had no trend while the informative variables had a strong positive trend. This at least indicates that the JAVPI score captures the relative structure present in the joint added variable plot. For lower values of JAVPI, we do not expect there to be much structure in the joint added variable plot, indicating uninformativeness of those variables. Higher values of JAVPI indicate that there is structure in data. In the case of higher JAVPI scores, combining the JAVPI score with the joint added variable plot should allow us to figure out where the signal is present. For example, with simulations 1 and 2, the trend of the joint added variable plot for the informative variables is much stronger than the trend for the uninformative variables. Furthermore, the JAVPI score for the informative variables is much higher than the JAVPI scores for the uninformative variables. Some further testing, such as examining the MDA variable importance for the full set of predictors may then allow us to conclude that the set of uninformative variables are truly uninformative. If the set of uninformative variables is not too large, we could also try computing the JAVPI for each predictor in the set of uninformative variables individually. If there is some signal in those predictors, then we would expect there to be some non-zero trend in the resulting joint added variable plot, otherwise, there would be no trend in the joint added variable plot. \par 
 
-```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE}
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 8}
 
 #mda jt_siml_1
-mda_siml_mat1 <- extract_matrix(numvar = 12, numsiml = 8, data.list = jt_siml_list1, rf.type = 3)
+mda.jt.siml.df1 <- as.data.frame(extract_matrix(numvar = 12, numsiml = 8, 
+                                              data.list = jt_siml_list1, rf.type = 3))
 
-kable(mda_siml_mat1,
-      format = "latex", booktabs = TRUE,
-      caption = "MDA values from simulation") %>%
-  kable_styling(latex_options = "scale_down")
+mda.jt.siml.plots1 <- map(1:8, plot_AVPI, mda.jt.siml.df1)
+mda.jt.siml.plots1[[1]] <- mda.jt.siml.plots1[[1]]+
+  ggtitle("Independent Predictors")+
+  labs(x = "Scenario 1")+
+  theme(plot.title = element_text(hjust = 0.5))
+mda.jt.siml.plots1[[2]] <- mda.jt.siml.plots1[[2]]+
+  ggtitle("Correlated Predictors")+
+  theme(plot.title = element_text(hjust = 0.5))
+mda.jt.siml.plots1[[3]] <- mda.jt.siml.plots1[[3]]+
+  labs(x = "Scenario 2")
+mda.jt.siml.plots1[[5]] <- mda.jt.siml.plots1[[5]]+
+  labs(x = "Scenario 3")
+mda.jt.siml.plots1[[7]] <- mda.jt.siml.plots1[[7]]+
+  labs(x = "Scenario 4")
+
+do.call("grid.arrange", c(mda.jt.siml.plots1, ncol = 2, nrow = 4))
 
 ```
 
 For the second simulation run, where there was signal in both partitions of the predictors, we find that, in general, the JAVPI scores for both partitions in each simulation is high, as we expected. When we include signal in both partitions, the JAVPI will generally pick up on the signal, and we can examine the joint added variable plots for visual confirmation of what is going on. In particular, we display the joint added variable plot for simulation 1. \par 
 
-```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE}
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 8}
 
 #javpi signal in both partitions
 
-jt_siml_mat2 <- extract_matrix(numvar = 2, numsiml = 8, data.list = jt_siml_list2, rf.type = 1)
-rownames(jt_siml_mat2) <- c("JAVPI of Predictors in Partition", "JAVPI of Predictors Not in Partition")
+jt.siml.df2 <- as.data.frame(extract_matrix(numvar = 2, numsiml = 8, 
+                                            data.list = jt_siml_list2, rf.type = 1))
+#rownames(jt_siml_mat2) <- c("JAVPI of Predictors in Partition", "JAVPI of Predictors Not in Partition")
 
-kable(jt_siml_mat2,
-      format = "latex", booktabs = TRUE) %>%
-    kable_styling(latex_options = "scale_down")
+javp.siml.plots2 <- map(1:8, plot_JAVPI_eq, jt.siml.df2)
+javp.siml.plots2[[1]] <- javp.siml.plots2[[1]]+
+  ggtitle("Independent Predictors")+
+  labs(x = "Scenario 1")+
+  theme(plot.title = element_text(hjust = 0.5))
+javp.siml.plots2[[2]] <- javp.siml.plots2[[2]]+
+  ggtitle("Correlated Predictors")+
+  theme(plot.title = element_text(hjust = 0.5))
+javp.siml.plots2[[3]] <- javp.siml.plots2[[3]]+
+  labs(x = "Scenario 2")
+javp.siml.plots2[[5]] <- javp.siml.plots2[[5]]+
+  labs(x = "Scenario 3")
+javp.siml.plots2[[7]] <- javp.siml.plots2[[7]]+
+  labs(x = "Scenario 4")
+
+do.call("grid.arrange", c(javp.siml.plots2, ncol = 2, nrow = 4))
+
 
 ```
 

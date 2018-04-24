@@ -523,6 +523,8 @@ rf.777 <- randomforest_avp(data = siml.data7, ntree1 = ntree.sim1,
 rf.888 <- randomforest_avp(data = siml.data8, ntree1 = ntree.sim1, 
                        ntree2 = ntree.sim2, replace = FALSE, x.res = T)
 
+avp_orig_list <- list(rf.111, rf.222, rf.333, rf.444, rf.555, rf.666, rf.777, rf.888)
+
 rf_added_var_plot(rf.111)
 rf_added_var_plot(rf.222)
 rf_added_var_plot(rf.333)

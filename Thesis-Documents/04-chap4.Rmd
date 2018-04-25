@@ -449,7 +449,7 @@ kable(var_inf_mat, format = "latex", booktabs = TRUE,
 
 ```
 
-Each simulation corresponds to a particular scenario and type of predictors. We ran each scenario with first independent predictors then predictors with the correlation structure from above. In addition, we first ran each simulation using sampling with replacement in the random forest ensemble, then re-ran the simulation using sampling without replacement. In addition,  \par
+Each simulation corresponds to a particular scenario and type of predictors. We ran each scenario with first independent predictors then predictors with the correlation structure from above. In addition, we first ran each simulation using sampling with replacement in the random forest ensemble, then re-ran the simulation using sampling without replacement.   \par
 
 ```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, eval = FALSE}
 

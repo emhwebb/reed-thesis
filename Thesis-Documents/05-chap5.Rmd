@@ -508,8 +508,6 @@ With the JAVPI, in particular, our intention in introducing the JAVPI variable i
 
 ### Simulation Design
 
-For our simulation of JAVPI, we used our simulation set-up from chapter 4 with some changes. That is we ran the 8 simulations from chapter 4 where we have independent and correlated predictors for each scenario. Rather than test both sampling with replacement and sampling without replacement for JAVPI, we chose to run our simulation on JAVPI with just sampling without replacement. In addition, we ran two sets of simulations for JAVPI to illustrate different features of the method. The first simulation was a simulation where we partitioned out all of the informative predictors to the response, leaving no signal in the remaining data. For the second simulation, we partitioned out our predictors such that both partitions of the set of predictors contained informative predictors. In the tables below we show the partitions of our simulated data sets for both the first round and second round of simulations. All other settings for the simulations are the same as those for chapter 4: we drew 2000 samples and grew 1000 tree ensembles for both stages of JAVPI. \par 
-
 ```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, size = "normalsize"}
 
 part11 <- c('V1, V2, V3, V5, V6, V7')
@@ -533,6 +531,8 @@ kable(partitions_mat,
 
 ```
 
+
+For our simulation of JAVPI, we used our simulation set-up from chapter 4 with some changes. That is we ran the 8 simulations from chapter 4 where we have independent and correlated predictors for each scenario. Rather than test both sampling with replacement and sampling without replacement for JAVPI, we chose to run our simulation on JAVPI with just sampling without replacement. In addition, we ran two sets of simulations for JAVPI to illustrate different features of the method. The first simulation was a simulation where we partitioned out all of the informative predictors to the response, leaving no signal in the remaining data. For the second simulation, we partitioned out our predictors such that both partitions of the set of predictors contained informative predictors. In the tables below we show the partitions of our simulated data sets for both the first round and second round of simulations. All other settings for the simulations are the same as those for chapter 4: we drew 2000 samples and grew 1000 tree ensembles for both stages of JAVPI. \par 
 
 ## Simulation Results 
 

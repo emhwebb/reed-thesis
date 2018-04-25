@@ -7,7 +7,7 @@ If you feel it necessary to include an appendix, it goes here.
 -->
 
 
-# Link to Added Variable Plot Importance Code
+# Code and Implementation
 
 Code and implementation details for random forest AVPI and JAVPI can be found at the following link:
 https://github.com/emhwebb/reed-thesis/tree/master/AddedVarImpCode

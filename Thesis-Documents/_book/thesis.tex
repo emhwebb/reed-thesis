@@ -1190,11 +1190,16 @@ to explain how added variable plots work. \par
 
 \section{Added Variable Plots in Linear
 Regression}\label{added-variable-plots-in-linear-regression}
-
+\begin{figure}
+\centering
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-4-1.pdf}
+\caption{\label{fig:unnamed-chunk-4}\label{AVPlinex}Linear Regression Added
+Variable Plot for Example Dataset}
+\end{figure}
 Suppose that we have data \(Z=\{(\mathbf{x}_i,Y_i)|i=1,\ldots,n\}\),
 where \(\mathbf{x}_i\) is a covariate in the feature space, and that we
 fit a multiple linear regression model of the form
-\[\mathbf{Y}_1=\mathbf{X}\beta_1+\mathbf{W}\alpha+\mathbf{\varepsilon}_1\]
+\(\mathbf{Y}_1=\mathbf{X}\beta_1+\mathbf{W}\alpha+\mathbf{\varepsilon}_1\)
 where \(\mathbf{X}\) is a \(n\times p\) matrix consisting of \(p-1\)
 predictors, \(\beta=(\beta_0,\beta_1,\ldots,\beta_p)^T\),
 \(\mathbf{W}=(w_1,\ldots,w_n)\) is a predictor, \(\alpha\) is a scalar,
@@ -1234,12 +1239,7 @@ simple linear response from chapter 1. That is, we have three
 independent normals \(X_1,X_2,X_3\sim N(0,1)\) and a response defined by
 \(Y=10X_1-5X_2+\varepsilon.\) We can plot the added variable plot of
 \(X_1, X_2,\) and \(X_3\). \par
-\begin{figure}
-\centering
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-4-1.pdf}
-\caption{\label{fig:unnamed-chunk-4}\label{AVPlinex}Linear Regression Added
-Variable Plot for Example Dataset}
-\end{figure}
+
 As we can see from Figure \ref{AVPlinex}, the AVP for \(X_1\) is a
 positive line through the origin, the AVP for \(X_2\) is a negative line
 through the origin, and the AVP for \(X_3\) is a mass of points about
@@ -1324,7 +1324,14 @@ relationship of \(X_k\) with the response \(Y\). \par
 \caption{\label{fig:unnamed-chunk-5}\label{AVPresex}Residual-based Added
 Variable Plot for Example Dataset}
 \end{figure}
-As we see in the example
+As we see in Figure \ref{AVPresex}, the residual-based AVP of the
+example dataset indicates the conditional relationship of each
+respective predictor and the response, once we have taken into account
+the effect of other predictors. The residual-based AVP will tend to
+preserve the sign and magnitude of the relationship between each
+predictor and the response. If a predictor has a non-linear relationship
+with the response, then the residual-based AVP will approximately
+capture the non-linear relationship.
 
 \subsection{Model-Based Added Variable
 Plot}\label{model-based-added-variable-plot}
@@ -1400,6 +1407,19 @@ different predictors. \par
 \caption{\label{fig:unnamed-chunk-6}\label{AVPmodex}Model-based Added
 Variable Plot for Example Dataset}
 \end{figure}
+As we see in Figure \ref{AVPmodex}, the indicates the conditional
+relationship of each predictor with respect to the response, but does
+not, in general, preserve the sign of the relationship. In particular,
+we note that the relationship between variable 2 and the response \(Y\)
+in the example dataset is negative and linear, but that the model-based
+AVP has a positive trend. This is as instead of plotting
+\(X_k-\hat{\theta}_{RF}(X_k|X_{-k})\) on the x-axis as in the
+residual-based AVP, we plot
+\(\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k})\), which will
+generally have a positive relationship with
+\(Y-\hat{\theta}_{RF}(Y|X_{-k})\) on the y-axis of the added variable
+plot. \par 
+
 \subsection{Discussion of Added Variable
 Plot}\label{discussion-of-added-variable-plot}
 
@@ -1580,6 +1600,11 @@ Importance}\label{example-of-added-variable-plot-importance}
 \caption{\label{fig:unnamed-chunk-7}\label{AVPIex}Residual and Model Based
 AVPI Scores of Example Dataset}
 \end{figure}
+In figure \ref{AVPIex}, we present the residual-based and model-based
+AVPI, respectively, of the predictors in the example dataset. As
+expected, for both measures, variables 1 and 2 receive high AVPI scores,
+while variable 3 receives a low AVPI score.
+
 \section{Extensions of Added Variable Plot
 Importance}\label{extensions-of-added-variable-plot-importance}
 
@@ -1765,6 +1790,14 @@ simulations 1 through 8 using sampling without replacement. \par
 
 \section{Simulation Results}\label{simulation-results}
 
+\subsection{Model-Based AVPI Simulation
+Results}\label{model-based-avpi-simulation-results}
+\begin{figure}
+\centering
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-12-1.pdf}
+\caption{\label{fig:unnamed-chunk-12}\label{AVPIwrep}Model-based AVPI
+Simulation Results Using Sampling With Replacement}
+\end{figure}
 In Figure \ref{AVPIwrep}, we have the results of running the model-based
 added variable plot importances on simulated data sets when sampling
 with replacement. We first note that the AVPI is quite noisy in this
@@ -1777,12 +1810,7 @@ predictors have the correlation structure discussed above. We see that
 in this case that confounding between correlated predictors is still an
 issue as variable 3 is assigned a AVPI score of 76 -- which is lower
 than the scores assigned to variables 8 through 12. \par
-\begin{figure}
-\centering
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-12-1.pdf}
-\caption{\label{fig:unnamed-chunk-12}\label{AVPIwrep}Model-based AVPI
-Simulation Results Using Sampling With Replacement}
-\end{figure}
+
 We also extracted the MDA variable importance values for each simulation
 as a comparison to the AVPI values and summarize the results in Figure
 \ref{MDAwrep}. In particular, we note that in simulation 1, the MDA
@@ -1824,32 +1852,46 @@ variables 1 and 5 have high AVPI scores as expected. \par
 Simulation Results Using Sampling Without Replacement}
 \end{figure}
 Looking at the column of plots corresponding to independent predictors
-in Figure \ref{AVPIworep}, we see that in simulations 1, 3, and 5,
-correctly the AVPI was able to correctly discern the importance of
-informative variables. However, with simulation 7, we see that in Figure
+in Figure \ref{AVPIworep}, we see that in simulations 1, 3, and 5, the
+AVPI was able to correctly discern the importance of informative
+variables. However, with simulation 7, we see that in Figure
 \ref{MDAworep1}, that the MDA variable importance outperformed the AVPI
 variable importance and was able to find which variables were
-informative while AVPI had difficulty.
+informative while AVPI had difficulty with this particular simulation.
+However, looking at the column of plots corresponding to correlated
+predictors in Figure \ref{AVPIworep}, we see that with the exception of
+simulation 8, that AVPI using sampling without replacement generally
+performed as well if not better than using MDA variable importance with
+sampling without replacement. We also note in comparing Figure
+\ref{AVPIworep} to Figure \ref{AVPIwrep}, that using AVPI with sampling
+without replacement appears to generally perform better than using AVPI
+with sampling with replacement with respect to correctly finding the
+informative variables among the correlated predictors. \par
 \begin{figure}
 \centering
 \includegraphics{thesis_files/figure-latex/unnamed-chunk-15-1.pdf}
 \caption{\label{fig:unnamed-chunk-15}\label{MDAworep1}MDA Simulation Results
 Using Sampling Without Replacement}
 \end{figure}
-Overall, simulation results indicate that AVPI can determine the
-informativeness of predictors with fairly strong signal, although in
-general MDA variable importance will offer similar results without the
-addition of uninformative variables receiving non-zero scores. In some
-situations with correlated predictors, the AVPI appears to find which of
-the correlated predictors are informative, so long as the signal in the
-informative predictor is relatively strong. This indicates that AVPI may
-be most effective as a tool employed alongside MDA variable importance
-when there is some correlation structure present in the predictors. In
-general, MDA variable importance will be able to evaluate the importance
-of independent predictors, and if there is some correlation structure
-that leads to unstable MDA variable importance values of the correlated
-predictors, then AVPI can be used on just the correlated predictors to
-determine which of the correlated predictors are important. \par 
+\subsection{Residuals-Based AVPI Simulation
+Results}\label{residuals-based-avpi-simulation-results}
+
+Looking at Figure \ref{resAVPI}, we see that while the residuals-based
+AVPI can handle a linear response with both independent and correlated
+predictors, the residuals-based AVPI has difficulty with other types of
+responses. In particular, the residuals-based AVPI cannot handle a
+response defined by an interaction term (scenario 3) across both
+independent and correlated predictors. The residuals-based AVPI also
+cannot handle correlated polynomial terms. With simulations 5 and 6, we
+expected to see that variables 1, 2, 5, and 6 to have the larges bars on
+the plot of AVPI values, however, what we see is that in both of these
+simulations, is that these variables have AVPI scores similar in value
+to uninformative variables. For simulation 8, we see that while
+variables 1 and 8 properly receive high AVPI scores, variable 2 received
+a similar AVPI score as variable 12, which was an uninformative. We do
+note, however, that relative to other correlated predictors in
+simulation 8, variables 1 and 2 receieved higher AVPI scores than
+variables 3 or 4, which is what we expected to see. \par
 \begin{figure}
 \centering
 \includegraphics{thesis_files/figure-latex/unnamed-chunk-16-1.pdf}
@@ -1863,28 +1905,56 @@ Simulation Results Using Sampling Without Replacement}
 Using Sampling Without Replacement on same data as in Figure
 \ref{resAVPI}}
 \end{figure}
-One issue with the AVPI method is the relative noisiness of the method.
-As observed in the simulation using sampling with replacement,
-uninformative variables can be assigned positive AVPI scores. Looking at
-results from re-running the simulation using sampling without
-replacement, we see that the same sort-of noisiness is also present in
-AVPI computed via random forests using sampling without replacement.
-Therefore the issue of noisiness for the AVPI method is not simply a
-matter of sampling with replacement versus sampling without replacement.
-The particular issue with the noisiness of the AVPI method is that it
-prevents us from readily employing permutation tests to determine
-importance of variables using AVPI as a test statistic in a hypothesis
-testing framework. In particular, looking at the tables of AVPI p-values
-for both sampling with replacement and sampling without replacement, we
-see that both tables are essentially identical, and that under a
-hypothesis testing framework, we would be committing type I errors
-across all simulations using a significance level of \(\alpha = 0.05\).
-Furthermore, looking at the simulated null distribution of AVPI values,
-we see that the null distributions are generally quite similar. The
-simulated null distribution of AVPI values is generally symmetric with
-the lower end of the tails at around an importance score of 25. So any
-AVPI score above 30 would likely appear statistically significant using
-a permutation test with AVPI as the test statistic. \par
+\subsection{AVPI Simulation Results
+Discussion}\label{avpi-simulation-results-discussion}
+
+Overall, simulation results indicate that AVPI can determine the
+informativeness of predictors with fairly strong signal, although in
+general MDA variable importance will offer similar results without the
+addition of uninformative variables receiving non-zero scores. In some
+situations with correlated predictors, the AVPI appears to find which of
+the correlated predictors are informative, so long as the signal in the
+informative predictor is relatively strong. This indicates that AVPI may
+be most effective as a tool employed alongside MDA variable importance
+when there is some correlation structure present in the predictors. In
+general, MDA variable importance will be able to evaluate the importance
+of independent predictors, and if there is some correlation structure
+that leads to unstable MDA variable importance values of the correlated
+predictors, then AVPI can be used on just the correlated predictors to
+determine which of the correlated predictors are important. We also note
+that based on our simulation results, the model-based AVPI appears to
+offer more stable answers to a larger class of response types than the
+residuals-based AVPI. Furthermore, using sampling without replacement
+with AVPI appears to offer better results than sampling with
+replacement, which is what we expected to see based on simulation
+results in Strobl et al. (2008). \par 
+
+\subsection{Issues with AVPI and AVPI Null Distribution Simulation
+Results}\label{issues-with-avpi-and-avpi-null-distribution-simulation-results}
+
+One issue with AVPI is the relative noisiness of the method. As observed
+in the simulations using sampling with replacement in Figure
+\ref{AVPIwrep}, uninformative variables can be assigned positive AVPI
+scores. Looking at results from re-running the simulation using sampling
+without replacement in \ref{AVPIworep}, we see that the same sort-of
+noisiness is also present in AVPI computed via random forests using
+sampling without replacement. Therefore the issue of noisiness for the
+AVPI method is not simply a matter of sampling with replacement versus
+sampling without replacement. The particular issue with the noisiness of
+the AVPI method is that it prevents us from readily employing
+permutation tests to determine importance of variables using AVPI as a
+test statistic in a hypothesis testing framework. In particular, looking
+at the tables of AVPI p-values for both sampling with replacement and
+sampling without replacement, we see that both tables are essentially
+identical, and that under a hypothesis testing framework, we would be
+committing type I errors across all simulations using a significance
+level of \(\alpha = 0.05\). Furthermore, looking at the simulated null
+distribution of AVPI values, we see that the null distributions are
+generally quite similar. The simulated null distribution of AVPI values
+is generally symmetric with the lower end of the tails at around an
+importance score of 25. So any AVPI score above 30 would likely appear
+statistically significant using a permutation test with AVPI as the test
+statistic. \par
 \begin{table}
 
 \caption{\label{tab:unnamed-chunk-18}Added Variable Importance P-values for Sampling with Replacement}
@@ -1947,6 +2017,40 @@ hypothesis testing framework, our simulation results suggest that when
 used in conjunction with the MDA variable importance, the AVPI can be a
 useful tool for dealing with correlated predictors in a regression
 setting. \par
+
+We conclude this chapter by returning to the questions we posed at the
+beginning of the chapter, namely,
+\begin{enumerate}
+  \item Can AVPI handle correlated predictors in the data? 
+  \item Can we extend AVPI to a hypothesis testing framework via permutation tests?
+\end{enumerate}
+With respect to the first question, we found that AVPI, in certain
+situations, can handle correlated predictors in the data better than the
+MDA variable importance measure. We also found that the model-based AVPI
+tends to provide more consistent scores than the residuals-based AVPI
+across a greater range of response types. On the other hand, the AVPI
+method is quite noisy. We were not able to determine the exact source of
+the noise, but we suspect that it has some relation with the correlation
+between \(\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k})\) and
+\(Y-\hat{\theta}_{RF}(Y|X_{-k})\) in the model-based added variable
+plot. In particular, each of these forest ensembles tend to be highly
+correlated with each other and the response, such that when we run AVPI,
+we are capturing some of the effect of this correlation structure, thus
+leading to non-zero AVPI scores for non-informative variables. As will
+be discussed in the next chapter, one method we may try to alleviate
+this noisiness in AVPI is to define a joint added variable plot
+importance (JAVPI) measure, in which we try to determine in which
+subsets of predictors there is signal. \par 
+
+With respect to the second question, due to the noisiness of AVPI, we
+find that the AVPI measure as it currently is, is an unreliable test
+statistic to compute a null distribution for via a permutation test. If
+the issue of noisiness could be sorted out, then AVPI would be a
+reliable test statistic, and we could enter into a hypothesis testing
+framework for random forests via simulating a null distribution for AVPI
+values. We also note that depending on the size of the dataset,
+computing adequete null distributions of the AVPI values of predictors
+can be computationally intensive. \par
 
 \chapter{Joint Added Variable Plot
 Importance}\label{joint-added-variable-plot-importance}
@@ -2073,6 +2177,16 @@ Doing so allows us to compare the predictive value of
 \(\hat{\theta}_{RF}(Y|X_{-J})\) and \(\hat{\theta}_{RF}(Y|X_J)\), while
 allowing us to also compare the added variable effect of \(J\) versus
 the complement of \(J\). \par
+
+In figure \ref{JAVPex}, we have joint added variable plots for two
+different partitions of the example data set. In the top row, we
+partitioned all of the signal into one subset. We see in this case that
+the JAVP of the partition containing variables 1 and 2 has a strong
+positive linear trend, while the JAVP of the partition containing
+variable 3 has no trend. On the other hand, in the bottom row figure
+\ref{JAVPex}, when we partition the predictors such that there is signal
+contained in both subsets, we see that the trend of the JAVP for both
+partitions is strongly positive and linear, which we expected. \par
 \begin{figure}
 \centering
 \includegraphics{thesis_files/figure-latex/unnamed-chunk-24-1.pdf}
@@ -2131,6 +2245,13 @@ between sets of predictors. \par
 \caption{\label{fig:unnamed-chunk-25}\label{JAVPIex}Joint Added Variable
 Plot Importances of Example Dataset}
 \end{figure}
+In figure \ref{JAVPIex}, we compute JAVPI for the parititions of the
+predictors from figure \ref{JAVPex}. We see that in the partition where
+variables 1 and 2 were in one subset, that the JAVPI score of the subset
+containing variables 1 and 2 is high, while the JAVPI score if variable
+3 is low. On the other hand, the JAVPI score of the subsets where each
+subset contains some signal is about equally as high. \par
+
 \section{Permutation Tests Using Joint Added Variable Plot
 Importance}\label{permutation-tests-using-joint-added-variable-plot-importance}
 
@@ -2220,37 +2341,40 @@ Scenario 4 & V1, V2, V5 & V1, V2\\
 \end{table}
 \section{Simulation Results}\label{simulation-results-1}
 
-Below are simulation results of JAVPI for the first simulation run. We
-find that, in general, JAVPI is relatively stable at distinguishing
-between the set of predictors containing all the signal and the set of
-predictors that are noise. In particular, in all cases the JAVPI values
-are much higher for the set of informative predictors than for the set
-of uninformative predictors, which is what we expected. We do note that
-in simulations 1, 2, and 6, the JAVPI value for the uninformative
-predictors is quite high. Some possible reasons for this are monte carlo
-variability and relatively weak signal in the predictors allowing for
-some masking between variables. \par 
+\subsection{JAVPI Simulation Results for First
+Run}\label{javpi-simulation-results-for-first-run}
+
+We present the simulation results of JAVPI for the first simulation run
+in figure \ref{JAVPIonesig}. We find that, in general, JAVPI is
+relatively stable at distinguishing between the set of predictors
+containing all the signal and the set of predictors that are noise. In
+particular, in all cases the JAVPI values are much higher for the set of
+informative predictors than for the set of uninformative predictors,
+which is what we expected. We do note that in simulations 1, 2, and 6,
+the JAVPI value for the uninformative predictors is quite high. Some
+possible reasons for this are monte carlo variability and relatively
+weak signal in the predictors allowing for some masking between
+variables. \par 
 \begin{figure}
 \centering
 \includegraphics{thesis_files/figure-latex/unnamed-chunk-27-1.pdf}
 \caption{\label{fig:unnamed-chunk-27}\label{JAVPIonesig}JAVPI Simulation
 Results When All the Signal is Contained in the Partition}
 \end{figure}
-We examine the joint added variable plots for simulations 1, then
-simulation 2. \par 
+We examine the joint added variable plots for simulations 1, simulation
+2, and simultaion 5 in figure \ref{siml1to5plots}. We see that there is
+a weak negative trend among the uninformative variables. This structure
+is somewhat hard to explain, although it is most likely due to noise or
+masking among variables. We do note that the informative predictors have
+a strongly positive trend in contrast to the uninformative predictors.
+This is in contrast to the joint added variable plots for simulations 5.
+\par 
 \begin{figure}
 \centering
 \includegraphics{thesis_files/figure-latex/unnamed-chunk-28-1.pdf}
 \caption{\label{fig:unnamed-chunk-28}\label{siml1to5plots}JAVP for
 Simulations 1, 2, and 5, Respectively, for First Simulation Run}
 \end{figure}
-We see that there is a weak negative trend among the uninformative
-variables. This structure is somewhat hard to explain, although it is
-most likely due to noise or masking among variables. We do note that the
-informative predictors have a strongly positive trend in contrast to the
-uninformative predictors. This is in contrast to the joint added
-variable plots for simulations 5 below. \par 
-
 For simulation 5, the uninformative variables had no trend while the
 informative variables had a strong positive trend. This at least
 indicates that the JAVPI score captures the relative structure present
@@ -2279,13 +2403,18 @@ in the joint added variable plot. \par
 \caption{\label{fig:unnamed-chunk-29}\label{MDAforJAVPI} MDA Simulation
 Results for JAVPI Simulated Datasets}
 \end{figure}
-For the second simulation run, where there was signal in both partitions
-of the predictors, we find that, in general, the JAVPI scores for both
-partitions in each simulation is high, as we expected. When we include
-signal in both partitions, the JAVPI will generally pick up on the
-signal, and we can examine the joint added variable plots for visual
-confirmation of what is going on. In particular, we display the joint
-added variable plot for simulation 1. \par 
+\subsection{JAVPI Simulation Results for Second
+Run}\label{javpi-simulation-results-for-second-run}
+
+We present the JAVPI scores of the second simulation run in figure
+\ref{JAVPItwosig}. For the second simulation run, where there was signal
+in both partitions of the predictors, we find that, in general, the
+JAVPI scores for both partitions in each simulation is high, as we
+expected. When we include signal in both partitions, the JAVPI will
+generally pick up on the signal, and we can examine the joint added
+variable plots for visual confirmation of what is going on. In
+particular, we display the joint added variable plot for simulation 1.
+\par 
 \begin{figure}
 \centering
 \includegraphics{thesis_files/figure-latex/unnamed-chunk-30-1.pdf}
@@ -2299,24 +2428,24 @@ Results When Signal is Contained in Both Partitions of the Predictors}
 Simulations 1 and 5, Respectively, for Second Simulation Run}
 \end{figure}
 For simulation 1, we found the JAVPI scores for both partitions is quite
-similar (around 512 versus 492), which makes sense given that we split
-the informative predictors evenly between both predictors. The joint
-added variable plot for simulation 1 is a strong positive trend as
-expected given the size of the JAVPI scores. \par 
+similar, which makes sense given that we split the informative
+predictors evenly between both predictors. The joint added variable plot
+for simulation 1 in figure \ref{siml1and5plots} is a strong positive
+trend as expected given the size of the JAVPI scores. \par 
 
-On the other hand, examining the table of JAVPI values for the second
-simulation run, it seems that in simulation 5, the second partition had
-a much lower JAVPI score than the first partition. Examining the joint
-added variable plots for simulation 5 immediately above, we see that
-while the joint added variable plot for the first partition is strongly
-positive, we can only describe the trend in the joint added variable
-plot for the second partition as being weakly positive. The JAVPI score
-for the second partition is high enough to suggest that there is signal
-in the second partition, but is much lower than the JAVPI score for the
-first partition. This seems very likely to be due to monte carlo
-variability. Choosing a different seed and re-running simulation 5
-results in a appropriately high JAVPI value for the second partition,
-which is what we had expected. \par 
+On the other hand, figure \ref{JAVPItwosig} for the second simulation
+run, it seems that in simulation 5, the second partition had a much
+lower JAVPI score than the first partition. Examining the joint added
+variable plots for simulation 5 in figure \ref{siml1and5plots}, we see
+that while the joint added variable plot for the first partition is
+strongly positive, we can only describe the trend in the joint added
+variable plot for the second partition as being weakly positive. The
+JAVPI score for the second partition is high enough to suggest that
+there is signal in the second partition, but is much lower than the
+JAVPI score for the first partition. This seems very likely to be due to
+monte carlo variability. Choosing a different seed and re-running
+simulation 5 results in a appropriately high JAVPI value for the second
+partition, which is what we had expected. \par 
 
 \section{Discussion}\label{discussion}
 
@@ -2339,14 +2468,15 @@ Furthermore, the JAVPI score is more computationally efficient to
 compute than the AVPI score since for each JAVPI score we train 5 forest
 ensembles, while for AVPI, if \(p\) is the number of predictors in the
 data set, then to compute the AVPI scores of a data set we would have to
-train \(2p+1\) many forest ensembles. This suggests that for
-applications to permutation tests when the AVPI and JAVPI scores are not
-too noisy, the JAVPI score would be more efficient to compute a
-permutation test for. We do note that JAVPI is sensitive to the strength
-of the signal in the response. If the signal is weak, then the AVPI and
-JAVPI methods will be sensitive to noise, but if the signal in the
-response is strong, the AVPI and JAVPI methods will be less sensitive to
-noise in the data. \par 
+train \(2p+1\) many forest ensembles for the model-based approach and
+\(4p\) many forest ensembles for the residuals-based approach. This
+suggests that for applications to permutation tests when the AVPI and
+JAVPI scores are not too noisy, the JAVPI score would be more efficient
+to compute a permutation test for. We do note that JAVPI is sensitive to
+the strength of the signal in the response. If the signal is weak, then
+the AVPI and JAVPI methods will be sensitive to noise, but if the signal
+in the response is strong, the AVPI and JAVPI methods will be less
+sensitive to noise in the data. \par 
 
 \chapter*{Conclusion}\label{conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}

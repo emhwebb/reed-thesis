@@ -8,14 +8,6 @@ Added variable plots are a diagnostic plot which estimate the effect of adding a
 
 ## Added Variable Plots in Linear Regression 
 
-Suppose that we have data $Z=\{(\mathbf{x}_i,Y_i)|i=1,\ldots,n\}$, where $\mathbf{x}_i$ is a covariate in the feature space, and that we fit a multiple linear regression model of the form $$\mathbf{Y}_1=\mathbf{X}\beta_1+\mathbf{W}\alpha+\mathbf{\varepsilon}_1$$ where $\mathbf{X}$ is a $n\times p$ matrix consisting of $p-1$ predictors, $\beta=(\beta_0,\beta_1,\ldots,\beta_p)^T$, $\mathbf{W}=(w_1,\ldots,w_n)$ is a predictor, $\alpha$ is a scalar, and $\text{Var}(\mathbf{\varepsilon})=\sigma^2 I$. \par
-
-Say we are interested in estimating the effect of the predictor $\mathbf{W}$ in the regression model $\hat{\mathbf{Y}}_1$. We could first fit the models $\hat{\mathbf{Y}}_2=\mathbf{X}\beta_2$ and $\hat{\mathbf{W}}=\mathbf{X}\delta$, where $\beta_2$ and $\delta$ are coefficient vectors like $\beta_1$ and then plot the residuals $\mathbf{W}-\hat{\mathbf{W}}$ against the residuals $\mathbf{Y}-\hat{\mathbf{Y}}_2$. The plot we obtain by plotting $\mathbf{W}-\hat{\mathbf{W}}$ against $\mathbf{Y}-\hat{\mathbf{Y}}_2$ is called the added variable plot of $\mathbf{W}$ and measures the effect of $\mathbf{W}$ on $\mathbf{Y}$ once we have adjusted for the effect of $\mathbf{X}$ on $\mathbf{W}$ and $\mathbf{Y}$, respectively. In particular, the residuals that we plot for the added variable plot is the portion of $\mathbf{W}$ unexplained by $\mathbf{X}$ on the $x$-axis and the portion of $\mathbf{Y}$ unexplained by $\hat{\mathbf{Y}}_2=\mathbf{X}\beta_2$ on the $y$-axis. \par
-
-In the linear regression setting the added variable plot has useful properties. In particular, let $\alpha_{AVP}$ denote the estimate of the slope from regressing $\mathbf{Y}-\hat{\mathbf{Y}}_2$ on $\mathbf{W}-\hat{\mathbf{W}}$. Then with some linear algebra it can be shown that $\alpha_{AVP}$ is equal to the least-squares estimate of $\alpha$ from $\hat{\mathbf{Y}}_1=\mathbf{X}\beta_1+\mathbf{W}\alpha$. For full details see @sheather2009 and @cook1982. Hence if we want to estimate the linear effect of the variable $\mathbf{W}$ on the linear regression $\hat{\mathbf{Y}}_1$, we can construct and visually inspect the trend of the added variable plot of $\mathbf{W}$. \par
-
-We provide an example of an added variable plot. Recall our example of a simple linear response from chapter 1. That is, we have three independent normals $X_1,X_2,X_3\sim N(0,1)$ and a response defined by $Y=10X_1-5X_2+\varepsilon.$ We can plot the added variable plot of $X_1, X_2,$ and $X_3$. \par
-
 ```{r results="asis", message = FALSE, echo = FALSE, warning = FALSE, fig.env = 'marginfigure', fig.cap = "\\label{AVPlinex}Linear Regression Added Variable Plot for Example Dataset"}
 
 lm.avp.list <- siml.ex.list[[5]]
@@ -39,6 +31,14 @@ do.call("grid.arrange", c(list(var1.avp,var2.avp,var3.avp), ncol = 2))
 
 ```
 
+Suppose that we have data $Z=\{(\mathbf{x}_i,Y_i)|i=1,\ldots,n\}$, where $\mathbf{x}_i$ is a covariate in the feature space, and that we fit a multiple linear regression model of the form $\mathbf{Y}_1=\mathbf{X}\beta_1+\mathbf{W}\alpha+\mathbf{\varepsilon}_1$ where $\mathbf{X}$ is a $n\times p$ matrix consisting of $p-1$ predictors, $\beta=(\beta_0,\beta_1,\ldots,\beta_p)^T$, $\mathbf{W}=(w_1,\ldots,w_n)$ is a predictor, $\alpha$ is a scalar, and $\text{Var}(\mathbf{\varepsilon})=\sigma^2 I$. \par
+
+Say we are interested in estimating the effect of the predictor $\mathbf{W}$ in the regression model $\hat{\mathbf{Y}}_1$. We could first fit the models $\hat{\mathbf{Y}}_2=\mathbf{X}\beta_2$ and $\hat{\mathbf{W}}=\mathbf{X}\delta$, where $\beta_2$ and $\delta$ are coefficient vectors like $\beta_1$ and then plot the residuals $\mathbf{W}-\hat{\mathbf{W}}$ against the residuals $\mathbf{Y}-\hat{\mathbf{Y}}_2$. The plot we obtain by plotting $\mathbf{W}-\hat{\mathbf{W}}$ against $\mathbf{Y}-\hat{\mathbf{Y}}_2$ is called the added variable plot of $\mathbf{W}$ and measures the effect of $\mathbf{W}$ on $\mathbf{Y}$ once we have adjusted for the effect of $\mathbf{X}$ on $\mathbf{W}$ and $\mathbf{Y}$, respectively. In particular, the residuals that we plot for the added variable plot is the portion of $\mathbf{W}$ unexplained by $\mathbf{X}$ on the $x$-axis and the portion of $\mathbf{Y}$ unexplained by $\hat{\mathbf{Y}}_2=\mathbf{X}\beta_2$ on the $y$-axis. \par
+
+In the linear regression setting the added variable plot has useful properties. In particular, let $\alpha_{AVP}$ denote the estimate of the slope from regressing $\mathbf{Y}-\hat{\mathbf{Y}}_2$ on $\mathbf{W}-\hat{\mathbf{W}}$. Then with some linear algebra it can be shown that $\alpha_{AVP}$ is equal to the least-squares estimate of $\alpha$ from $\hat{\mathbf{Y}}_1=\mathbf{X}\beta_1+\mathbf{W}\alpha$. For full details see @sheather2009 and @cook1982. Hence if we want to estimate the linear effect of the variable $\mathbf{W}$ on the linear regression $\hat{\mathbf{Y}}_1$, we can construct and visually inspect the trend of the added variable plot of $\mathbf{W}$. \par
+
+We provide an example of an added variable plot. Recall our example of a simple linear response from chapter 1. That is, we have three independent normals $X_1,X_2,X_3\sim N(0,1)$ and a response defined by $Y=10X_1-5X_2+\varepsilon.$ We can plot the added variable plot of $X_1, X_2,$ and $X_3$. \par
+
 As we can see from Figure \ref{AVPlinex}, the AVP for $X_1$ is a positive line through the origin, the AVP for $X_2$ is a negative line through the origin, and the AVP for $X_3$ is a mass of points about the origin. This indicates that the conditional relationship of $X_1$ with $Y$ once we have taken into account the effects of $X_2$ and $X_3$ is positive and linear, while the conditional relationship of $X_2$ with $Y$ once we take into account the effects of $X_1$ and $X_3$ is negative and linear. On the other hand, there is no conditional relationship between $X_3$ and $Y$ once we have taken into account the effects of $X_1$ and $X_3$. Most the variability of $Y$ can be explained by $X_1$ and $X_2$ and once we take into account the effect of those two variables, the remaining portion of $Y$ is largely noise. \par
 
 
@@ -52,7 +52,7 @@ Suppose we are interested in the added variable effect of variable $X_k$. Let $X
 
 The output of the residual-based added variable plot for a predictor $X_k$ would depend on the relationship between $X_k$ and the response $Y$. If $X_k$ is uninformative to the response, then we would expect that $\hat{\theta}_{RF}(Y|X_{-k})$ would form a prediction for $Y$ that is similar to a prediction for $Y$ given by $\hat{\theta}_{RF}(Y|X)$. Hence we would expect that $Y-\hat{\theta}_{RF}(Y|X_{-k})$ to generally be close to zero. If on the other hand, $X_k$ is informative to the response, then we would expect that $\hat{\theta}_{RF}(Y|X_{-k})$ would form a worse prediction for $Y$ than that given by $\hat{\theta}_{RF}(Y|X)$, since we would be excluding $X_k$ as a splitting variable. Futhermore, we would be taking into account the amount of the response explainable by $X_{-k}$ using the random forest model, such that $Y-\hat{\theta}_{RF}(Y|X_{-k})$ would be the amount of the response unexplained by $X_{-k}$. The values of $X_k-\hat{\theta}_{RF}(X_k|X_{-k})$ will depend on the relationship between $X_k$ and $X_{-k}$. In general, the importance of subtracting $\hat{\theta}_{RF}(X_k|X_{-k})$ from $X_k$ is that this takes into account the part of $X_k$ that can be explained by $X_{-k}$ using the random forest model. This can be particularly useful if $X_k$ has a complex, dependent relationship with some of the predictors among the $X_{-k}$. However, if $X_k$ and $X_{-k}$ are independent, then $\hat{\theta}_{RF}(X_k|X_{-k})$ will likely be a noisy prediction of $X_k$. Hence, if $X_k$ is uninformative to the response, we would expect the added variable plot of $X_k$ to be de-trended mass of point centered about the origin. While if $X_k$ is informative, we would expect that the added variable plot of $X_k$ to have a non-zero, possibly non-linear trend depending on the conditional relationship of $X_k$ with the response $Y$. \par
 
-```{r results = "asis", echo = FALSE, warning = FALSE, message = FALSE, fig.env = 'marginfigure', fig.cap = "\\label{AVPresex}Residual-based Added Variable Plot for Example Dataset"}
+```{r results = "asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap = "\\label{AVPresex}Residual-based Added Variable Plot for Example Dataset"}
 
 res.avp.ex <- siml.ex.list[[7]]
 res.ex.gg.list <- map(1:3, plot_add_var_excep, res.avp.ex[[2]])
@@ -61,7 +61,7 @@ do.call("grid.arrange", c(res.ex.gg.list, ncol = 2))
 
 ```
 
-As we see in the example 
+As we see in Figure \ref{AVPresex}, the residual-based AVP of the example dataset indicates the conditional relationship of each respective predictor and the response, once we have taken into account the effect of other predictors. The residual-based AVP will tend to preserve the sign and magnitude of the relationship between each predictor and the response.  If a predictor has a non-linear relationship with the response, then the residual-based AVP will approximately capture the non-linear relationship. 
 
 ### Model-Based Added Variable Plot
 
@@ -72,7 +72,7 @@ Depending on the relationship between the predictors and the response, there are
 
 On the other hand, suppose that the predictor $X_k$ is informative with respect to the response. Then we would expect that when properly tuned the random forest ensemble $\hat{\theta}_{RF}(Y|X)$ would provide reasonably accurate predictions of $Y$. We would also expect that the forest ensemble $\hat{\theta}_{RF}(Y|X_{-k})$ would suffer in predictive performance due to the lack of information from $X_k$. Then in the limit, we would expect that $$(\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k})\neq 0 \text{ and } Y-\hat{\theta}_{RF}(Y|X_{-k}))\neq 0$$ when we evaluate $X=x$ and $X_{-k}=x_{-k}$ where $x,x_{-k}$ are training examples in the full dataset and the reduced dataset, respectively. Since the difference $\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k}$ and $Y-\hat{\theta}_{RF}(Y|X_{-k})$ is generally non-zero when we evaluate the random forest at a particular point in the feature space and these differences are precisely what we plot on the x and y-axis of the added variable plot, we would then expect the trend of the added variable plot of $X_k$ to be non-zero. In other words, in the case of informative predictors, we would expect there to be correlation between $\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k})$ and $Y-\hat{\theta}_{RF}(Y|X_{-k})$. The departure from a trend of approximately zero would depend on the relative informativeness of $X_k$. If $X_k$ is strongly informative then we would expect the difference between $Y$ and $\hat{\theta}_{RF}(Y|X_{-k})$ and the difference between $\hat{\theta}_{RF}(Y|X)$ and $\hat{\theta}_{RF}(Y|X_{-k})$ to often be large. If $X_k$ is weakly informative we would expect the two differnces to often be of smaller magnitude than when $X_k$ is strongly informative. Hence visually the trend of the added variable plot of predictors used to grow a random forest ensemble offer a method of gauging the informativeness of different predictors. \par
 
-```{r results = "asis", echo = FALSE, warning = FALSE, message = FALSE, fig.env = 'marginfigure', fig.cap = "\\label{AVPmodex}Model-based Added Variable Plot for Example Dataset"}
+```{r results = "asis", echo = FALSE, warning = FALSE, message = FALSE,  fig.env = 'marginfigure', fig.cap = "\\label{AVPmodex}Model-based Added Variable Plot for Example Dataset"}
 
 mod.avp.ex <- siml.ex.list[[6]]
 mod.ex.gg.list <- map(1:3, plot_add_var_excep, mod.avp.ex[[2]])
@@ -81,7 +81,7 @@ do.call("grid.arrange", c(mod.ex.gg.list, ncol = 2))
 
 ```
 
-
+As we see in Figure \ref{AVPmodex}, the indicates the conditional relationship of each predictor with respect to the response, but does not, in general, preserve the sign of the relationship. In particular, we note that the relationship between variable 2 and the response $Y$ in the example dataset is negative and linear, but that the model-based AVP has a positive trend. This is as instead of plotting $X_k-\hat{\theta}_{RF}(X_k|X_{-k})$ on the x-axis as in the residual-based AVP, we plot $\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k})$, which will generally have a positive relationship with $Y-\hat{\theta}_{RF}(Y|X_{-k})$ on the y-axis of the added variable plot. \par 
 
 ### Discussion of Added Variable Plot
 
@@ -159,6 +159,7 @@ do.call("grid.arrange", c(list(res.avp.ex.plot, mod.avp.ex.plot), ncol = 2))
 
 ```
 
+In figure \ref{AVPIex}, we present the residual-based and model-based AVPI, respectively, of the predictors in the example dataset. As expected, for both measures, variables 1 and 2 receive high AVPI scores, while variable 3 receives a low AVPI score.  
 
 ## Extensions of Added Variable Plot Importance 
 

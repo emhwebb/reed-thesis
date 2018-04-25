@@ -1,56 +1,5 @@
 # Joint Added Variable Plot Importance
 
-## Introduction
-
-In the previous chapters, we introduced the added variable plot importance (AVPI) of a predictor in the random forest ensemble. One direction we can extend our framework of added variable plot importances is to compute the joint added variable plot importance for a set of predictors. We would like to capture the joint effect of sets of predictors on the performance of the random forest ensemble in predicting the response. One scenario in which we might want to capture the joint effect of sets of predictors is if out of a set of correlated predictors, we believe that only a subset of the correlated predictors are informative to the response. In such a scenario, we would like a quantitative measure to compare the joint importance of the subset of correlated informative predictors with the subset of correlated uninformative predictors. \par
-
-## Partial F-Test 
-
-In the linear regression context, we may be interested in if a subset of predictors are informative or not towards the linear regression model. If our covariates are $\mathbf{X}$, then we would partition the covariates to $\mathbf{X}=(\mathbf{X}_1,\mathbf{X}_2)$, where $\mathbf{X}_1$ are the first $p-q$ predictors and $\mathbf{X}_2$ are the last $q$ predictors. Similarly partition the coefficients from the linear model $\mathbf{\beta}=(\mathbf{\beta}_1,\mathbf{\beta}_2)$, where $\mathbf{\beta}_1$ are the coefficients for the first $p-q$ predictors and $\mathbf{\beta}_2$ are the coefficents for the last $q$ predictors. Then we would like to test whether $\mathbf{\beta}_2$ should be non-zero for $\mathbf{X}_2$. We are testing the hypotheses
-\begin{align}
-H_0: \mathbf{Y}&=\mathbf{X}_1\mathbf{\beta}_1+\varepsilon \nonumber \\
-H_1: \mathbf{Y}&=\mathbf{X}_1\mathbf{\beta}_1+\mathbf{X}_2\mathbf{\beta}_2+\varepsilon. \nonumber
-\end{align}
-The partial F-test allows us to test the above hypotheses. First fit the model under the null hypothesis $H_0$ and find the residual sums of squares $RSS_{H_0}$ and degrees of freedom $df_{H_0}$ of the model. Next fit the model under the alternative hypothesis $H_1$ and find $RSS_{H_1}$ and $df_{H_1}$. As @weisberg2005 notes, $df_{H_0}>df_{H_1}$ and $RSS_{H_0}-RSS_{H_1}>0$. The partial F-test statistic is $$F=\frac{(RSS_{H_0}-RSS_{H_1})/(df_{H_0}-df_{H_1})}{RSS_{H_1}/df_{H1}}.$$ If $F$ is large when compared to the $F(df_{H_0}-df_{H_1}, df_{H_1})$ distribution, then there is evidence against the null hypothesis that the coefficients of $\mathbf{\beta}_2$ should be set to zero. In particular, while we cannot compute a test statistic similar to the F-test statistic for joint added variable importance, we can take the approach of comparing models fit with and without $\mathbf{X}_2$ to determine the importance of $\mathbf{X}_2$ in the random forest context.    \par
-
-
-## Joint Added Variable Plots
-
-Suppose that out of a particular set of correlated predictors, we believe that two, $X_j$ and $X_k$, are particularly informative to the response while the other correlated predictors are uninformative. Denote the set of correlated precictors by $H=\{X_{\alpha_1},\ldots,X_{\alpha_m}\}$ of which $K=\{X_j,X_k\}$ is a subset. One approach to determining the relative importance of the variables in $H$ is to plot added variable plots and compute added variable plot importances for each variable in $H$. However, if based on looking at the full random forest model variable importance, or based on some other information, we think that the variables in $K$ are more important, we could instead train a random forest excluding the variables in $K$, a random forest excluding the variables in $H\setminus K$, and a random forest excluding the variables in $H$. From there we can compute and compare added variable plots and added variable plot importances for predictors in the set $K$, the set $H\setminus K$, and the set $H$, respectively, as we would in the single variable added variable plot scenario. \par
-
-More generally, suppose we have a subset $J=\{X_{\alpha_1},\ldots, X_{\alpha_m}\}\subseteq \{X_1,\ldots,X_p\}$, where $m< p$, for which we are interested in the joint added variable effect of the predictors in $J$. As in the case of the added variable plot of a single variable, we could grow the full random forest $\hat{\theta}_{RF}(Y|X)$ and the reduced model $\hat{\theta}_{RF}(Y|X_{-J})$, where $X_{-J}$ denotes the set of predictors not in $J$. The joint added variable plot for the predictors in $J$ is then given by $$(\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-J}), Y-\hat{\theta}_{RF}(Y|X_{-J})).$$ The rationale for forming the joint added variable plot of the predictors in $J$ is similar to the single variable case, although care has to be taken in describing what sort-of relationship the joint added variable plot of $J$ provides. The joint added variable plot for $J$ captures the aggregated informativeness of the predictors in $J$ with respect to the response. In particular, if at least one predictor in $J$ is informative, then we would expect that the random forest ensemble $\hat{\theta}_{RF}(Y|X_{-J})$ would have a decrease in predictive performance in comparison to the full model.  If many predictors in $J$ are informative, then we would expect that, correspondedly there would be a large decrease in predictive performance in $\hat{\theta}_{RF}(Y|X_{-J})$. At each node split, as the predictors in $J$ are unavailable to be chosen as one of the $m_{try}$ variables, there is a greater chance for an uninformative variable to be chosen as the splitting variable. On the other hand, if no variable in $J$ is informative, then we would expect $\hat{\theta}_{RF}(Y|X_{-J})$ to have similar predictive performance to the full model $\hat{\theta}_{RF}(Y|X)$. Hence for reasons similar to the single added variable plots, if at least one variable in $J$ is an informative predictor of the response, the trend of the joint added variable plot will be strongly non-zero, while if no predictor in $J$ is informative, we would expect the joint added variable plot to be centered about the origin and have no significant trend. If there are a mixture of informative and uninformative variables contained in $J$, then the joint added variable plot of $J$ would have a non-zero trend although the magnitude and direction of the trend would depend on the composition of the variables in $J$. \par
-
-Depending on the number of predictors in $J$ relative to number of predictors not in $J$, computing the joint added variable plot for $J$ can be quicker than computing the individual added variable plots of each variable in $J$. Once the variables in $J$ are removed, there are fewer potential splitting variables for the tree growing algorithm to search through at each split on each node. We would also recommend when computing the joint added variable plot of $J$, to also compute the joint added variable plot of the predictors not in $J$, that is to also compute the random forest $\hat{\theta}_{RF}(Y|X_J)$. Doing so allows us to compare the predictive value of $\hat{\theta}_{RF}(Y|X_{-J})$ and $\hat{\theta}_{RF}(Y|X_J)$, while allowing us to also compare the added variable effect of $J$ versus the complement of $J$. \par
-
-[Have examples here. One of correlated predictors, another of uncorrelated predictors] \par
-
-
-## Joint Added Variable Plot Importance 
-
-As with the single variable case, once we have acquired the joint added variable plot for $J$, we would like to have a quantitative measure of the joint importance of $J$. As with added variable plot importance, once we have acquired the joint added variable plot of $J$, $$(\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-J}), Y-\hat{\theta}_{RF}(Y|X_{-J})),$$ we can try to model the trend in the joint added variable plot utilizing a bagged forest. Let $U_J=\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-J})$ and $W_J=Y-\hat{\theta}_{RF}(Y|X_{-J})$. To measure, the joint added variable importance, grow the bagged forest $\hat{\theta}_{BF}(W_J|U_j)$ and compute the MDA variable importance of $U_J$ in predicting $W_J$. We call the MDA variable importance of $U_J$ the joint added variable importance (JAVPI) of $J$ and denote the quantity by $VI_{JAVP}(X_J)$. Note that the joint added variable plot importance of $J$ provides a quantitative measure of the relative importance of $U_J$ in predicting the trend in the added variable plot. As mentioned previously, the trend in the added variable plot of $J$ should reflect the aggregated informativeness of the variables in $J$ with respect to the response, so the JAVPI of $J$ indicates the relative aggregated importance of the variables in $J$ as predictors of the response. In particular, higher values of JAVPI for $J$ should indicate that the variables contained in $J$ are more informative than lower values of JAVPI for $J$. That is, the value of JAVPI measures the importance of all the predictors in $J$ to the response $Y$ via the loss in predictive performance in the ensemble when we remove the predictors in $J$ as potential splitting variables in the forest growing process. As in the previous section, we also recommend that $VI_{JAVP}(X_{-J})$, the JAVPI of those predictors not in $J$ be concurrently computed to provide a comparison of joint importance between sets of predictors. \par
-
-\begin{algorithm}
-    \caption{Joint Added Variable Plot Importance (JAVPI)} \label{added variable importance}
-      \begin{algorithmic}[1]
-          \State Grow the random forest ensemble $\hat{\theta}_{RF}(Y|X)$ predicting $Y$ using the full set of predictors.
-          \State Grow the random forest ensemble $\hat{\theta}_{RF}(Y|X_{-J})$ predicting $Y$ using the full set of predictors minus the predictors in $J$.
-          \State Compute $U_J=\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-J})$ and $W_J=Y-\hat{\theta}_{RF}(Y|X_{-J})).$
-          \State Grow the bagged forest ensemble $\hat{\theta}_{BF}(W_J|U_J)$ predicting $W_J$ using $U_J$. 
-          \State Compute the added variable plot importance of $X_J$ to be the MDA variable importance of $U_J$: $VI_{JAVP}(X_J)=VI_{MDA}(U_J)$.
-          
-      \end{algorithmic}
-  \end{algorithm}
-
-## Permutation Tests Using Joint Added Variable Plot Importance 
-
-Once we have computed $VI_{JAVP}(X_J)$, we can again take a simulation approach to generating a sampling distribution for $VI_{JAVP}(X_J)$. The process is essentially analogous to computing sampling distributions of single added variable plots. To compute $VI_{JAVP}(X_J)$, we require the joint added variable plot $(U_J,W_J)$, where $U_J=\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-J})$ and $W_J=Y-\hat{\theta}_{RF}(Y|X_{-J})$. Permute $U_J$ to obtain $U_J^*$ and grow the bagged forest $\hat{\theta}_{BF}(W_J|U_J^*)$ using the permuted $U_J^*$ as the predictor. We then use the resulting ensemble to compute $VI_{MDA}(U_J^*)=VI_{JAVP}^*(X_J)$ as the permuted JAVPI of $J$. Once we have ran enough iterations of permutations of $U_J^*$ and computation $VI_{JAVP}^*(X_J)$, we can compute a two-sided p-value using $VI_{JAVP}(X_J)$ as our test statistic. \par
-
-If we have a collection $J_1,\ldots, J_q$ of subsets of the predictors, we could simulate sampling distributions of $VI_{JAVP}(X_{J_i})$ for each $i=1,\ldots,q$ and compute two-sided p-values for each subset $J_i$. We could then enter into a hypothesis testing framework. We do offer some words of caution here with respect to using joint added variable plot importances in a hypothesis test framework with multiple subsets. In particular, due to sensitivity of permutation tests using JAVPI to type-I errors and due to possible overlap of predictors in the $J_i$, we would recommend most certainly using a multiple comparisons procedure such as the Bonferonni correction. Furthermore, we would like to emphasize the use of JAVPI and AVPI as variable selection tools and diagnostic tools for random forests, rather than tools purely of inferential statistics and hypothesis testing. \par
-
-With the JAVPI, in particular, our intention in introducing the JAVPI variable importance measure was to offer a method that utilizes the random forest mechanism to measure the importance of a subset $J$ of predictors while taking into account the effect of the predictors not in $J$. However, as we have noted above, if the subset $J$ of predictors consists of a mixture of informative and uninformative predictors, then a finer analysis of the variables in $J$ may be required if the JAVPI of $J$ is high. Concluding that each variable in $J$ is informative based on a high JAVPI value or low p-value from simulation would be erronuous if $J$ is a mixture of informative and uninformative. We would also like to emphasize that it is important to check the fit and residual sum of squares of the random forest model if using the JAVPI or AVPI to see if conclusions drawn from JAVPI or AVPI are valid. Furthermore, we would like to remind the reader that inference based on residuals as we are describing with JAVPI and AVPI can be sensitive to outliers and extreme points such that statistically significant results from JAVPI or AVPI should be examined with some scrutiny. \par
-
-## Simulation and Results of Joint Added Variable Plot Importance
-
 ```{r, include = FALSE, warning = FALSE, message = FALSE, echo = FALSE}
 
 #extract_rf_pred is a function which takes as input 
@@ -471,6 +420,88 @@ plot_JAVPI_eq <-function(i, df){
 }
 
 ```
+
+
+## Introduction
+
+In the previous chapters, we introduced the added variable plot importance (AVPI) of a predictor in the random forest ensemble. One direction we can extend our framework of added variable plot importances is to compute the joint added variable plot importance for a set of predictors. We would like to capture the joint effect of sets of predictors on the performance of the random forest ensemble in predicting the response. One scenario in which we might want to capture the joint effect of sets of predictors is if out of a set of correlated predictors, we believe that only a subset of the correlated predictors are informative to the response. In such a scenario, we would like a quantitative measure to compare the joint importance of the subset of correlated informative predictors with the subset of correlated uninformative predictors. \par
+
+## Partial F-Test 
+
+In the linear regression context, we may be interested in if a subset of predictors are informative or not towards the linear regression model. If our covariates are $\mathbf{X}$, then we would partition the covariates to $\mathbf{X}=(\mathbf{X}_1,\mathbf{X}_2)$, where $\mathbf{X}_1$ are the first $p-q$ predictors and $\mathbf{X}_2$ are the last $q$ predictors. Similarly partition the coefficients from the linear model $\mathbf{\beta}=(\mathbf{\beta}_1,\mathbf{\beta}_2)$, where $\mathbf{\beta}_1$ are the coefficients for the first $p-q$ predictors and $\mathbf{\beta}_2$ are the coefficents for the last $q$ predictors. Then we would like to test whether $\mathbf{\beta}_2$ should be non-zero for $\mathbf{X}_2$. We are testing the hypotheses
+\begin{align}
+H_0: \mathbf{Y}&=\mathbf{X}_1\mathbf{\beta}_1+\varepsilon \nonumber \\
+H_1: \mathbf{Y}&=\mathbf{X}_1\mathbf{\beta}_1+\mathbf{X}_2\mathbf{\beta}_2+\varepsilon. \nonumber
+\end{align}
+The partial F-test allows us to test the above hypotheses. First fit the model under the null hypothesis $H_0$ and find the residual sums of squares $RSS_{H_0}$ and degrees of freedom $df_{H_0}$ of the model. Next fit the model under the alternative hypothesis $H_1$ and find $RSS_{H_1}$ and $df_{H_1}$. As @weisberg2005 notes, $df_{H_0}>df_{H_1}$ and $RSS_{H_0}-RSS_{H_1}>0$. The partial F-test statistic is $$F=\frac{(RSS_{H_0}-RSS_{H_1})/(df_{H_0}-df_{H_1})}{RSS_{H_1}/df_{H1}}.$$ If $F$ is large when compared to the $F(df_{H_0}-df_{H_1}, df_{H_1})$ distribution, then there is evidence against the null hypothesis that the coefficients of $\mathbf{\beta}_2$ should be set to zero. In particular, while we cannot compute a test statistic similar to the F-test statistic for joint added variable importance, we can take the approach of comparing models fit with and without $\mathbf{X}_2$ to determine the importance of $\mathbf{X}_2$ in the random forest context.    \par
+
+
+## Joint Added Variable Plots
+
+Suppose that out of a particular set of correlated predictors, we believe that two, $X_j$ and $X_k$, are particularly informative to the response while the other correlated predictors are uninformative. Denote the set of correlated precictors by $H=\{X_{\alpha_1},\ldots,X_{\alpha_m}\}$ of which $K=\{X_j,X_k\}$ is a subset. One approach to determining the relative importance of the variables in $H$ is to plot added variable plots and compute added variable plot importances for each variable in $H$. However, if based on looking at the full random forest model variable importance, or based on some other information, we think that the variables in $K$ are more important, we could instead train a random forest excluding the variables in $K$, a random forest excluding the variables in $H\setminus K$, and a random forest excluding the variables in $H$. From there we can compute and compare added variable plots and added variable plot importances for predictors in the set $K$, the set $H\setminus K$, and the set $H$, respectively, as we would in the single variable added variable plot scenario. \par
+
+More generally, suppose we have a subset $J=\{X_{\alpha_1},\ldots, X_{\alpha_m}\}\subseteq \{X_1,\ldots,X_p\}$, where $m< p$, for which we are interested in the joint added variable effect of the predictors in $J$. As in the case of the added variable plot of a single variable, we could grow the full random forest $\hat{\theta}_{RF}(Y|X)$ and the reduced model $\hat{\theta}_{RF}(Y|X_{-J})$, where $X_{-J}$ denotes the set of predictors not in $J$. The joint added variable plot for the predictors in $J$ is then given by $$(\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-J}), Y-\hat{\theta}_{RF}(Y|X_{-J})).$$ The rationale for forming the joint added variable plot of the predictors in $J$ is similar to the single variable case, although care has to be taken in describing what sort-of relationship the joint added variable plot of $J$ provides. The joint added variable plot for $J$ captures the aggregated informativeness of the predictors in $J$ with respect to the response. In particular, if at least one predictor in $J$ is informative, then we would expect that the random forest ensemble $\hat{\theta}_{RF}(Y|X_{-J})$ would have a decrease in predictive performance in comparison to the full model.  If many predictors in $J$ are informative, then we would expect that, correspondedly there would be a large decrease in predictive performance in $\hat{\theta}_{RF}(Y|X_{-J})$. At each node split, as the predictors in $J$ are unavailable to be chosen as one of the $m_{try}$ variables, there is a greater chance for an uninformative variable to be chosen as the splitting variable. On the other hand, if no variable in $J$ is informative, then we would expect $\hat{\theta}_{RF}(Y|X_{-J})$ to have similar predictive performance to the full model $\hat{\theta}_{RF}(Y|X)$. Hence for reasons similar to the single added variable plots, if at least one variable in $J$ is an informative predictor of the response, the trend of the joint added variable plot will be strongly non-zero, while if no predictor in $J$ is informative, we would expect the joint added variable plot to be centered about the origin and have no significant trend. If there are a mixture of informative and uninformative variables contained in $J$, then the joint added variable plot of $J$ would have a non-zero trend although the magnitude and direction of the trend would depend on the composition of the variables in $J$. \par
+
+Depending on the number of predictors in $J$ relative to number of predictors not in $J$, computing the joint added variable plot for $J$ can be quicker than computing the individual added variable plots of each variable in $J$. Once the variables in $J$ are removed, there are fewer potential splitting variables for the tree growing algorithm to search through at each split on each node. We would also recommend when computing the joint added variable plot of $J$, to also compute the joint added variable plot of the predictors not in $J$, that is to also compute the random forest $\hat{\theta}_{RF}(Y|X_J)$. Doing so allows us to compare the predictive value of $\hat{\theta}_{RF}(Y|X_{-J})$ and $\hat{\theta}_{RF}(Y|X_J)$, while allowing us to also compare the added variable effect of $J$ versus the complement of $J$. \par
+
+```{r results = "asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap = "\\label{JAVPex}Joint Added Variable Plots of Example Dataset. Top two plots are JAVP Plots When All the Signal is Contained in the Partition. Bottom two plots are JAVP Plots When Only Some of Signal Is Contained in Partition"}
+
+javp.ex.all <- siml.ex.list[[8]]
+javp.ex.some <- siml.ex.list[[9]]
+
+javp.ex.plots <- rf_jt_added_var_plot_mult(list(javp.ex.all, javp.ex.some))
+javp.ex.plots[[1]] <- javp.ex.plots[[1]]+labs(title = "Partition Containing V1 and V2")
+javp.ex.plots[[2]] <- javp.ex.plots[[2]]+labs(title = "Partition Containing V3")
+javp.ex.plots[[3]] <- javp.ex.plots[[3]]+labs(title = "Partition Containing V1")
+javp.ex.plots[[4]] <- javp.ex.plots[[4]]+labs(title = "Partition Containing V2 and V3")
+
+do.call("grid.arrange", c(javp.ex.plots, ncol = 2, nrow = 2))
+
+```
+
+
+
+## Joint Added Variable Plot Importance 
+
+As with the single variable case, once we have acquired the joint added variable plot for $J$, we would like to have a quantitative measure of the joint importance of $J$. As with added variable plot importance, once we have acquired the joint added variable plot of $J$, $$(\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-J}), Y-\hat{\theta}_{RF}(Y|X_{-J})),$$ we can try to model the trend in the joint added variable plot utilizing a bagged forest. Let $U_J=\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-J})$ and $W_J=Y-\hat{\theta}_{RF}(Y|X_{-J})$. To measure, the joint added variable importance, grow the bagged forest $\hat{\theta}_{BF}(W_J|U_j)$ and compute the MDA variable importance of $U_J$ in predicting $W_J$. We call the MDA variable importance of $U_J$ the joint added variable importance (JAVPI) of $J$ and denote the quantity by $VI_{JAVP}(X_J)$. Note that the joint added variable plot importance of $J$ provides a quantitative measure of the relative importance of $U_J$ in predicting the trend in the added variable plot. As mentioned previously, the trend in the added variable plot of $J$ should reflect the aggregated informativeness of the variables in $J$ with respect to the response, so the JAVPI of $J$ indicates the relative aggregated importance of the variables in $J$ as predictors of the response. In particular, higher values of JAVPI for $J$ should indicate that the variables contained in $J$ are more informative than lower values of JAVPI for $J$. That is, the value of JAVPI measures the importance of all the predictors in $J$ to the response $Y$ via the loss in predictive performance in the ensemble when we remove the predictors in $J$ as potential splitting variables in the forest growing process. As in the previous section, we also recommend that $VI_{JAVP}(X_{-J})$, the JAVPI of those predictors not in $J$ be concurrently computed to provide a comparison of joint importance between sets of predictors. \par
+
+\begin{algorithm}
+    \caption{Joint Added Variable Plot Importance (JAVPI)} \label{added variable importance}
+      \begin{algorithmic}[1]
+          \State Grow the random forest ensemble $\hat{\theta}_{RF}(Y|X)$ predicting $Y$ using the full set of predictors.
+          \State Grow the random forest ensemble $\hat{\theta}_{RF}(Y|X_{-J})$ predicting $Y$ using the full set of predictors minus the predictors in $J$.
+          \State Compute $U_J=\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-J})$ and $W_J=Y-\hat{\theta}_{RF}(Y|X_{-J})).$
+          \State Grow the bagged forest ensemble $\hat{\theta}_{BF}(W_J|U_J)$ predicting $W_J$ using $U_J$. 
+          \State Compute the added variable plot importance of $X_J$ to be the MDA variable importance of $U_J$: $VI_{JAVP}(X_J)=VI_{MDA}(U_J)$.
+          
+      \end{algorithmic}
+  \end{algorithm}
+
+```{r results = "asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap = "\\label{JAVPIex}Joint Added Variable Plot Importances of Example Dataset"}
+
+
+javpi.ex.all <- javp.ex.all[[1]][,1]
+javpi.ex.some <- javp.ex.some[[1]][,1]
+
+javpi.ex.plots <- map(1:2, plot_JAVPI_eq, df = data.frame(javpi.ex.all, javpi.ex.some))
+
+javpi.ex.plots[[1]] <- javpi.ex.plots[[1]]+labs(y = "Where All of Signal is Contained in Partition")
+javpi.ex.plots[[2]] <- javpi.ex.plots[[2]]+labs(y = "Where Signal is Split Between Partitions")
+
+do.call("grid.arrange", c(javpi.ex.plots, nrow = 1))
+
+```
+
+
+## Permutation Tests Using Joint Added Variable Plot Importance 
+
+Once we have computed $VI_{JAVP}(X_J)$, we can again take a simulation approach to generating a sampling distribution for $VI_{JAVP}(X_J)$. The process is essentially analogous to computing sampling distributions of single added variable plots. To compute $VI_{JAVP}(X_J)$, we require the joint added variable plot $(U_J,W_J)$, where $U_J=\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-J})$ and $W_J=Y-\hat{\theta}_{RF}(Y|X_{-J})$. Permute $U_J$ to obtain $U_J^*$ and grow the bagged forest $\hat{\theta}_{BF}(W_J|U_J^*)$ using the permuted $U_J^*$ as the predictor. We then use the resulting ensemble to compute $VI_{MDA}(U_J^*)=VI_{JAVP}^*(X_J)$ as the permuted JAVPI of $J$. Once we have ran enough iterations of permutations of $U_J^*$ and computation $VI_{JAVP}^*(X_J)$, we can compute a two-sided p-value using $VI_{JAVP}(X_J)$ as our test statistic. \par
+
+If we have a collection $J_1,\ldots, J_q$ of subsets of the predictors, we could simulate sampling distributions of $VI_{JAVP}(X_{J_i})$ for each $i=1,\ldots,q$ and compute two-sided p-values for each subset $J_i$. We could then enter into a hypothesis testing framework. We do offer some words of caution here with respect to using joint added variable plot importances in a hypothesis test framework with multiple subsets. In particular, due to sensitivity of permutation tests using JAVPI to type-I errors and due to possible overlap of predictors in the $J_i$, we would recommend most certainly using a multiple comparisons procedure such as the Bonferonni correction. Furthermore, we would like to emphasize the use of JAVPI and AVPI as variable selection tools and diagnostic tools for random forests, rather than tools purely of inferential statistics and hypothesis testing. \par
+
+With the JAVPI, in particular, our intention in introducing the JAVPI variable importance measure was to offer a method that utilizes the random forest mechanism to measure the importance of a subset $J$ of predictors while taking into account the effect of the predictors not in $J$. However, as we have noted above, if the subset $J$ of predictors consists of a mixture of informative and uninformative predictors, then a finer analysis of the variables in $J$ may be required if the JAVPI of $J$ is high. Concluding that each variable in $J$ is informative based on a high JAVPI value or low p-value from simulation would be erronuous if $J$ is a mixture of informative and uninformative. We would also like to emphasize that it is important to check the fit and residual sum of squares of the random forest model if using the JAVPI or AVPI to see if conclusions drawn from JAVPI or AVPI are valid. Furthermore, we would like to remind the reader that inference based on residuals as we are describing with JAVPI and AVPI can be sensitive to outliers and extreme points such that statistically significant results from JAVPI or AVPI should be examined with some scrutiny. \par
+
+## Simulation and Results of Joint Added Variable Plot Importance
 
 ### Simulation Design
 

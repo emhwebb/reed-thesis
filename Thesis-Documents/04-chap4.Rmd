@@ -392,11 +392,16 @@ plot_AVPI <-function(i, df){
 
 ## Introduction 
 
-In this chapter, we present simulation results of the random forest added variable plot and added variable plot importance methods. The design of our simulation follows closely to @strobl2008. \par
+In this chapter, we present simulation results of the random forest added variable plot and added variable plot importance methods. The design of our simulation follows closely to @strobl2008. In particular, we are interested in answering the following questions we layed out in Chapter 1: 
+\begin{enumerate}
+  \item Can AVPI handle correlated predictors in the data? 
+  \item Can we extend AVPI to a hypothesis testing framework via permutation tests?
+  \end{enumerate}
+  \par
 
 ## Simulation Design 
 
-We set up a simulation to test the added variable plot importance method on several different regression models. In particular, we were interested in how the added variable plot importance method would perform in situations where the relationship of the response to the predictors was linear, polynomial, and non-linear, and when there was and was not a correlation structure in the predictors. In addition, we were interested in comparing the effect of sampling with replacement versus sampling without replacement in the forest growing process. In the case of the independent random variables, we drew twelve predictors from a standard normal distribution. For the case of random variables with a correlation structure, we drew $X_1,\ldots,X_{12}$ from a multivariate normal distribution with mean 0 and covariance matrix $\Sigma$ where the first four variables $X_1,\ldots,X_4$ are block-correlated with a value of 0.9, and with the other eight variables independent. \par 
+We set up a simulation to test the added variable plot importance method on several different regression models. In particular, we were interested in how the added variable plot importance method would perform in situations where the relationship of the response to the predictors was linear, polynomial, and non-linear, and when there was and was not a correlation structure in the predictors. In addition, we were interested in comparing the effect of sampling with replacement versus sampling without replacement in the forest growing process as @strobl2008 indicates that there should be a difference. In particular, based on simulation results from @strobl2008, we expect that sampling without replacement to perform better than sampling with replacement. In the case of the independent random variables, we drew twelve predictors from a standard normal distribution. For the case of random variables with a correlation structure, we drew $X_1,\ldots,X_{12}$ from a multivariate normal distribution with mean 0 and covariance matrix $\Sigma$ where the first four variables $X_1,\ldots,X_4$ are block-correlated with a value of 0.9, and with the other eight variables independent. \par 
 
 ```{r kable, results="asis", echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -444,7 +449,7 @@ kable(var_inf_mat, format = "latex", booktabs = TRUE,
 
 ```
 
-Each simulation corresponds to a particular scenario and type of predictors. We ran each scenario with first independent predictors then predictors with the correlation structure from above. In addition, we first ran each simulation using sampling with replacement in the random forest ensemble, then re-ran the simulation using sampling without replacement. \par
+Each simulation corresponds to a particular scenario and type of predictors. We ran each scenario with first independent predictors then predictors with the correlation structure from above. In addition, we first ran each simulation using sampling with replacement in the random forest ensemble, then re-ran the simulation using sampling without replacement. In addition,  \par
 
 ```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, eval = FALSE}
 
@@ -483,17 +488,13 @@ kable(matrix(scen_vec_names, nrow = 8, ncol = 1, dimnames = list(siml_name)),
 \label{ScenarioPredictors}
 \end{figure}
 
-
-
-For each simulated dataset, we drew 2000 entries. We then ran the added variable plot importance scheme with the permutation scheme. For each stage of AVPI, we trained forest ensembles with 1000 trees, and to generate simulated null distributions of AVPI, we ran 1000 iterations of AVPI with permuted values for the x-axis of the added variable plot. \par
-
+For each simulated dataset, we drew 2000 entries. We then ran the added variable plot importance scheme with the permutation scheme. For each stage of AVPI, we trained forest ensembles with 1000 trees, and to generate simulated null distributions of AVPI, we ran 1000 iterations of AVPI with permuted values for the x-axis of the added variable plot. In addition, the AVPI values we computed for the above simulations were for the model-based AVPI. We only ran the residuals-based AVPI on simulations 1 through 8 using sampling without replacement. \par
 
 ## Simulation Results
 
-In the table below, we have the results of running the added variable plot importances on simulated data sets when sampling with replacement. We first note that the AVPI is quite noisy in this case. For example, in the first simulation, the relevant variables were variables 1, 2, 3, 5, 6, and 7. The AVPI reflects the importance of these variables by assigning high AVPI scores to these variables. However, irrelevant variables also had AVPI scores between 70 and 95. Simulation 2 is a similar set-up as Simulation 1, except that the predictors have the correlation structure discussed above. We see that in this case that confounding between correlated predictors is still an issue as variable 3 is assigned a AVPI score of 76 -- which is lower than the scores assigned to variables 8 through 12. We also extracted the MDA variable importance values for each simulation as a comparison to the AVPI values. In particular, we note that in simulation 1, the MDA variable importance values and AVPI values more or less agree on which variables are more important to the response. Looking at the MDA variable importance values for simulation 2, we see that the full random forest model assigned MDA scores of around zero to variables 8 through 12, so we would be disinclined to believe in the AVPI scores for those variables. However, we see that there is some confounding between variables 1 through 4 due to the correlation structure betweeen those variables. In this case, the AVPI properly deflates the importance of variable 4 in comparison to variables 1, 2, and 3, which is what we would have expected. \par
+In Figure \ref{AVPIwrep}, we have the results of running the model-based added variable plot importances on simulated data sets when sampling with replacement. We first note that the AVPI is quite noisy in this case. For example, in the first simulation, the relevant variables were variables 1, 2, 3, 5, 6, and 7. The AVPI reflects the importance of these variables by assigning high AVPI scores to these variables. However, irrelevant variables also had AVPI scores between 70 and 95. Simulation 2 is a similar set-up as Simulation 1, except that the predictors have the correlation structure discussed above. We see that in this case that confounding between correlated predictors is still an issue as variable 3 is assigned a AVPI score of 76 -- which is lower than the scores assigned to variables 8 through 12. \par
 
-
-```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 8, fig.env = 'marginfigure', fig.cap= "\\label{AVPIwrep}Model-based AVPI Simulation Results Using Sampling With Replacement"}
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.env = 'marginfigure', fig.cap= "\\label{AVPIwrep}Model-based AVPI Simulation Results Using Sampling With Replacement"}
 
 #addvar w replacement
 
@@ -518,7 +519,9 @@ do.call("grid.arrange", c(avp.wrep.siml.plots, ncol = 2, nrow = 4))
 
 ```
 
-```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 8, fig.env = 'marginfigure', fig.cap= "\\label{MDAwrep}MDA Simulation Results Using Sampling With Replacement"}
+We also extracted the MDA variable importance values for each simulation as a comparison to the AVPI values and summarize the results in Figure \ref{MDAwrep}. In particular, we note that in simulation 1, the MDA variable importance values and AVPI values more or less agree on which variables are more important to the response. Looking at the MDA variable importance values for simulation 2, we see that the full random forest model assigned MDA scores of around zero to variables 8 through 12, so we would be disinclined to believe in the AVPI scores for those variables. However, we see that there is some confounding between variables 1 through 4 due to the correlation structure betweeen those variables. In this case, the AVPI properly deflates the importance of variable 4 in comparison to variables 1, 2, and 3, which is what we would have expected. \par
+
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.env = 'marginfigure', fig.cap= "\\label{MDAwrep}MDA Simulation Results Using Sampling With Replacement"}
 
 #mda w replacement
 
@@ -545,9 +548,9 @@ do.call("grid.arrange", c(mda.wrep.siml.plots, ncol = 2, nrow = 4))
 
 ```
 
-For simulation 3 we see that AVPI matches with the MDA variable importance in matching which variables are informative. However, with simulation 4, while variable 2 has a higher score than variable 4 with AVPI and MDA variable importance, both variables have similar scores with respect to AVPI and MDA variable importance.  For simulation 5, the AVPI scores for variables 1, 2, 5, and 6 were highest although the uninformative predicotrs had relatively high AVPI scores. For simulation 6, which was the interaction terms with correlated predictors, the AVPI correctly downweights the importance of variables 3 and 4, while accounting for the importance of variables 1 and 2. With simulation 7 and 8, which was a highly non-linear response, there was small signal with respect to variable 2, so both AVPI and MDA importance computed low scores for variable 2. In particular, variable 2 in simulation 8 for AVPI has a particularly low score. However, for variables 1 and 5 have high AVPI scores as expected. \par 
+In Figure \ref{AVPIwrep}, for simulation 3 , we see that AVPI matches with the MDA variable importance in matching which variables are informative. However, with simulation 4, while variable 2 has a higher score than variable 4 with AVPI and MDA variable importance, both variables have similar scores with respect to AVPI and MDA variable importance.  For simulation 5, the AVPI scores for variables 1, 2, 5, and 6 were highest although the uninformative predicotrs had relatively high AVPI scores. For simulation 6, which was the interaction terms with correlated predictors, the AVPI correctly downweights the importance of variables 3 and 4, while accounting for the importance of variables 1 and 2. With simulation 7 and 8, which was a highly non-linear response, there was small signal with respect to variable 2, so both AVPI and MDA importance computed low scores for variable 2. In particular, variable 2 in simulation 8 for AVPI has a particularly low score. However, variables 1 and 5 have high AVPI scores as expected. \par 
 
-```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 8, fig.env = 'marginfigure', fig.cap= "\\label{AVPIworep}Model-based AVPI Simulation Results Using Sampling Without Replacement"}
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.env = 'marginfigure', fig.cap= "\\label{AVPIworep}Model-based AVPI Simulation Results Using Sampling Without Replacement"}
 
 #addvar wo replacement
 
@@ -574,7 +577,9 @@ do.call("grid.arrange", c(avp.worep.siml.plots, ncol = 2, nrow = 4))
 
 ```
 
-```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 8, fig.env = 'marginfigure', fig.cap= "\\label{MDAworep1}MDA Simulation Results Using Sampling Without Replacement"}
+Looking at the column of plots corresponding to independent predictors in Figure \ref{AVPIworep}, we see that in simulations 1, 3, and 5, correctly the AVPI was able to correctly discern the importance of informative variables. However, with simulation 7, we see that in Figure \ref{MDAworep1}, that the MDA variable importance outperformed the AVPI variable importance and was able to find which variables were informative while AVPI had difficulty with this particular simulation. However, looking at the column of plots corresponding to correlated predictors in Figure \ref{AVPIworep}, we see that with the exception of simulation 8, that AVPI using sampling without replacement generally performed as well if not better than using MDA variable importance with sampling without replacement. We also note that comparing Figure \ref{AVPIworep} to Figure \ref{AVPIwrep}, that using AVPI with sampling without replacement appears to generally perform better than using AVPI with sampling with replacement with respect to correctly finding the informative variables among the correlated predictors. 
+
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.env = 'marginfigure', fig.cap= "\\label{MDAworep1}MDA Simulation Results Using Sampling Without Replacement"}
 
 #MDA wo replacement 
 

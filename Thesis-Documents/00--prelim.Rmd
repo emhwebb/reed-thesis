@@ -2,6 +2,5 @@
 
 ## Acknowledgements {-}
 
-This thesis would not have been possible to write without the support and encouragement of friends and family. 
 
 `r if(!knitr:::is_latex_output()) '## Abstract {-}'`

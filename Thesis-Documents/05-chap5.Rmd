@@ -446,7 +446,7 @@ Depending on the number of predictors in $J$ relative to number of predictors no
 
 In figure \ref{JAVPex}, we have joint added variable plots for two different partitions of the example data set. In the top row, we partitioned all of the signal into one subset. We see in this case that the JAVP of the partition containing variables 1 and 2 has a strong positive linear trend, while the JAVP of the partition containing variable 3 has no trend. On the other hand, in the bottom row figure \ref{JAVPex}, when we partition the predictors such that there is signal contained in both subsets, we see that the trend of the JAVP for both partitions is strongly positive and linear, which we expected. \par
 
-```{r results = "asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap = "\\label{JAVPex}Joint Added Variable Plots of Example Dataset. Top two plots are JAVP Plots When All the Signal is Contained in the Partition. Bottom two plots are JAVP Plots When Only Some of Signal Is Contained in Partition"}
+```{r results = "asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap = "\\label{JAVPex}Joint added variable plots of example dataset. Top two plots are JAVP plots when all the signal is contained in the partition. Bottom two plots are JAVP plots when only some of signal is contained in partition"}
 
 javp.ex.all <- siml.ex.list[[8]]
 javp.ex.some <- siml.ex.list[[9]]
@@ -538,7 +538,7 @@ kable(partitions_mat,
 
 ### JAVPI Simulation Results for First Run
 
-```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap= "\\label{JAVPIonesig}JAVPI Simulation Results When All the Signal is Contained in the Partition"}
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap= "\\label{JAVPIonesig}JAVPI simulation results when all the signal is contained in the partition"}
 
 #javpi signal in one partition
 
@@ -569,7 +569,7 @@ We present the simulation results of JAVPI for the first simulation run in figur
 
 We examine the joint added variable plots for simulations 1, simulation 2, and simulation 5 in figure \ref{siml1to5plots}. We see that there is a weak negative trend among the uninformative variables. This structure is somewhat hard to explain, although it is most likely due to noise or masking among variables. We do note that the informative predictors have a strongly positive trend in contrast to the uninformative predictors. This is in contrast to the joint added variable plots for simulations 5. \par 
 
-```{r results = "asis", echo = FALSE, warning = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap= "\\label{siml1to5plots}JAVP for Simulations 1, 2, and 5, Respectively, for First Simulation Run"}
+```{r results = "asis", echo = FALSE, warning = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap= "\\label{siml1to5plots}JAVP for simulations 1, 2, and 5, respectively, for first simulation run"}
 
 siml1to5.plots <- rf_jt_added_var_plot_mult(list(jt.siml1, jt.siml2, jt.siml5))
 
@@ -588,7 +588,7 @@ do.call("grid.arrange", c(siml1to5.plots, ncol = 2, nrow = 3))
 
 For simulation 5, the uninformative variables had no trend while the informative variables had a strong positive trend. This at least indicates that the JAVPI score captures the relative structure present in the joint added variable plot. For lower values of JAVPI, we do not expect there to be much structure in the joint added variable plot, indicating uninformativeness of those variables. Higher values of JAVPI indicate that there is structure in data. In the case of higher JAVPI scores, combining the JAVPI score with the joint added variable plot should allow us to figure out where the signal is present. For example, with simulations 1 and 2, the trend of the joint added variable plot for the informative variables is much stronger than the trend for the uninformative variables. Furthermore, the JAVPI score for the informative variables is much higher than the JAVPI scores for the uninformative variables. Some further testing, such as examining the MDA variable importance for the full set of predictors may then allow us to conclude that the set of uninformative variables are truly uninformative. If the set of uninformative variables is not too large, we could also try computing the JAVPI for each predictor in the set of uninformative variables individually. If there is some signal in those predictors, then we would expect there to be some non-zero trend in the resulting joint added variable plot, otherwise, there would be no trend in the joint added variable plot. \par 
 
-```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.env = 'marginfigure', fig.cap= "\\label{MDAforJAVPI} MDA Simulation Results for JAVPI Simulated Datasets"}
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.env = 'marginfigure', fig.cap= "\\label{MDAforJAVPI} MDA simulation results for JAVPI simulated datasets"}
 
 #mda jt_siml_1
 mda.jt.siml.df1 <- as.data.frame(extract_matrix(numvar = 12, numsiml = 8, 
@@ -615,7 +615,7 @@ do.call("grid.arrange", c(mda.jt.siml.plots1, ncol = 2, nrow = 4))
 
 ### JAVPI Simulation Results for Second Run
 
-```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap= "\\label{JAVPItwosig}JAVPI Simulation Results When Signal is Contained in Both Partitions of the Predictors"}
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap= "\\label{JAVPItwosig}JAVPI simulation results when Signal is contained in both partitions of the predictors"}
 
 #javpi signal in both partitions
 
@@ -645,7 +645,7 @@ do.call("grid.arrange", c(javp.siml.plots2, ncol = 2, nrow = 4))
 
 We present the JAVPI scores of the second simulation run in figure \ref{JAVPItwosig}. For the second simulation run, where there was signal in both partitions of the predictors, we find that, in general, the JAVPI scores for both partitions in each simulation is high, as we expected. When we include signal in both partitions, the JAVPI will generally pick up on the signal, and we can examine the joint added variable plots for visual confirmation of what is going on. In particular, we display the joint added variable plot for simulation 1. \par 
 
-```{r echo = FALSE, warning = FALSE, fig.env = 'marginfigure', fig.cap= "\\label{siml1and5plots}JAVP for Simulations 1 and 5, Respectively, for Second Simulation Run"}
+```{r echo = FALSE, warning = FALSE, fig.env = 'marginfigure', fig.cap= "\\label{siml1and5plots}JAVP for simulations 1 and 5, respectively, for second simulation run"}
 
 siml12and52.plots <- rf_jt_added_var_plot_mult(list(jt.siml12,jt.siml52))
 

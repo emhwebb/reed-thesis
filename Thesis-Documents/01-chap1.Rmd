@@ -55,9 +55,7 @@ plot_add_var_excep <- function(i, df.list){
 
 ## CART
 
-  We begin our discussion of CART (Classification and Regression Trees) by considering the following problem. Suppose we have data generated from the piecewise function $Y=f(X)+\varepsilon$ where [at this point insert a very non-linear piecewise function.] with Gaussian error $\varepsilon$. One approach to fitting a model to this data would be to fit a linear regression model. However, the particular form of the data is not well suited for linear regression due to the non-linearity of the data. Another approach we might try as follows. We might try to find a method that can fit a regression line to each piecewise component of the data. One such method is to fit CART trees. We fit a CART tree to the data and perform cost-complexity pruning to output the model shown in figure [figure not yet made]. In this example, we produced a regression surface which was able to take into account the piecewise, non-linear nature of the data and produce a reasonable estimate of the underlying data generating mechanism. \par
-	
-  The CART methodology allows us to fit a model that can take into account non-linear regression or classification surfaces. The basic idea of CART is that if we can split the predictors into roughly homogeneous partitions in terms of the response $Y$, then we can fit a simple model to predict the response of each partition. CART trees were first introduced by @breiman1984 and are a flexible method, capable of handling classification and regression settings.  \par
+  We begin our discussion of random forests by considering CART (Classification and Regression Trees). The CART methodology allows us to fit a model that can take into account non-linear regression or classification surfaces. The basic idea of CART is that if we can split the predictors into roughly homogeneous partitions in terms of the response $Y$, then we can fit a simple model to predict the response of each partition. CART trees were first introduced by @breiman1984 and are a flexible method, capable of handling classification and regression settings.  \par
 
   More formally, suppose we have a training data set $Z=\{Z_1,\ldots,Z_n\}$, where $Z_i=(X_i,Y_i)$ is an $p+1$ dimensional vector in $\mathbb{R}^{p+1}$. Here we have $X_i$ is a $p$-dimensional predictor variable and $Y_i$ is the response. In particular, we can consider $Z$ to be a $n\times (p+1)$ array where the rows are observations and the columns are the response and predictor variables. CART works by partitioning the data through binary recursive splits via optimizing some loss function. Trees in CART are called trees because partitioning the data through binary recursive splits forms a tree-like structure. We adopt notation evocative of this tree structure. Any subset of the training data $Z$ is called a node while the entire data set $Z$ is called the root node. Nodes are of two kinds: they are either terminal (sometimes called leaves) or not terminal. Non-terminal nodes are nodes that are split on in the tree growing process, while terminal nodes are nodes which are not split on. Generally, a node is a terminal node if some stopping rule is reached. Note that terminal nodes form a partition of the training data $Z$. \par
   
@@ -94,9 +92,9 @@ plot_add_var_excep <- function(i, df.list){
   
 ### Example of Regression Tree
 
-We now provide an example of a regression tree using a simulated data set we will use throughout this thesis to illustrate important examples. We made 2000 draws of 3 independent standard normals $X_1,X_2,X_3\sim N(0,1)$ and defined the response by the linear equation $$Y=10X_1-5X_2+\varepsilon,$$ where $\varepsilon\sim N(0,1)$. Our data set is thus a $2000\times 4$ array where each row is of the form $(X_1,X_2,X_3,Y)$. Hence we have two informative predictors ($X_1$ and $X_2$) and one uninformative predictor ($X_3$) in our simulated data set. For this data set, we ran CART to produce Figure \ref{tree_ex}. \par  
+We now provide an example of a regression tree using a simulated data set we will use throughout this thesis to illustrate important examples. We made 2000 draws of 3 independent standard normals $X_1,X_2,X_3\sim N(0,1)$ and defined the response by the linear equation $$Y=10X_1-5X_2+\varepsilon,$$ where $\varepsilon\sim N(0,1)$. Our data set is thus a $2000\times 4$ array where each row is of the form $(X_1,X_2,X_3,Y)$. Hence we have two informative predictors ($X_1$ and $X_2$) and one uninformative predictor ($X_3$) in our simulated data set. For this data set, we ran CART to produce figure \ref{tree_ex}. \par  
 
-```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.env = 'marginfigure', fig.cap= "\\label{tree_ex}Example of a Regression Tree"}
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.env = 'marginfigure', fig.cap= "\\label{tree_ex}Example of a regression tree"}
 
 siml_data_ex <- siml.ex.list[[1]]
 tree_ex <- rpart(Y~., data = siml_data_ex)
@@ -203,9 +201,9 @@ We would like to note that the tree structure produced by CART is quite easy to 
   
 ### Example of MDA and MDI variable importance
 
-We ran a random forest using 1000 trees on our example dataset and plotted bar charts of the MDA and MDI variable importance scores, respectively, in Figure \ref{mda_ex}. \par
+We ran a random forest using 1000 trees on our example dataset and plotted bar charts of the MDA and MDI variable importance scores, respectively, in figure \ref{mda_ex}. \par
 
-```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.env = 'marginfigure', fig.cap= "\\label{mda_ex}Example of MDA and MDI Variable Importance", fig.height = 3}
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.env = 'marginfigure', fig.cap= "\\label{mda_ex}Example of MDA and MDI variable importance", fig.height = 3}
 
 rf_ex <- siml.ex.list[[3]]
 

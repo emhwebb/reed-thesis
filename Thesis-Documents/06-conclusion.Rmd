@@ -1,5 +1,23 @@
 # Conclusion {-}
 
+In this thesis, we explored added variable plots for random forests. We were motivated in our investigation of added variable plots for random forests by the properties that added variable plots have in the linear regression setting. In the linear regression setting, the added variable plot of a predictor $X_k$ provides the relationship of the predictor $X_k$ with the response $Y$ once we have taken into account the effect of the $X_{-k}$ on $X_k$ and $Y$. \par 
+
+As we layed out in chapter 1, our original motivation for this thesis was to:
+\begin{enumerate}
+  \item Develop computationally tractable random forest variable importance measures which can handle correlated predictors in the data. 
+  \item Extend our random forest variable importance measures to a hypothesis testing framework via permutation tests. 
+\end{enumerate}
+  \par
+  
+With respect to question 1, we developed several different variable importance measures for random forests. We developed the residual-based and model-based added variable plot importance measure, and we also developed the joint added variable plot importance measure. Simulation results in chapter 4 indicate that using the model-based AVPI with sampling without replacement was more stable than using the residual-based AVPI. However, both AVPI measures suffer from noisiness. In particular, with AVPI, we often obtain non-zero AVPI scores for non-informative variables. In addition, the MDA variable importance measure often provides the same information as the AVPI measures with less computing time. There are, however, situations in which the AVPI measures can properly take into account which variables are informative or uninformative when there are correlated predictors. \par 
+
+Simulation results in chapter 5 indicate that the JAVPI may be a more stable measure of variable importance than AVPI. In particular, we found that JAVPI gave similar simulation results for both correlated and independent predictors. When we partitioned all of the signal into one subset of the predictors and ran JAVPI, in both independent and correlated setting, we generally obtained that the JAVPI score was high for the subset of predictors containing all the signal, and the JAVPI score was low for the subset of predictors not containing any signal. But on the other hand, we found that when we split the signal between the two subsets, the JAVPI score was appropriately high for both subsets. Furthermore, the JAVPI measure appears to be less noisy than AVPI measures. As we mentioned at the end of chapter 5, we would recommend running the MDA variable importance measure in conjunction with AVPI and JAVPI measures in order to fully utilize the predictive capabilities of the random forest. If we suspect there is a correlation structure in the data, we could run JAVPI on different subsets of the correlated predictors to determine where the signal may lie. \par 
+
+With respect to question 2, as simulation results in chapter 4 indicate, the AVPI measures are too noisy for use as test statistics in a permutation test. When we simulated a null distribution for AVPI variable importance measures in chapter 4 and computed p-values, we found that most variables had low p-values due to the non-zero AVPI scores of non-informative variables. On the other hand, as discussed above, based on our simulation results the JAVPI measure appears to be less noisy than the AVPI measures, so JAVPI may be more suited for use as a test statistic for permutation tests than AVPI.   \par 
+
+## Future Work
+
+There are several directions in which we could take added variable plots for random forests. Perhaps the largest issue with the AVPI measures is that non-informative predictors often receive non-zero variable importance scores. Visual inspection of added variable plots for non-informative predictors that receive non-zero AVPI scores shows that the added variable plots for such predictors have a non-zero trend. That is, there appears to be some sort of correlation structure present in added variable plots for these predictors that is leading to skewed simulation results. Understanding the source of non-zero AVPI scores for non-informative predictors could allow us to introduce a correction term that takes into account the correlation structure. A good theoretical first-step towards finding a correction term would be to analytically compute the covariance of random forest added variable plots. A good handle on the covariances of added variable plots could then allow us to understand why we observe non-zero AVPI scores for non-informative predictors. \par
 
 
-## Future Directions
+  

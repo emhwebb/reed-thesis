@@ -69,6 +69,46 @@
 % \usepackage{times} % other fonts are available like times, bookman, charter, palatino
 
 % Syntax highlighting #22
+  \usepackage{color}
+  \usepackage{fancyvrb}
+  \newcommand{\VerbBar}{|}
+  \newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+  % Add ',fontsize=\small' for more characters per line
+  \usepackage{framed}
+  \definecolor{shadecolor}{RGB}{248,248,248}
+  \newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+  \newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+  \newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+  \newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+  \newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+  \newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+  \newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+  \newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+  \newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+  \newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+  \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+  \newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+  \newcommand{\ImportTok}[1]{#1}
+  \newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+  \newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+  \newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+  \newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+  \newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+  \newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+  \newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+  \newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+  \newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+  \newcommand{\BuiltInTok}[1]{#1}
+  \newcommand{\ExtensionTok}[1]{#1}
+  \newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+  \newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+  \newcommand{\RegionMarkerTok}[1]{#1}
+  \newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+  \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+  \newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+  \newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+  \newcommand{\NormalTok}[1]{#1}
 
 % To pass between YAML and LaTeX the dollar signs are added by CII
 \title{Added Variable Plot Importance and Joint Added Variable Plot Importance
@@ -131,9 +171,18 @@ You can have a dedication here if you wish.
 }
 
 \Abstract{
-The preface pretty much says it all. \par
-
-Second paragraph of abstract starts here.
+Existing variable importance measures for random forests are often
+unreliable when there are correlated predictors in the data set. In this
+paper, we develop and test whether added variable plot importance (AVPI)
+and joint added variable plot importance (JAVPI) measures are capable of
+handling correlated predictors in the dataset when assessing whether a
+predictor is informative towards the response. Simulation results
+indicate that while the AVPI measures are in certain cases more
+informative than existing variable importance measures when there are
+correlated predictors, AVPI is generally noisier than existing variable
+importance measures. We also find that the JAVPI measure is generally
+able to account for correlated predictors in the data, and does not
+suffer from the same issues of noise as the AVPI measure.
 }
 
 	\usepackage{tikz, algorithm}
@@ -177,9 +226,18 @@ Second paragraph of abstract starts here.
 
   \listoffigures
   \begin{abstract}
-    The preface pretty much says it all. \par
-    
-    Second paragraph of abstract starts here.
+    Existing variable importance measures for random forests are often
+    unreliable when there are correlated predictors in the data set. In this
+    paper, we develop and test whether added variable plot importance (AVPI)
+    and joint added variable plot importance (JAVPI) measures are capable of
+    handling correlated predictors in the dataset when assessing whether a
+    predictor is informative towards the response. Simulation results
+    indicate that while the AVPI measures are in certain cases more
+    informative than existing variable importance measures when there are
+    correlated predictors, AVPI is generally noisier than existing variable
+    importance measures. We also find that the JAVPI measure is generally
+    able to account for correlated predictors in the data, and does not
+    suffer from the same issues of noise as the AVPI measure.
   \end{abstract}
   \begin{dedication}
     You can have a dedication here if you wish.
@@ -249,7 +307,7 @@ underlying data generating mechanism. \par
 
 The CART methodology allows us to fit a model that can take into account
 non-linear regression or classification surfaces. The basic idea of CART
-is that if we can split the predictors into roughly homogenous
+is that if we can split the predictors into roughly homogeneous
 partitions in terms of the response \(Y\), then we can fit a simple
 model to predict the response of each partition. CART trees were first
 introduced by Breiman, Friedman, Olshen, \& Stone (1984) and are a
@@ -274,9 +332,9 @@ terminal nodes are nodes which are not split on. Generally, a node is a
 terminal node if some stopping rule is reached. Note that terminal nodes
 form a partition of the training data \(Z\). \par
 
-We aim to grow a tree with roughly homogenous terminal nodes in terms of
-\(Y\). As Breiman et al. (1984) note, there are several factors that we
-need to consider:
+We aim to grow a tree with roughly homogeneous terminal nodes in terms
+of \(Y\). As Breiman et al. (1984) note, there are several factors that
+we need to consider:
 \begin{enumerate}
         \item How to select splits of the data.
         
@@ -366,7 +424,7 @@ let \(\hat{p}_{tL}\) and \(\hat{p}_{tR}\) be proportion of observations
 falling into \(t_L\) and \(t_R\), respectively. Denote the Gini index of
 the left node \(t_L\) by \(G_{L}\) and denote the Gini index of the
 right node \(t_R\) by \(G_{R}\). Then our splitting criterion is to seek
-the spliting variable and splitting point which minimizes
+the splitting variable and splitting point which minimizes
 \[\hat{p}_{tL}G_L+\hat{p}_{tR}G_R.\] The case is similar when using
 misclassification rate and cross-entropy as the impurity measures. \par
 
@@ -374,7 +432,7 @@ Some issues with CART trees include overfitting and variability. While
 there is a stopping criterion for growing the CART trees, often times
 naively growing a tree can result in overfitting to the data. One method
 of alleviating overfitting is to employ cost-complexity pruning, which
-searches for an optimal tree that balances fitting a good predicitve
+searches for an optimal tree that balances fitting a good predictive
 tree model with overfitting to the data. We do not go into details here,
 but point the reader to Hastie, Tibshirani, \& Friedman (2009). \par
 
@@ -417,10 +475,10 @@ running the learner once. \par
 \subsection{How Bagged Forests Work}\label{how-bagged-forests-work}
 
 Bagged forests are an ensemble obtained by taking many bootstrap samples
-of the data and fitting a tree to each bootstrapped dataset. In this
+of the data and fitting a tree to each bootstrapped data set. In this
 case, we grow the trees quite deep and do not employ cost-complexity
 pruning. The idea behind this decision is that we want to sufficiently
-explore the feature space using a single baggedtree of the forest
+explore the feature space using a single bagged tree of the forest
 ensemble, and since we are also taking an average of the trees, we are
 fine with overfitting at least a little bit. As the algorithm above for
 bagged forests indicates, the output is an ensemble of trees
@@ -646,14 +704,14 @@ forests often produce good predictions with little tuning required
 except growing a sufficient number of trees and choosing a good value of
 \(m\leq p\) to try at each split in the tree growing process. The ease
 of fitting random forests is one of the advantages of the random forest
-algorithm compred to more complex methods like neural networks or
+algorithm compared to more complex methods like neural networks or
 support vector machines. Since the random forest algorithm is a readily
 available and easy to use tool for statistical practitioners, we would
 like to develop random forest variable importance measures which can
 take into account correlated predictors. Our goal with this thesis is
 to:
 \begin{enumerate}
-  \item Develop computationally tractible random forest variable importance measures which can handle correlated predictors in the data. 
+  \item Develop computationally tractable random forest variable importance measures which can handle correlated predictors in the data. 
   \item Extend our random forest variable importance measures to a hypothesis testing framework via permutation tests. 
   \end{enumerate}
 \par
@@ -734,7 +792,7 @@ noising up \(x_j\) to be the variable importance of \(x_j\) in the tree
 \(T\). Denote the tree that results from noising up \(x_j\) by \(T_j\).
 \par
 
-Such a scheme relies on the following heuristic: if we chose an adequete
+Such a scheme relies on the following heuristic: if we chose an adequate
 splitting rule to construct our tree, then we expect that variables that
 are split earlier in the tree are more important, since prediction will
 suffer the most from noising up a variable higher up in the tree than a
@@ -756,7 +814,7 @@ subtree is quite intuitive. We call \(\tilde{T}_j\) a \(j\)-subtree of
 the tree \(T\), if the root node of \(\tilde{T}_j\) has daughters that
 depend on an \(x_j\) split. A \(j\)-subtree \(\tilde{T}_j\) is a maximal
 \(j\)-subtree of the tree \(T\), if there are no larger \(j\)-subtrees
-continaing \(\tilde{T}_j\). For a given tree \(T\) and for each variable
+containing \(\tilde{T}_j\). For a given tree \(T\) and for each variable
 \(x_j\), there is a set of \(K_j\) many distinct maximal \(j\)-subtrees,
 which are denoted by \(\tilde{T}_{1,j},\ldots, \tilde{T}_{K_j,j}\). Note
 each distinct \(\tilde{T}_{k,j}\) maximal \(j\)-subtree contains a set
@@ -862,7 +920,7 @@ be characterized through node mean squared error of subtrees. Variable
 importance as defined above differs from the \(MDA\) variable importance
 for random forests, but the two follow a similar heuristic towards
 measuring variable importance via the loss of predictive accuracy when
-the variable \(x_j\) is pertrubed. Therefore this result suggests that,
+the variable \(x_j\) is perturbed. Therefore this result suggests that,
 perhaps, so long as the random forest estimator is consistent and the
 trees constructed are at least approximately orthogonal, the \(MDA\)
 variable importance can be characterized via the mean squared error of
@@ -886,7 +944,7 @@ approach to dealing with this issue may be to adopt the above definition
 of variable importance in different random forest settings and see if
 similar results to Ishwaran (2007) may be derived. Another approach,
 which is the one more or less taken by Ishwaran (2007), is to to find a
-mathematically tractible definition of variable importance which is
+mathematically tractable definition of variable importance which is
 approximately the MDA variable importance measure and proceed with
 analysis from there. \par
 
@@ -918,10 +976,10 @@ Rather than working with random forests, we will work with an infinite
 ensemble of totally randomized and fully developed trees. Totally
 randomized and fully developed trees are a variant of forest ensembles
 given by the following. A totally randomized and fully developed tree is
-a decision tree in which each node \(t\) is partioned using a variable
+a decision tree in which each node \(t\) is partitioned using a variable
 \(X_j\) picked uniformly at random among those not yet used at the
 parent nodes of \(t\), where each node \(t\) is split into \(|X_j|\)
-sub-trees, i.e., one for each possiblevalue of \(X_j\), and where the
+sub-trees, i.e., one for each possible value of \(X_j\), and where the
 recursive construction process halts only when all \(p\) variables have
 been used along the current branch. \par
 
@@ -939,7 +997,7 @@ Shannon entropy to other impurity measures, for the GINI index (used in
 commonly in classification problems) and variance (used in regression
 via MSE), only irrelevant variables result in no decrease in nodal
 impurity. We would like to reiterate that these results concerning
-irrelvant variables are valid particularly in the setting of infinite
+irrelevant variables are valid particularly in the setting of infinite
 ensembles of totally randomized and fully developed trees. \par
 
 In the random forest setting, the results discussed in the previous
@@ -975,7 +1033,7 @@ In the previous two sections of this chapter we discussed theoretical
 results pertaining to MDA and MDI variable importance measures. For MDA
 variable importance, a consistent ensemble with orthogonal trees have a
 nice asymptotic form in the framework developed in Ishwaran (2007). On
-the otherhand, with MDI variable importance, if the trees are grown in
+the other hand, with MDI variable importance, if the trees are grown in
 the random forest setting, then there are issues of the variable
 importance not capturing the actual importance of the variables in the
 training data. This could particularly arise as an issue in data sets
@@ -1036,7 +1094,7 @@ the \(VI(X_j)\) is nonzero, then if also \(X_j\perp X_{-j}\), it would
 follow that \(Y\) and \(X_j\) are not independent. However, it is
 important to note that the null hypothesis under which the MDA variable
 importance measure operates is: \[H_0:X_j \perp Y,X_{-j}.\] If on the
-otherhand, \(X_j\) and \(X_{-j}\) are not independent, then \(VI(X_j)\)
+other hand, \(X_j\) and \(X_{-j}\) are not independent, then \(VI(X_j)\)
 will be biased by the correlation between \(X_j\) and \(X_{-j}\). It
 could be that \(Y\) and \(X_j\) are not independent or that \(Y\) and
 \(X_j\) are independent, but in either case, if the predictor variables
@@ -1118,7 +1176,7 @@ as base learners. However, the infforest variable importance could
 certainly be used with random forest variants such as conditional
 inference forests used in Strobl et al. (2008). Another possible
 modification of the infforest variable importance algorithm is to only
-grow an auxilary tree predicting
+grow an auxiliary tree predicting
 \(X_j\sim X_{\alpha_1},\ldots,X_{\alpha_k}\), where
 \(X_{\alpha_1},\ldots,X_{\alpha_k}\) are variables whose correlation
 with \(X_j\) exceeds some reasonable threshold. This would combine the
@@ -1128,7 +1186,7 @@ conditional variable importance with the infforest partition-permute
 scheme. \par
 
 One issue with infforest variable importance is the steep computational
-cost of the algorithm. The algorithm grows an auxilary tree
+cost of the algorithm. The algorithm grows an auxiliary tree
 \(T_{j}^{b*}\) for each variable \(X_j\) and bootstrap resample \(b\)
 and then proceeds to permute the OOB sample with respect to each
 \(T_j^{b*}\). Even implementing the infforest variable importance
@@ -1167,7 +1225,7 @@ Infforest variable importance aim at measuring the conditional
 importance of a particular variable by conditionally permuting OOB data
 according to some criteria measured from the data, whether that be
 empirical correlation in the case of conditional variable importance, or
-the partitions induced by a particular tree inthe case of Infforest
+the partitions induced by a particular tree in the case of Infforest
 variable importance. In any case, we are primarily interested in the
 conditional importance of a predictor given the information provided by
 other predictors. While we would like to have a exact method of
@@ -1263,7 +1321,7 @@ picture for more complex regression functions such as random forests is
 more complicated. In particular, if the relationship between the
 response and predictors is non-linear, or we are using a statistical
 learning method such as a random forest, then we do not have the nice
-linear algebra that undergirds the interpretation of added variable
+linear algebra that under girds the interpretation of added variable
 plots of linear regression models. However, we can still construct added
 variable plots for random forests that are similar to the added variable
 plots for linear regression. \par
@@ -1299,9 +1357,9 @@ prediction for \(Y\) that is similar to a prediction for \(Y\) given by
 the other hand, \(X_k\) is informative to the response, then we would
 expect that \(\hat{\theta}_{RF}(Y|X_{-k})\) would form a worse
 prediction for \(Y\) than that given by \(\hat{\theta}_{RF}(Y|X)\),
-since we would be excluding \(X_k\) as a splitting variable. Futhermore,
-we would be taking into account the amount of the response explainable
-by \(X_{-k}\) using the random forest model, such that
+since we would be excluding \(X_k\) as a splitting variable.
+Furthermore, we would be taking into account the amount of the response
+explainable by \(X_{-k}\) using the random forest model, such that
 \(Y-\hat{\theta}_{RF}(Y|X_{-k})\) would be the amount of the response
 unexplained by \(X_{-k}\). The values of
 \(X_k-\hat{\theta}_{RF}(X_k|X_{-k})\) will depend on the relationship
@@ -1364,7 +1422,7 @@ the Law of Total Expectation, we would expect that asymptotically
 limit, by linearity of expectation,
 \[\mathbb{E}(\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k}))=\mathbb{E}(\hat{\theta}_{RF}(Y|X))-\mathbb{E}(\hat{\theta}_{RF}(Y|X_{-k}))=Y-Y=0.\]
 Similarly, \[\mathbb{E}(Y-\hat{\theta}_{RF}(Y|X_{-k}))=Y-Y=0.\] Hence if
-a predictor \(X_k\) is uninformative, provided we have grown adequetely
+a predictor \(X_k\) is uninformative, provided we have grown adequately
 accurate forest ensembles to predict \(Y\) given \(X\) and \(Y\) given
 \(X_{-k}\), respectively, then we expect that the the added variable
 plot of \(X_k\) to either be radially centered about the origin or to
@@ -1396,7 +1454,7 @@ approximately zero would depend on the relative informativeness of
 difference between \(Y\) and \(\hat{\theta}_{RF}(Y|X_{-k})\) and the
 difference between \(\hat{\theta}_{RF}(Y|X)\) and
 \(\hat{\theta}_{RF}(Y|X_{-k})\) to often be large. If \(X_k\) is weakly
-informative we would expect the two differnces to often be of smaller
+informative we would expect the two differences to often be of smaller
 magnitude than when \(X_k\) is strongly informative. Hence visually the
 trend of the added variable plot of predictors used to grow a random
 forest ensemble offer a method of gauging the informativeness of
@@ -1426,7 +1484,7 @@ Plot}\label{discussion-of-added-variable-plot}
 We note that in the above argument that we made an appeal to the random
 forest estimator \(\hat{\theta}_{RF}(Y|X)\) being a consistent estimator
 of \(\mathbb{E}(Y|X)\). As discussed earlier, the random forest
-algorithm as introduced and implemented by Breiman and collaboraters has
+algorithm as introduced and implemented by Breiman and collaborators has
 not yet been shown to be consistent. However, empirically the random
 forest algorithm often offers good predictions of the response, so we
 expect that the added variable plot as applied to the original random
@@ -1636,7 +1694,7 @@ will indicate, hypothesis testing using the AVPI is likely more
 sensitive to type-I errors than type-II errors, so an adjustment such as
 the Bonferroni correction may be appropriate. \par
 
-We also note that while generating adequete null distributions of
+We also note that while generating adequate null distributions of
 \(VI_{AVP}(X_k)\) for each predictor \(X_k\) is computationally
 expensive, each step of the process from growing the full ensemble
 \(\hat{\theta}_{RF}(Y|X)\) to growing each
@@ -1820,7 +1878,7 @@ variable importance values for simulation 2, we see that the full random
 forest model assigned MDA scores of around zero to variables 8 through
 12, so we would be disinclined to believe in the AVPI scores for those
 variables. However, we see that there is some confounding between
-variables 1 through 4 due to the correlation structure betweeen those
+variables 1 through 4 due to the correlation structure between those
 variables. In this case, the AVPI properly deflates the importance of
 variable 4 in comparison to variables 1, 2, and 3, which is what we
 would have expected. \par
@@ -1836,9 +1894,9 @@ informative. However, with simulation 4, while variable 2 has a higher
 score than variable 4 with AVPI and MDA variable importance, both
 variables have similar scores with respect to AVPI and MDA variable
 importance. For simulation 5, the AVPI scores for variables 1, 2, 5, and
-6 were highest although the uninformative predicotrs had relatively high
+6 were highest although the uninformative predictors had relatively high
 AVPI scores. For simulation 6, which was the interaction terms with
-correlated predictors, the AVPI correctly downweights the importance of
+correlated predictors, the AVPI correctly down weights the importance of
 variables 3 and 4, while accounting for the importance of variables 1
 and 2. With simulation 7 and 8, which was a highly non-linear response,
 there was small signal with respect to variable 2, so both AVPI and MDA
@@ -1890,7 +1948,7 @@ to uninformative variables. For simulation 8, we see that while
 variables 1 and 8 properly receive high AVPI scores, variable 2 received
 a similar AVPI score as variable 12, which was an uninformative. We do
 note, however, that relative to other correlated predictors in
-simulation 8, variables 1 and 2 receieved higher AVPI scores than
+simulation 8, variables 1 and 2 received higher AVPI scores than
 variables 3 or 4, which is what we expected to see. \par
 \begin{figure}
 \centering
@@ -2049,7 +2107,7 @@ the issue of noisiness could be sorted out, then AVPI would be a
 reliable test statistic, and we could enter into a hypothesis testing
 framework for random forests via simulating a null distribution for AVPI
 values. We also note that depending on the size of the dataset,
-computing adequete null distributions of the AVPI values of predictors
+computing adequate null distributions of the AVPI values of predictors
 can be computationally intensive. \par
 
 \chapter{Joint Added Variable Plot
@@ -2081,7 +2139,7 @@ covariates to \(\mathbf{X}=(\mathbf{X}_1,\mathbf{X}_2)\), where
 are the last \(q\) predictors. Similarly partition the coefficients from
 the linear model \(\mathbf{\beta}=(\mathbf{\beta}_1,\mathbf{\beta}_2)\),
 where \(\mathbf{\beta}_1\) are the coefficients for the first \(p-q\)
-predictors and \(\mathbf{\beta}_2\) are the coefficents for the last
+predictors and \(\mathbf{\beta}_2\) are the coefficients for the last
 \(q\) predictors. Then we would like to test whether
 \(\mathbf{\beta}_2\) should be non-zero for \(\mathbf{X}_2\). We are
 testing the hypotheses
@@ -2111,7 +2169,7 @@ of \(\mathbf{X}_2\) in the random forest context. \par
 Suppose that out of a particular set of correlated predictors, we
 believe that two, \(X_j\) and \(X_k\), are particularly informative to
 the response while the other correlated predictors are uninformative.
-Denote the set of correlated precictors by
+Denote the set of correlated predictors by
 \(H=\{X_{\alpha_1},\ldots,X_{\alpha_m}\}\) of which \(K=\{X_j,X_k\}\) is
 a subset. One approach to determining the relative importance of the
 variables in \(H\) is to plot added variable plots and compute added
@@ -2146,9 +2204,9 @@ in \(J\) is informative, then we would expect that the random forest
 ensemble \(\hat{\theta}_{RF}(Y|X_{-J})\) would have a decrease in
 predictive performance in comparison to the full model. If many
 predictors in \(J\) are informative, then we would expect that,
-correspondedly there would be a large decrease in predictive performance
-in \(\hat{\theta}_{RF}(Y|X_{-J})\). At each node split, as the
-predictors in \(J\) are unavailable to be chosen as one of the
+correspondingly there would be a large decrease in predictive
+performance in \(\hat{\theta}_{RF}(Y|X_{-J})\). At each node split, as
+the predictors in \(J\) are unavailable to be chosen as one of the
 \(m_{try}\) variables, there is a greater chance for an uninformative
 variable to be chosen as the splitting variable. On the other hand, if
 no variable in \(J\) is informative, then we would expect
@@ -2293,7 +2351,7 @@ predictors consists of a mixture of informative and uninformative
 predictors, then a finer analysis of the variables in \(J\) may be
 required if the JAVPI of \(J\) is high. Concluding that each variable in
 \(J\) is informative based on a high JAVPI value or low p-value from
-simulation would be erronuous if \(J\) is a mixture of informative and
+simulation would be erroneous if \(J\) is a mixture of informative and
 uninformative. We would also like to emphasize that it is important to
 check the fit and residual sum of squares of the random forest model if
 using the JAVPI or AVPI to see if conclusions drawn from JAVPI or AVPI
@@ -2343,7 +2401,12 @@ Scenario 4 & V1, V2, V5 & V1, V2\\
 
 \subsection{JAVPI Simulation Results for First
 Run}\label{javpi-simulation-results-for-first-run}
-
+\begin{figure}
+\centering
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-27-1.pdf}
+\caption{\label{fig:unnamed-chunk-27}\label{JAVPIonesig}JAVPI Simulation
+Results When All the Signal is Contained in the Partition}
+\end{figure}
 We present the simulation results of JAVPI for the first simulation run
 in figure \ref{JAVPIonesig}. We find that, in general, JAVPI is
 relatively stable at distinguishing between the set of predictors
@@ -2355,14 +2418,9 @@ the JAVPI value for the uninformative predictors is quite high. Some
 possible reasons for this are monte carlo variability and relatively
 weak signal in the predictors allowing for some masking between
 variables. \par 
-\begin{figure}
-\centering
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-27-1.pdf}
-\caption{\label{fig:unnamed-chunk-27}\label{JAVPIonesig}JAVPI Simulation
-Results When All the Signal is Contained in the Partition}
-\end{figure}
+
 We examine the joint added variable plots for simulations 1, simulation
-2, and simultaion 5 in figure \ref{siml1to5plots}. We see that there is
+2, and simulation 5 in figure \ref{siml1to5plots}. We see that there is
 a weak negative trend among the uninformative variables. This structure
 is somewhat hard to explain, although it is most likely due to noise or
 masking among variables. We do note that the informative predictors have
@@ -2405,7 +2463,12 @@ Results for JAVPI Simulated Datasets}
 \end{figure}
 \subsection{JAVPI Simulation Results for Second
 Run}\label{javpi-simulation-results-for-second-run}
-
+\begin{figure}
+\centering
+\includegraphics{thesis_files/figure-latex/unnamed-chunk-30-1.pdf}
+\caption{\label{fig:unnamed-chunk-30}\label{JAVPItwosig}JAVPI Simulation
+Results When Signal is Contained in Both Partitions of the Predictors}
+\end{figure}
 We present the JAVPI scores of the second simulation run in figure
 \ref{JAVPItwosig}. For the second simulation run, where there was signal
 in both partitions of the predictors, we find that, in general, the
@@ -2415,12 +2478,6 @@ generally pick up on the signal, and we can examine the joint added
 variable plots for visual confirmation of what is going on. In
 particular, we display the joint added variable plot for simulation 1.
 \par 
-\begin{figure}
-\centering
-\includegraphics{thesis_files/figure-latex/unnamed-chunk-30-1.pdf}
-\caption{\label{fig:unnamed-chunk-30}\label{JAVPItwosig}JAVPI Simulation
-Results When Signal is Contained in Both Partitions of the Predictors}
-\end{figure}
 \begin{figure}
 \centering
 \includegraphics{thesis_files/figure-latex/unnamed-chunk-31-1.pdf}
@@ -2454,14 +2511,14 @@ JAVPI, the conclusions we reached with respect to independent versus
 correlated predictors were quite similar. Since with JAVPI, we are
 interested in the aggregated effect of a set of predictors, this means
 that we are really testing whether or not the subset of predictors
-contains a discernable signal. The particular usefulness of JAVPI is not
+contains a discernible signal. The particular usefulness of JAVPI is not
 necessarily detecting where there is a signal, but detecting where there
 is not a signal. If a subset of predictors produce a low JAVPI score,
 then it is quite possible that there is very little to no signal in that
 subset. Hence in this manner, we could in theory test each correlated
 variable in a data set to try to figure out if any correlated predictors
 are informative to the response. Of course, such a method can be
-computationally intractible and impractical for data sets with many
+computationally intractable and impractical for data sets with many
 predictors, so computing the JAVPI score of different combinations of
 subsets could be more efficient than testing each predictor one by one.
 Furthermore, the JAVPI score is more computationally efficient to
@@ -2481,10 +2538,422 @@ sensitive to noise in the data. \par
 \chapter*{Conclusion}\label{conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
 
+In this thesis, we explored added variable plots for random forests. We
+were motivated in our investigation of added variable plots for random
+forests by the properties that added variable plots have in the linear
+regression setting. In the linear regression setting, the added variable
+plot of a predictor \(X_k\) provides the relationship of the predictor
+\(X_k\) with the response \(Y\) once we have taken into account the
+effect of the \(X_{-k}\) on \(X_k\) and \(Y\). \par 
+
+As we layed out in chapter 1, our original motivation for this thesis
+was to:
+\begin{enumerate}
+  \item Develop computationally tractable random forest variable importance measures which can handle correlated predictors in the data. 
+  \item Extend our random forest variable importance measures to a hypothesis testing framework via permutation tests. 
+\end{enumerate}
+\par
+
+With respect to question 1, we developed several different variable
+importance measures for random forests. We developed the residual-based
+and model-based added variable plot importance measure, and we also
+developed the joint added variable plot importance measure. Simulation
+results in chapter 4 indicate that using the model-based AVPI with
+sampling without replacement was more stable than using the
+residual-based AVPI. However, both AVPI measures suffer from noisiness.
+In particular, with AVPI, we often obtain non-zero AVPI scores for
+non-informative variables. In addition, the MDA variable importance
+measure often provides the same information as the AVPI measures with
+less computing time. There are, however, situations in which the AVPI
+measures can properly take into account which variables are informative
+or uninformative when there are correlated predictors. \par 
+
+Simulation results in chapter 5 indicate that the JAVPI may be a more
+stable measure of variable importance than AVPI. In particular, we found
+that JAVPI gave similar simulation results for both correlated and
+independent predictors. When we partitioned all of the signal into one
+subset of the predictors and ran JAVPI, in both independent and
+correlated setting, we generally obtained that the JAVPI score was high
+for the subset of predictors containing all the signal, and the JAVPI
+score was low for the subset of predictors not containing any signal.
+But on the other hand, we found that when we split the signal between
+the two subsets, the JAVPI score was appropriately high for both
+subsets. Furthermore, the JAVPI measure appears to be less noisy than
+AVPI measures. As we mentioned at the end of chapter 5, we would
+recommend running the MDA variable importance measure in conjunction
+with AVPI and JAVPI measures in order to fully utilize the predictive
+capabilities of the random forest. If we suspect there is a correlation
+structure in the data, we could run JAVPI on different subsets of the
+correlated predictors to determine where the signal may lie. \par 
+
+With respect to question 2, as simulation results in chapter 4 indicate,
+the AVPI measures are too noisy for use as test statistics in a
+permutation test. When we simulated a null distribution for AVPI
+variable importance measures in chapter 4 and computed p-values, we
+found that most variables had low p-values due to the non-zero AVPI
+scores of non-informative variables. On the other hand, as discussed
+above, based on our simulation results the JAVPI measure appears to be
+less noisy than the AVPI measures, so JAVPI may be more suited for use
+as a test statistic for permutation tests than AVPI. \par 
+
+\section{Future Work}\label{future-work}
+
+There are several directions in which we could take added variable plots
+for random forests. Perhaps the largest issue with the AVPI measures is
+that non-informative predictors often receive non-zero variable
+importance scores. Visual inspection of added variable plots for
+non-informative predictors that receive non-zero AVPI scores shows that
+the added variable plots for such predictors have a non-zero trend. That
+is, there appears to be some sort of correlation structure present in
+added variable plots for these predictors that is leading to skewed
+simulation results. Understanding the source of non-zero AVPI scores for
+non-informative predictors could allow us to introduce a correction term
+that takes into account the correlation structure. A good theoretical
+first-step towards finding a correction term would be to analytically
+compute the covariance of random forest added variable plots. A good
+handle on the covariances of added variable plots could then allow us to
+understand why we observe non-zero AVPI scores for non-informative
+predictors. \par
+
 \appendix
 
-\chapter{The First Appendix}\label{the-first-appendix}
+\chapter{Appendix}\label{appendix}
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#itr_col takes as input an integer and removes that column from the dataset}
+\CommentTok{#note: should make itr_col more robust}
 
+\NormalTok{itr_col <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(i, data)\{}
+  \KeywordTok{select}\NormalTok{(data,}\OperatorTok{-}\NormalTok{i)}
+\NormalTok{\}}
+
+\CommentTok{#df_combs is a function which takes as input a dataframe and returns all iterations of the}
+\CommentTok{#dataframe where one predictor has been removed. Output is a p+1 element list where each element}
+\CommentTok{#is a dataframe with the ith variable removed. the last element of the list is the entire dataframe}
+\NormalTok{df_combs <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data)\{}
+\NormalTok{  p <-}\StringTok{ }\KeywordTok{ncol}\NormalTok{(data)}\OperatorTok{-}\DecValTok{1}
+\NormalTok{  df.list <-}\StringTok{ }\KeywordTok{map}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\NormalTok{p, itr_col, }\DataTypeTok{data =}\NormalTok{ data)}
+\NormalTok{  df.list[[p}\OperatorTok{+}\DecValTok{1}\NormalTok{]] <-}\StringTok{ }\NormalTok{data}
+\NormalTok{  df.list}
+\NormalTok{\}}
+
+\CommentTok{#extract_rf_pred is a function which takes as input }
+\CommentTok{#a list of randomforest objects, an index value, }
+\CommentTok{#and the number of predictors in the model and }
+\CommentTok{#outputs the predicted values of the random forest in }
+\CommentTok{#a dataframe. extract_rf_pred is mainly for use in map_dfc, }
+\CommentTok{#which binds by column the predicted values in }
+\CommentTok{#data.list as a dataframe. Primarily for use in each_pred_rf}
+\NormalTok{extract_rf_pred <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(i, data.list, p)\{}
+\NormalTok{ new.df <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(data.list[[i]]}\OperatorTok{$}\NormalTok{predicted) }
+ \KeywordTok{colnames}\NormalTok{(new.df) <-}\StringTok{ }\KeywordTok{ifelse}\NormalTok{(i }\OperatorTok{<=}\StringTok{ }\NormalTok{p, }\KeywordTok{paste}\NormalTok{(}\StringTok{"PredWoVar"}\NormalTok{, }\KeywordTok{as.character}\NormalTok{(i), }\DataTypeTok{sep =} \StringTok{""}\NormalTok{),}
+                            \StringTok{"PredFullMod"}\NormalTok{)}
+\NormalTok{ new.df}
+\NormalTok{\}}
+
+\CommentTok{#each_pred_rf is a function whose input is a list of dataframes }
+\CommentTok{#that come from output of df_combs and runs the }
+\CommentTok{#randomForest function on each dataframe using the map function. }
+\CommentTok{#Output is dataframe of predicted values along with actual value of Y as last column. }
+\CommentTok{#Second to last column is the predicted value of full model. }
+\NormalTok{each_pred_rf <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data.list, ntree1, }\DataTypeTok{replace =} \OtherTok{TRUE}\NormalTok{)\{}
+\NormalTok{  p <-}\StringTok{ }\KeywordTok{length}\NormalTok{(data.list)}\OperatorTok{-}\DecValTok{1}
+\NormalTok{  rf.list <-}\StringTok{ }\KeywordTok{map}\NormalTok{(}\DataTypeTok{.x =}\NormalTok{ data.list, }\ControlFlowTok{function}\NormalTok{(x) }
+    \KeywordTok{randomForest}\NormalTok{(Y}\OperatorTok{~}\NormalTok{., }\DataTypeTok{data =}\NormalTok{ x, }\DataTypeTok{ntree =}\NormalTok{ ntree1, }\DataTypeTok{replace =}\NormalTok{ replace, }\DataTypeTok{importance =} \OtherTok{TRUE}\NormalTok{))}
+\NormalTok{  rf.df <-}\StringTok{ }\KeywordTok{map_dfc}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\NormalTok{(p}\OperatorTok{+}\DecValTok{1}\NormalTok{), extract_rf_pred, }\DataTypeTok{data.list =}\NormalTok{ rf.list, }\DataTypeTok{p =}\NormalTok{ p)}
+\NormalTok{  Y <-}\StringTok{ }\NormalTok{data.list[[}\DecValTok{1}\NormalTok{]]}\OperatorTok{$}\NormalTok{Y}
+\NormalTok{  new.df <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(rf.df, Y)}
+\NormalTok{  imp <-}\StringTok{ }\KeywordTok{importance}\NormalTok{(rf.list[[p}\OperatorTok{+}\DecValTok{1}\NormalTok{]])}
+  \KeywordTok{list}\NormalTok{(new.df, imp)}
+\NormalTok{\}}
+
+\CommentTok{#res_rf_pred runs random forest with each predictor as response and outputs }
+\CommentTok{#predicted values in a dataframe (for use with map_dfc)}
+\NormalTok{res_rf_pred <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(i, df, ntree1, }\DataTypeTok{replace =}\NormalTok{ replace)\{}
+\NormalTok{  form <-}\StringTok{ }\KeywordTok{reformulate}\NormalTok{(}\DataTypeTok{termlabels =} \KeywordTok{names}\NormalTok{(df[}\OperatorTok{-}\NormalTok{i]), }\DataTypeTok{response =} \KeywordTok{paste0}\NormalTok{(}\StringTok{"V"}\NormalTok{, }\KeywordTok{as.character}\NormalTok{(i)))}
+\NormalTok{  var.rf <-}\StringTok{ }\KeywordTok{randomForest}\NormalTok{(form, }\DataTypeTok{data =}\NormalTok{ df, }\DataTypeTok{ntree =}\NormalTok{ ntree1, }\DataTypeTok{replace =}\NormalTok{ replace)}
+\NormalTok{  var.rf.pred <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(var.rf}\OperatorTok{$}\NormalTok{predicted)}
+  \KeywordTok{colnames}\NormalTok{(var.rf.pred) <-}\StringTok{ }\KeywordTok{paste}\NormalTok{(}\StringTok{"PredWoVar"}\NormalTok{, }\KeywordTok{as.character}\NormalTok{(i), }\DataTypeTok{sep =} \StringTok{""}\NormalTok{)}
+\NormalTok{  var.rf.pred}
+\NormalTok{\}}
+
+\NormalTok{res_each_pred_rf <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data.list, ntree1, }\DataTypeTok{replace =} \OtherTok{TRUE}\NormalTok{)\{}
+\NormalTok{  p <-}\StringTok{ }\KeywordTok{length}\NormalTok{(data.list)}\OperatorTok{-}\DecValTok{1}
+\NormalTok{  rf.list <-}\StringTok{ }\KeywordTok{map}\NormalTok{(}\DataTypeTok{.x =}\NormalTok{ data.list, }\ControlFlowTok{function}\NormalTok{(x) }
+    \KeywordTok{randomForest}\NormalTok{(Y}\OperatorTok{~}\NormalTok{., }\DataTypeTok{data =}\NormalTok{ x, }\DataTypeTok{ntree =}\NormalTok{ ntree1, }\DataTypeTok{replace =}\NormalTok{ replace, }\DataTypeTok{importance =} \OtherTok{TRUE}\NormalTok{))}
+\NormalTok{  rf.df <-}\StringTok{ }\KeywordTok{map_dfc}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\NormalTok{(p}\OperatorTok{+}\DecValTok{1}\NormalTok{), extract_rf_pred, }\DataTypeTok{data.list =}\NormalTok{ rf.list, }\DataTypeTok{p =}\NormalTok{ p)}
+\NormalTok{  Y <-}\StringTok{ }\NormalTok{data.list[[}\DecValTok{1}\NormalTok{]]}\OperatorTok{$}\NormalTok{Y}
+\NormalTok{  new.df <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(rf.df, Y)}
+\NormalTok{  imp <-}\StringTok{ }\KeywordTok{importance}\NormalTok{(rf.list[[p}\OperatorTok{+}\DecValTok{1}\NormalTok{]])}
+\NormalTok{  pred.df <-}\StringTok{ }\KeywordTok{select}\NormalTok{(data.list[[(p}\OperatorTok{+}\DecValTok{1}\NormalTok{)]], }\OperatorTok{-}\NormalTok{Y)}
+\NormalTok{  rf.df.}\DecValTok{2}\NormalTok{ <-}\StringTok{ }\KeywordTok{map_dfc}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\NormalTok{p, res_rf_pred, }\DataTypeTok{df =}\NormalTok{ pred.df, }\DataTypeTok{ntree1 =}\NormalTok{ ntree1, }\DataTypeTok{replace =}\NormalTok{ replace)}
+\NormalTok{  x.rf.df <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(rf.df.}\DecValTok{2}\NormalTok{, pred.df)}
+  \KeywordTok{list}\NormalTok{(new.df, x.rf.df, imp) }
+\NormalTok{\}}
+
+\CommentTok{#extract_add_var takes as input an index value and data frame and }
+\CommentTok{#outputs a dataframe of the basic added variable data frame where }
+\CommentTok{#x.res is the difference between predicted values of full model and }
+\CommentTok{#predicted values of model with out jth variable}
+\CommentTok{#y.res is the residual of Y and predicted values of model without jth variable.}
+\CommentTok{#For use with map in rf_add_var}
+\NormalTok{extract_add_var <-}\ControlFlowTok{function}\NormalTok{(i, df)\{}
+\NormalTok{  PredFullMod <-}\StringTok{ }\KeywordTok{as.name}\NormalTok{(}\StringTok{"PredFullMod"}\NormalTok{)}
+\NormalTok{  Y <-}\StringTok{ }\KeywordTok{as.name}\NormalTok{(}\StringTok{"Y"}\NormalTok{)}
+\NormalTok{  V <-}\StringTok{ }\KeywordTok{as.name}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"PredWoVar"}\NormalTok{, }\KeywordTok{as.character}\NormalTok{(i), }\DataTypeTok{sep =}\StringTok{""}\NormalTok{))}
+\NormalTok{  x.res <-}\StringTok{ }\NormalTok{df[[PredFullMod]]}\OperatorTok{-}\NormalTok{df[[V]]}
+\NormalTok{  y.res <-}\StringTok{ }\NormalTok{df[[Y]]}\OperatorTok{-}\NormalTok{df[[V]]}
+\NormalTok{  new.df <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(x.res, y.res)}
+  \KeywordTok{colnames}\NormalTok{(new.df) <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"added.Var"}\NormalTok{, }\KeywordTok{as.character}\NormalTok{(i), }\DataTypeTok{sep =} \StringTok{""}\NormalTok{), }\StringTok{"y.res"}\NormalTok{)}
+\NormalTok{  new.df}
+\NormalTok{\}}
+
+\CommentTok{#rf_add_var takes as input the output of each_pred_rf and outputs a list of length p }
+\CommentTok{#in which each entry is a data frame corresponding}
+\CommentTok{#to an added variable plot for the jth predictor in the }
+\CommentTok{#data set.}
+\NormalTok{rf_add_var <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data.list)\{}
+\NormalTok{  rf.df <-}\StringTok{ }\NormalTok{data.list[[}\DecValTok{1}\NormalTok{]]}
+\NormalTok{  p <-}\StringTok{ }\KeywordTok{length}\NormalTok{(rf.df)}\OperatorTok{-}\DecValTok{2}
+\NormalTok{  add.var.list <-}\StringTok{ }\KeywordTok{map}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\NormalTok{p, extract_add_var, }\DataTypeTok{df =}\NormalTok{ rf.df)}
+\NormalTok{  add.var.list}
+\NormalTok{\}}
+
+\CommentTok{#res_extract_add_var is like extract_add_var, but is for when }
+\CommentTok{#plotting actual x-residuals}
+\CommentTok{#df1 is data frame with y-pred and df2 is dataframe with x-pred}
+\NormalTok{res_extract_add_var <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(i, df1, df2)\{}
+\NormalTok{  Y <-}\StringTok{ }\KeywordTok{as.name}\NormalTok{(}\StringTok{"Y"}\NormalTok{)}
+\NormalTok{  V <-}\StringTok{ }\KeywordTok{as.name}\NormalTok{(}\KeywordTok{paste0}\NormalTok{(}\StringTok{"V"}\NormalTok{, }\KeywordTok{as.character}\NormalTok{(i)))}
+\NormalTok{  M <-}\StringTok{ }\KeywordTok{as.name}\NormalTok{(}\KeywordTok{paste0}\NormalTok{(}\StringTok{"PredWoVar"}\NormalTok{, }\KeywordTok{as.character}\NormalTok{(i)))}
+\NormalTok{  x.res <-}\StringTok{ }\NormalTok{df2[[V]]}\OperatorTok{-}\NormalTok{df2[[M]]}
+\NormalTok{  y.res <-}\StringTok{ }\NormalTok{df1[[Y]]}\OperatorTok{-}\NormalTok{df1[[M]]}
+\NormalTok{  new.df <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(x.res, y.res)}
+  \KeywordTok{colnames}\NormalTok{(new.df) <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\KeywordTok{paste0}\NormalTok{(}\StringTok{"added.Var"}\NormalTok{, }\KeywordTok{as.character}\NormalTok{(i)), }\StringTok{"y.res"}\NormalTok{)}
+\NormalTok{  new.df}
+\NormalTok{\}}
+
+\CommentTok{#res_rf_add_var is rf_add_var for when plotting actual x-residuals in added variable plots}
+\NormalTok{res_rf_add_var <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data.list)\{}
+\NormalTok{ df1 <-}\StringTok{ }\NormalTok{data.list[[}\DecValTok{1}\NormalTok{]]}
+\NormalTok{ df2 <-}\StringTok{ }\NormalTok{data.list[[}\DecValTok{2}\NormalTok{]]}
+\NormalTok{ p <-}\StringTok{ }\KeywordTok{length}\NormalTok{(df1)}\OperatorTok{-}\DecValTok{2}
+\NormalTok{ add.var.list <-}\StringTok{ }\KeywordTok{map}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\NormalTok{p, res_extract_add_var, }\DataTypeTok{df1 =}\NormalTok{ df1, }\DataTypeTok{df2 =}\NormalTok{ df2)}
+\NormalTok{ add.var.list}
+\NormalTok{\}}
+
+\CommentTok{#rf_add_var_imp takes as input a list of add_var df's from rf_add_var and runs}
+\CommentTok{#a random forest on the y-residuals with x-residuals as input.}
+\CommentTok{#output is a list of random forest objects. \textbackslash{}}
+\CommentTok{#Might change output to be just variable importance values. }
+\NormalTok{rf_add_var_imp <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data.list, ntree2, }\DataTypeTok{replace =} \OtherTok{TRUE}\NormalTok{)\{}
+\NormalTok{  p <-}\StringTok{ }\KeywordTok{length}\NormalTok{(data.list)}
+\NormalTok{  rf.add.imp.list <-}\StringTok{ }\KeywordTok{map}\NormalTok{(}\DataTypeTok{.x =}\NormalTok{ data.list, }\ControlFlowTok{function}\NormalTok{(x) }
+    \KeywordTok{randomForest}\NormalTok{(y.res}\OperatorTok{~}\NormalTok{., }\DataTypeTok{data =}\NormalTok{ x, }\DataTypeTok{ntree =}\NormalTok{ ntree2, }\DataTypeTok{replace =}\NormalTok{ replace, }\DataTypeTok{importance =} \OtherTok{TRUE}\NormalTok{))}
+\NormalTok{  rf.add.imp.list}
+\NormalTok{\}}
+
+\NormalTok{extract_imp <-}\ControlFlowTok{function}\NormalTok{(i, data.list)\{}
+\NormalTok{  new.df <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{t}\NormalTok{(}\KeywordTok{importance}\NormalTok{(data.list[[i]])))}
+\NormalTok{  new.df}
+\NormalTok{\}}
+
+\NormalTok{extract_var_imp <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data.list)\{}
+\NormalTok{  p <-}\StringTok{ }\KeywordTok{length}\NormalTok{(data.list)}
+\NormalTok{  new.df <-}\StringTok{ }\KeywordTok{map_dfc}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\NormalTok{p, extract_imp, }\DataTypeTok{data.list =}\NormalTok{ data.list)}
+  \KeywordTok{rownames}\NormalTok{(new.df) <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"%IncMSE"}\NormalTok{, }\StringTok{"IncNodePurity"}\NormalTok{)}
+  \KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{t}\NormalTok{(new.df))}
+\NormalTok{\}}
+
+
+\CommentTok{#Once rf has been run once on each added variable plot, we can try to assess}
+\CommentTok{#importance via framework of p-values. In particular, we implement a }
+\CommentTok{#permutation test to obtain distribution of variable importance scores }
+\CommentTok{#rf_perm takes as input a list of added variable dataframes }
+\CommentTok{#(in particular output of rf_add_var}
+\CommentTok{#and outputs a list of dataframes consisting of variable importance scores }
+\CommentTok{#obtained after permuting each added variable dataframe. }
+\CommentTok{#number of permutations is it input for rf_perm}
+
+\CommentTok{#perm_rf takes as input a dataframe, permutes the dataframe}
+\CommentTok{#runs a randomforest and returns the variable importance score}
+\CommentTok{#variable importance score is MDA (mean decrease in accuracy) as a percentage change}
+\NormalTok{perm_rf <-}\ControlFlowTok{function}\NormalTok{(df, ntree3, replace)\{}
+\NormalTok{  df.names <-}\StringTok{ }\KeywordTok{colnames}\NormalTok{(df)}
+\NormalTok{  df.mat <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(df)}
+\NormalTok{  x <-}\StringTok{ }\NormalTok{df.mat[}\KeywordTok{sample}\NormalTok{(}\KeywordTok{nrow}\NormalTok{(df.mat),}\DataTypeTok{replace =} \OtherTok{FALSE}\NormalTok{),}\DecValTok{1}\NormalTok{]}
+\NormalTok{  y <-}\StringTok{ }\NormalTok{df.mat[,}\DecValTok{2}\NormalTok{]}
+\NormalTok{  perm.df <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(x,y))}
+  \KeywordTok{colnames}\NormalTok{(perm.df) <-}\StringTok{ }\NormalTok{df.names}
+\NormalTok{  perm.rf <-}\StringTok{ }\KeywordTok{randomForest}\NormalTok{(y.res}\OperatorTok{~}\NormalTok{., }\DataTypeTok{data =}\NormalTok{ perm.df, }\DataTypeTok{replace =}\NormalTok{ replace, }\DataTypeTok{importance =} \OtherTok{TRUE}\NormalTok{)}
+  \KeywordTok{importance}\NormalTok{(perm.rf, }\DataTypeTok{type =} \DecValTok{1}\NormalTok{)}
+\NormalTok{\}}
+
+\CommentTok{#perm_add_var takes as input an index value, the data.list, it the number of permutations, }
+\CommentTok{#ntree3 the number of trees to grow for each forest on the permuted data}
+\NormalTok{perm_add_var <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(i, data.list, it, ntree3, replace)\{}
+\NormalTok{  df <-}\StringTok{ }\NormalTok{data.list[[i]]}
+\NormalTok{  new.df <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{replicate}\NormalTok{(}\DataTypeTok{n =}\NormalTok{ it, }\DataTypeTok{expr =} \KeywordTok{perm_rf}\NormalTok{(}\DataTypeTok{df =}\NormalTok{ df, }
+                                                           \DataTypeTok{ntree3 =}\NormalTok{ ntree3, }\DataTypeTok{replace =}\NormalTok{ replace)))}
+  \KeywordTok{colnames}\NormalTok{(new.df) <-}\StringTok{ }\KeywordTok{paste}\NormalTok{(}\StringTok{"Var"}\NormalTok{, }\KeywordTok{as.character}\NormalTok{(i), }\StringTok{"VI"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{)}
+\NormalTok{  new.df}
+\NormalTok{\}}
+
+\NormalTok{rf_perm_add_var <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data.list, it, ntree3, }\DataTypeTok{replace =} \OtherTok{TRUE}\NormalTok{)\{}
+\NormalTok{  p <-}\StringTok{ }\KeywordTok{length}\NormalTok{(data.list)}
+\NormalTok{  new.list <-}\StringTok{ }\KeywordTok{map}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\NormalTok{p, perm_add_var, }\DataTypeTok{data.list =}\NormalTok{ data.list, }
+      \DataTypeTok{it =}\NormalTok{ it, }\DataTypeTok{ntree3 =}\NormalTok{ ntree3, }\DataTypeTok{replace =}\NormalTok{ replace)}
+\NormalTok{  new.list}
+\NormalTok{\}}
+
+\CommentTok{#add_var_randomforest is a wrapper for the previous functions (exluding rf_perm_add_var)}
+\NormalTok{add_var_randomforest <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, ntree1, ntree2, }\DataTypeTok{replace =} \OtherTok{TRUE}\NormalTok{)\{}
+  \CommentTok{#to get the copy of the data with one predictor removed}
+\NormalTok{  df.list <-}\StringTok{ }\KeywordTok{df_combs}\NormalTok{(data)}
+  \CommentTok{#running initial randomFoest on each data frame}
+\NormalTok{  rf.list <-}\StringTok{ }\KeywordTok{each_pred_rf}\NormalTok{(df.list, }\DataTypeTok{ntree1 =}\NormalTok{ ntree1, }\DataTypeTok{replace =}\NormalTok{ replace)}
+  \CommentTok{#tidying the data to compute added variable plots}
+\NormalTok{  rf.add.var.list <-}\StringTok{ }\KeywordTok{rf_add_var}\NormalTok{(rf.list)}
+  \CommentTok{#running randomForests on each plot}
+\NormalTok{  rf.add.imp.list <-}\StringTok{ }\KeywordTok{rf_add_var_imp}\NormalTok{(rf.add.var.list, }\DataTypeTok{ntree2 =}\NormalTok{ ntree2, }\DataTypeTok{replace =}\NormalTok{ replace)}
+  \CommentTok{#extracts variable importance values for each randomForest ran on added variable plots}
+\NormalTok{  add.var.imp <-}\StringTok{ }\KeywordTok{extract_var_imp}\NormalTok{(rf.add.imp.list)}
+  \CommentTok{#output is list containing data frame of added variable plot variable importances, }
+  \CommentTok{#rf.add.var.list which are dataframe for added variable plots, and }
+  \CommentTok{#the variable importances from full model run in each_pred_rf}
+  \KeywordTok{list}\NormalTok{(add.var.imp, rf.add.var.list, rf.list[[}\DecValTok{2}\NormalTok{]])}
+\NormalTok{\}}
+
+\CommentTok{#model_add_var_randomforest is identical to add_var_randomforest, but is for use in }
+\CommentTok{#randomforest_avp}
+\NormalTok{model_add_var_randomforest <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, ntree1, ntree2, }\DataTypeTok{replace =} \OtherTok{TRUE}\NormalTok{)\{}
+  \CommentTok{#to get the copy of the data with one predictor removed}
+\NormalTok{  df.list <-}\StringTok{ }\KeywordTok{df_combs}\NormalTok{(data)}
+  \CommentTok{#running initial randomForest on each data frame}
+\NormalTok{  rf.list <-}\StringTok{ }\KeywordTok{each_pred_rf}\NormalTok{(df.list, }\DataTypeTok{ntree1 =}\NormalTok{ ntree1, }\DataTypeTok{replace =}\NormalTok{ replace)}
+  \CommentTok{#tidying the data to compute added variable plots}
+\NormalTok{  rf.add.var.list <-}\StringTok{ }\KeywordTok{rf_add_var}\NormalTok{(rf.list)}
+  \CommentTok{#running randomForests on each plot}
+\NormalTok{  rf.add.imp.list <-}\StringTok{ }\KeywordTok{rf_add_var_imp}\NormalTok{(rf.add.var.list, }\DataTypeTok{ntree2 =}\NormalTok{ ntree2, }\DataTypeTok{replace =}\NormalTok{ replace)}
+  \CommentTok{#extracts variable importance values for each randomForest ran on added variable plots}
+\NormalTok{  add.var.imp <-}\StringTok{ }\KeywordTok{extract_var_imp}\NormalTok{(rf.add.imp.list)}
+  \CommentTok{#output is list containing data frame of added variable plot variable importances, }
+  \CommentTok{#rf.add.var.list which are dataframe for added variable plots, and }
+  \CommentTok{#the variable importances from full model run in each_pred_rf}
+  \KeywordTok{list}\NormalTok{(add.var.imp, rf.add.var.list, rf.list[[}\DecValTok{2}\NormalTok{]])}
+\NormalTok{\}}
+
+\CommentTok{#residual_add_var_randomforest is add_var_randomforest ran on actual x-residuals}
+\NormalTok{residual_add_var_randomforest <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, ntree1, ntree2, }\DataTypeTok{replace =} \OtherTok{TRUE}\NormalTok{)\{}
+  \CommentTok{#to get the copy of the data with one predictor removed with last entry the data set without the predictor}
+\NormalTok{  df.list <-}\StringTok{ }\KeywordTok{df_combs}\NormalTok{(data)}
+  \CommentTok{#to get randomforests on each dataframe and on each predictor}
+\NormalTok{  rf.list <-}\StringTok{ }\KeywordTok{res_each_pred_rf}\NormalTok{(df.list, }\DataTypeTok{ntree1 =}\NormalTok{ ntree1, }\DataTypeTok{replace =}\NormalTok{ replace)}
+  \CommentTok{#tidying up data for added variable plots}
+\NormalTok{  rf.add.var.list <-}\StringTok{ }\KeywordTok{res_rf_add_var}\NormalTok{(rf.list)}
+  \CommentTok{#running randomForests on each plot}
+\NormalTok{  rf.add.imp.list <-}\StringTok{ }\KeywordTok{rf_add_var_imp}\NormalTok{(rf.add.var.list, }\DataTypeTok{ntree2 =}\NormalTok{ ntree2, }\DataTypeTok{replace =}\NormalTok{ replace)}
+  \CommentTok{#extracts variable importance values for each randomForest ran on added variable plots}
+\NormalTok{  add.var.imp <-}\StringTok{ }\KeywordTok{extract_var_imp}\NormalTok{(rf.add.imp.list)}
+  \CommentTok{#output is list containing data frame of added variable plot variable importances, }
+  \CommentTok{#rf.add.var.list which are dataframe for added variable plots, and }
+  \CommentTok{#the variable importances from full model run in each_pred_rf}
+  \KeywordTok{list}\NormalTok{(add.var.imp, rf.add.var.list, rf.list[[}\DecValTok{3}\NormalTok{]])}
+\NormalTok{\}}
+
+\CommentTok{#randomforest_avp is a wrapper for model_add_var_randomforest and }
+\CommentTok{#residual_add_var_randomforest, x.res = FALSE indicates using model_add_var_randomforest}
+\NormalTok{randomforest_avp <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, ntree1, ntree2, }\DataTypeTok{replace =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{x.res =} \OtherTok{FALSE}\NormalTok{)\{}
+  \ControlFlowTok{if}\NormalTok{(x.res }\OperatorTok{==}\StringTok{ }\OtherTok{FALSE}\NormalTok{) }\KeywordTok{model_add_var_randomforest}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ data, }\DataTypeTok{ntree1 =}\NormalTok{ ntree1, }
+                                                    \DataTypeTok{ntree2 =}\NormalTok{ ntree2, }\DataTypeTok{replace =}\NormalTok{ replace)}
+  \ControlFlowTok{else} \KeywordTok{residual_add_var_randomforest}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ data, }\DataTypeTok{ntree1 =}\NormalTok{ ntree1, }\DataTypeTok{ntree2 =}\NormalTok{ ntree2, }\DataTypeTok{replace =}\NormalTok{ replace)}
+\NormalTok{\}}
+
+\CommentTok{#perm_add_var_randomforest is a wrapper for previous functions (including rf_perm_add_var)}
+\NormalTok{perm_add_var_randomforest <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, it, ntree1, ntree2, ntree3, }\DataTypeTok{replace =} \OtherTok{TRUE}\NormalTok{)\{}
+\NormalTok{  df.list <-}\StringTok{ }\KeywordTok{df_combs}\NormalTok{(data)}
+  \CommentTok{#running initial randomFoest on each data frame}
+\NormalTok{  rf.list <-}\StringTok{ }\KeywordTok{each_pred_rf}\NormalTok{(df.list, }\DataTypeTok{ntree1 =}\NormalTok{ ntree1, }\DataTypeTok{replace =}\NormalTok{ replace)}
+  \CommentTok{#tidying the data to compute added variable plots}
+\NormalTok{  rf.add.var.list <-}\StringTok{ }\KeywordTok{rf_add_var}\NormalTok{(rf.list)}
+  \CommentTok{#running randomForests on each plot}
+\NormalTok{  rf.add.imp.list <-}\StringTok{ }\KeywordTok{rf_add_var_imp}\NormalTok{(rf.add.var.list, }
+                                    \DataTypeTok{ntree2 =}\NormalTok{ ntree2, }\DataTypeTok{replace =}\NormalTok{ replace)}
+  \CommentTok{#extracts variable importance values for each randomForest ran on added variable plots}
+\NormalTok{  add.var.imp <-}\StringTok{ }\KeywordTok{extract_var_imp}\NormalTok{(rf.add.imp.list)}
+  \CommentTok{#run permutations on each dataframe in rf.add.var.list to obtain }
+  \CommentTok{#distribution of importance values}
+\NormalTok{  rf.perm.add.var.list <-}\StringTok{ }\KeywordTok{rf_perm_add_var}\NormalTok{(}\DataTypeTok{data.list =}\NormalTok{ rf.add.var.list, }
+                                          \DataTypeTok{it =}\NormalTok{ it, }\DataTypeTok{ntree3 =}\NormalTok{ ntree3, }\DataTypeTok{replace =}\NormalTok{ replace)}
+  \KeywordTok{list}\NormalTok{(add.var.imp, rf.add.var.list, rf.list[[}\DecValTok{2}\NormalTok{]], rf.perm.add.var.list)}
+\NormalTok{\}}
+
+\CommentTok{#input for rf_added_var_plot is output of }
+\CommentTok{#add_var_randomforest. Output is plot of added variable plots for }
+\CommentTok{#the random forest arranged in a grid.}
+
+\NormalTok{plot_add_var <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(i, df.list)\{}
+\NormalTok{  df <-}\StringTok{ }\NormalTok{df.list[[i]]}
+\NormalTok{  x.name <-}\StringTok{ }\KeywordTok{colnames}\NormalTok{(df)[}\DecValTok{1}\NormalTok{]}
+\NormalTok{  y.name <-}\StringTok{ }\KeywordTok{colnames}\NormalTok{(df)[}\DecValTok{2}\NormalTok{]}
+\NormalTok{  plot.obj <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(df, }\KeywordTok{aes_string}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ x.name, }\DataTypeTok{y =}\NormalTok{ y.name))}\OperatorTok{+}\KeywordTok{geom_point}\NormalTok{()}
+\NormalTok{  plot.obj}
+\NormalTok{\}}
+
+\NormalTok{rf_added_var_plot <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data.list)\{}
+\NormalTok{    df.list <-}\StringTok{ }\NormalTok{data.list[[}\DecValTok{2}\NormalTok{]]}
+\NormalTok{    p <-}\StringTok{ }\KeywordTok{length}\NormalTok{(df.list)}
+\NormalTok{    gg.list <-}\StringTok{ }\KeywordTok{map}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\NormalTok{p, plot_add_var, }\DataTypeTok{df.list =}\NormalTok{ df.list)}
+\NormalTok{    nCol <-}\StringTok{ }\KeywordTok{floor}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(p))}
+    \KeywordTok{do.call}\NormalTok{(}\StringTok{"grid.arrange"}\NormalTok{, }\KeywordTok{c}\NormalTok{(gg.list, }\DataTypeTok{ncol =}\NormalTok{ nCol))}
+\NormalTok{\}}
+
+\CommentTok{#next make functions which plot distributions of the added variable importances and }
+\CommentTok{#adds in observed variable importance of added variable}
+
+\NormalTok{plot_var_imp <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(i, df.list, add.var.imp)\{}
+\NormalTok{  df <-}\StringTok{ }\NormalTok{df.list[[i]]}
+\NormalTok{  x.name <-}\StringTok{ }\KeywordTok{colnames}\NormalTok{(df)}
+\NormalTok{  obs.add.var <-}\StringTok{ }\NormalTok{add.var.imp[i,}\DecValTok{1}\NormalTok{]}
+\NormalTok{  plot.obj <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(df, }\KeywordTok{aes_string}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ x.name))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{bins =} \DecValTok{50}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_vline}\NormalTok{(}\DataTypeTok{xintercept =}\NormalTok{ obs.add.var, }\DataTypeTok{col =} \StringTok{"Red"}\NormalTok{, }\DataTypeTok{size =} \DecValTok{1}\NormalTok{)}
+\NormalTok{  plot.obj}
+\NormalTok{\}}
+
+\NormalTok{rf_plot_var_imp <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data.list)\{}
+\NormalTok{ df.list  <-data.list[[}\DecValTok{4}\NormalTok{]]}
+\NormalTok{ add.var.imp <-}\StringTok{ }\NormalTok{data.list[[}\DecValTok{1}\NormalTok{]]}
+\NormalTok{ p <-}\StringTok{ }\KeywordTok{length}\NormalTok{(df.list)}
+\NormalTok{ gg.list <-}\StringTok{ }\KeywordTok{map}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\NormalTok{p, plot_var_imp, }\DataTypeTok{df.list =}\NormalTok{ df.list, }\DataTypeTok{add.var.imp =}\NormalTok{ add.var.imp)}
+\NormalTok{ nCol <-}\StringTok{ }\KeywordTok{floor}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(p))}
+ \KeywordTok{do.call}\NormalTok{(}\StringTok{"grid.arrange"}\NormalTok{, }\KeywordTok{c}\NormalTok{(gg.list, }\DataTypeTok{ncol =}\NormalTok{ nCol))}
+\NormalTok{\}}
+
+\CommentTok{#Next define a function which takes the output of perm_add_var_randomforest}
+\CommentTok{#and computes p-values of variable importances.}
+
+\NormalTok{perm_pval <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(i, var.imp.df, var.imp.list)\{}
+\NormalTok{  obs.var.imp <-}\StringTok{ }\NormalTok{var.imp.df[i,}\DecValTok{1}\NormalTok{]}
+\NormalTok{  perm.var.imp <-}\StringTok{ }\NormalTok{var.imp.list[[i]]}
+\NormalTok{  n.perm <-}\StringTok{ }\KeywordTok{nrow}\NormalTok{(perm.var.imp)}
+\NormalTok{  right.tail <-}\StringTok{ }\NormalTok{(}\KeywordTok{sum}\NormalTok{(obs.var.imp }\OperatorTok{<=}\StringTok{ }\NormalTok{perm.var.imp)}\OperatorTok{+}\DecValTok{1}\NormalTok{)}\OperatorTok{/}\NormalTok{(n.perm}\OperatorTok{+}\DecValTok{1}\NormalTok{)}
+\NormalTok{  left.tail <-}\StringTok{ }\NormalTok{(}\KeywordTok{sum}\NormalTok{(perm.var.imp }\OperatorTok{<=}\StringTok{ }\NormalTok{obs.var.imp)}\OperatorTok{+}\DecValTok{1}\NormalTok{)}\OperatorTok{/}\NormalTok{(n.perm}\OperatorTok{+}\DecValTok{1}\NormalTok{)}
+\NormalTok{  p.val <-}\StringTok{ }\KeywordTok{ifelse}\NormalTok{(right.tail}\OperatorTok{<=}\NormalTok{left.tail, }\DecValTok{2}\OperatorTok{*}\NormalTok{right.tail, }\DecValTok{2}\OperatorTok{*}\NormalTok{left.tail)}
+\NormalTok{  p.val <-}\StringTok{ }\KeywordTok{ifelse}\NormalTok{(}\DecValTok{1}\OperatorTok{<}\NormalTok{p.val, }\DecValTok{1}\NormalTok{, p.val)}
+  \KeywordTok{names}\NormalTok{(p.val) <-}\StringTok{ }\KeywordTok{paste}\NormalTok{(}\StringTok{"p.val.Var."}\NormalTok{, }\KeywordTok{as.character}\NormalTok{(i), }\DataTypeTok{sep =} \StringTok{""}\NormalTok{)}
+\NormalTok{  p.val}
+\NormalTok{\}}
+
+\NormalTok{add_var_pval <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data.list)\{}
+\NormalTok{  var.imp.df <-}\StringTok{ }\NormalTok{data.list[[}\DecValTok{1}\NormalTok{]]}
+\NormalTok{  var.imp.list <-}\StringTok{ }\NormalTok{data.list[[}\DecValTok{4}\NormalTok{]]}
+\NormalTok{  p <-}\StringTok{ }\KeywordTok{nrow}\NormalTok{(var.imp.df)}
+\NormalTok{  pval.df <-}\StringTok{ }\KeywordTok{sapply}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\NormalTok{p, perm_pval, }\DataTypeTok{var.imp.df =}\NormalTok{ var.imp.df, }\DataTypeTok{var.imp.list =}\NormalTok{ var.imp.list)}
+  \KeywordTok{as.data.frame}\NormalTok{(pval.df)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
 \backmatter
 
 \chapter*{References}\label{references}

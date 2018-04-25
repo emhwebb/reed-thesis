@@ -2,14 +2,6 @@
 
 ## Acknowledgements {-}
 
-I want to thank a few people.
-
-## Preface {-}
-
-
-
-## Dedication {-}
-
-You can have a dedication here if you wish. 
+This thesis would not have been possible to write without the support and encouragement of friends and family. 
 
 `r if(!knitr:::is_latex_output()) '## Abstract {-}'`

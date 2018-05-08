@@ -280,10 +280,10 @@ Friedman, Olshen, \& Stone (1984) and are a flexible method, capable of
 handling classification and regression settings. \par
 
 More formally, suppose we have a training data set
-\(Z=\{Z_1,\ldots,Z_n\}\), where \(Z_i=(X_i,Y_i)\) is an \(p+1\)
+\(Z=\{Z_1,\ldots,Z_n\}\), where \(Z_i=(X_i,Y_i)\) is a \(p+1\)
 dimensional vector in \(\mathbb{R}^{p+1}\). Here we have \(X_i\) is a
 \(p\)-dimensional predictor variable and \(Y_i\) is the response. In
-particular, we can consider \(Z\) to be a \(n\times (p+1)\) array where
+particular, we can consider \(Z\) to be an \(n\times (p+1)\) array where
 the rows are observations and the columns are the response and predictor
 variables. CART works by partitioning the data through binary recursive
 splits via optimizing some loss function. Trees in CART are called trees
@@ -307,24 +307,24 @@ we need to consider:
         
         \item How to assign classes or values to terminal nodes. 
     \end{enumerate}
-CART address point 1 decreasing the nodal impurity of a node \(t\).
-Nodal impurity is defined through some nodal impurity measure
-\(i(s,t)\), usually the GINI index in the classification setting and the
-residual sum of squares in the regression setting. We present the
-regression setting and then the classification setting. If we have a
-continuous response \(Y\), then we could try to predict \(Y\) by
-partitioning the data using the decision tree structure and predicting
-that points that fall within a particular partition will take on the
-average response on that partition. To choose the best binary split on
-the data, we need to search across the splitting variables and splitting
-points for the split which maximizes the reduction in the RSS between
-the parent node and daughter nodes. In particular, we want to find the
-split which maximizes \(RSS_l(j,s)+RSS_r(j,s)\) where \(j\) is the
-proposed splitting variable and \(s\) is the proposed splitting point,
-and \(RSS_l\) is the RSS of the proposed left node and \(RSS_r\) is the
-RSS of the proposed right node. The assignment of response within a node
-is given by the average of the response. We present the following
-algorithm. \par
+The CART algorithm addresses point 1 by decreasing the \emph{nodal
+impurity} of a node \(t\). Nodal impurity is defined through some nodal
+impurity measure \(i(s,t)\), usually the GINI index in the
+classification setting and the residual sum of squares in the regression
+setting. We present the regression setting and then the classification
+setting. If we have a continuous response \(Y\), then we could try to
+predict \(Y\) by partitioning the data using the decision tree structure
+and predicting that points that fall within a particular partition will
+take on the average response on that partition. To choose the best
+binary split on the data, we need to search across the splitting
+variables and splitting points for the split which maximizes the
+reduction in the RSS between the parent node and daughter nodes. In
+particular, we want to find the split which maximizes
+\(RSS_l(j,s)+RSS_r(j,s)\) where \(j\) is the proposed splitting variable
+and \(s\) is the proposed splitting point, and \(RSS_l\) is the RSS of
+the proposed left node and \(RSS_r\) is the RSS of the proposed right
+node. The assignment of response within a node is given by the average
+of the response. We present the following algorithm. \par
 \begin{algorithm}
         \caption{Construction of Regression tree}\label{regression tree}
         \begin{algorithmic}[1]
@@ -361,15 +361,15 @@ simulated data set. For this data set, we ran CART to produce figure
 tree}
 \end{figure}
 We would like to note that the tree structure produced by CART is quite
-easy to interpret. Given some point \(x=(x_1,x_2,x_3)\) in our feature
-space, to determine what the prediction for \(x\) should be, we simply
-follow the left-right paths down to a terminal node of the tree. We also
-note that this regression tree generally reflects the structure of our
-data set in the sense that important splits near the base of the tree
-tend to be made on \(X_1\), while splits further down in the tree tend
-to be on \(X_2\). Furthermore, no splits are made on \(X_3\). In this
-scenario, we can visually inspect the tree to determine which predictors
-are informative towards predicting the response \(Y\).
+easy to interpret. Given some point \(x=(x_1,x_2,x_3)\), to determine
+what the prediction for \(x\) should be, we simply follow the left-right
+paths down to a terminal node of the tree. We also note that this
+regression tree generally reflects the structure of our data set in the
+sense that important splits near the base of the tree tend to be made on
+\(X_1\), while splits further down in the tree tend to be on \(X_2\).
+Furthermore, no splits are made on \(X_3\). In this scenario, we can
+visually inspect the tree to determine which predictors are informative
+towards predicting the response \(Y\).
 
 \subsection{Classification Trees and Issues with
 CART}\label{classification-trees-and-issues-with-cart}
@@ -385,13 +385,14 @@ setting. The most common measure is perhaps the Gini index defined by
 \[2p(1-p).\] Other options include misclassification error
 \[1-\max(p,1-p),\] and cross-entropy \[-p\log(p)-(1-p)\log(1-p).\] If
 \(t_L\) and \(t_R\) are left and right nodes proposed under the split,
-let \(\hat{p}_{tL}\) and \(\hat{p}_{tR}\) be proportion of observations
-falling into \(t_L\) and \(t_R\), respectively. Denote the Gini index of
-the left node \(t_L\) by \(G_{L}\) and denote the Gini index of the
-right node \(t_R\) by \(G_{R}\). Then our splitting criterion is to seek
-the splitting variable and splitting point which minimizes
-\[\hat{p}_{tL}G_L+\hat{p}_{tR}G_R.\] The case is similar when using
-misclassification rate and cross-entropy as the impurity measures. \par
+let \(\hat{p}_{tL}\) and \(\hat{p}_{tR}\) be the proportion of
+observations falling into \(t_L\) and \(t_R\), respectively. Denote the
+Gini index of the left node \(t_L\) by \(G_{L}\) and denote the Gini
+index of the right node \(t_R\) by \(G_{R}\). Then our splitting
+criterion is to seek the splitting variable and splitting point which
+minimizes \[\hat{p}_{tL}G_L+\hat{p}_{tR}G_R.\] The case is similar when
+using misclassification rate and cross-entropy as the impurity measures.
+\par
 
 Some issues with CART trees include overfitting and variability. While
 there is a stopping criterion for growing the CART trees, often times
@@ -412,7 +413,7 @@ forest algorithm. \par
 \section{Random Forests}\label{random-forests}
 
 Among the limitations of CART discussed in the preceding sections, the
-biggest issues ARE perhaps the variability of the method and the issue
+biggest issues are perhaps the variability of the method and the issue
 of collinearity among predictors. While overfitting can be addressed
 using cost-complexity pruning, variability and collinearity are not
 fixed by pruning. Random forests deal with these two issues of CART by
@@ -420,8 +421,8 @@ introducing a resampling and randomization mechanism. The natural order
 is to first discuss bagged forests before turning to random forests.
 \par
 
-One method of improving CART trees is to bag them. Bagging, which stand
-for bootstrap aggregating, is a variation reduction technique
+One method of improving CART trees is to bag them. Bagging, which stands
+for bootstrap aggregating, is a variances reduction technique
 particularly useful for improving the predictive power of weak learners.
 We are interested in bagging CART trees to reduce the variability of
 single trees under slight perturbations of the data. Generally bagged
@@ -431,7 +432,7 @@ running the learner once. \par
         \caption{Bagged Forest algorithm}\label{bagged forest}
         \begin{algorithmic}[1]
             \For {$b=1,\ldots, B$ }
-            \State Draw a bootstrap sample $Z_b^*$ of size $N$ from the training data $Z$.
+            \State Draw a bootstrap sample $Z_b^*$ of size $n$ from the training data $Z$.
             \State Grow a CART tree $T_b$ on each bootstrap sample $Z_b^*$.
             \EndFor
             \State Output the bagged forest ensemble $\{T_b\}_{b=1}^B$.
@@ -449,15 +450,15 @@ fine with overfitting at least a little bit. As the algorithm above for
 bagged forests indicates, the output is an ensemble of trees
 \(\{T_b\}_{b=1}^B\). Given a test data point, we form a prediction by
 taking the average of predictions given by the tree ensemble:
-\[\hat{f}_{bf}^B(x)=\frac{1}{B}\sum_{b=1}^B T_b(x),\] where
+\[\hat{\theta}_{BF}^B(x)=\frac{1}{B}\sum_{b=1}^B T_b(x),\] where
 \(\hat{f}_{bf}^B\) indicates we are taking the bagged forest estimate of
 the underlying regression or classification function using \(B\) many
 trees. Note that it is important to be consistent in the choice of
 splitting criterion throughout the bagging process. \par
 
-While bagging is a general method, that can be applied, for example, to
-methods such as ordinary least squares or general linear models, it has
-been shown by Friedman \& Hall (1999) and Chen \& Hall (2003) that
+While bagging is a general method that can be applied, for example, to
+methods such as ordinary least squares or generalized linear models, it
+has been shown by Friedman \& Hall (1999) and Chen \& Hall (2003) that
 bagging is especially effective when used on highly non-linear models
 such as CART trees. Under ideal conditions, bagged estimates of
 non-linear estimators reduces both the bias and variance of the
@@ -474,19 +475,19 @@ replicate \(Z_b\) is called the out-of-bag (OOB) data and is denoted by
 \(\bar{Z}_b\). The OOB data allows us to approximate the test error of
 the ensemble as follows. For simplicity suppose we are in the regression
 setting (the classification setting is similar). Then the OOB estimate
-of the MSE of the bagged forest is given by
+of the mean squared error (MSE) of the bagged forest is given by
 \[MSE_{\textup{OOB}}(T;Z)=\frac{1}{B}\sum_{b=1}^B MSE(T_b;\bar{Z}_b).\]
 As the number of trees in the ensemble grows, the OOB estimate of the
-MSE for the bagged forest converges to the LOOCV estimate of the MSE for
-forest Hastie et al. (2009). \par
+MSE for the bagged forest converges to the LOOCV estimate of the MSE
+(Hastie et al. (2009)). \par
 
-A weakness of bagged forests is collinearity between trees Hastie et al.
-(2009). This collinearity between trees grown from the bootstrap sample
-can be addressed by adding a randomization mechanism in the tree growing
-process. When we grow a tree from a bootstrap sample, even with the
-randomness induced by resampling from the data, certain features may be
-explored at the expense of other just as interesting features. This is a
-particular issue with collinear predictors. If two predictors are
+A weakness of bagged forests is collinearity between trees (Hastie et
+al. (2009)). This collinearity between trees grown from the bootstrap
+sample can be addressed by adding a randomization mechanism in the tree
+growing process. When we grow a tree from a bootstrap sample, even with
+the randomness induced by resampling from the data, certain features may
+be explored at the expense of other just as interesting features. This
+is a particular issue with collinear predictors. If two predictors are
 collinear, then the bagged forest might consistently choose one
 predictor over another even if the predictor not chosen leads to splits
 that are just as informative. This is due in part to the greedy nature
@@ -526,7 +527,7 @@ of exploring the feature space fully. \par
         \end{algorithmic}
     \end{algorithm}
 To form a prediction at a test point \(x\), we have in the regression
-setting \[\hat{f}_{rf}^B(x)=\frac{1}{B}\sum_{b=1}^B T_b(x).\] \par
+setting \[\hat{\theta}_{RF}^B(x)=\frac{1}{B}\sum_{b=1}^B T_b(x).\] \par
 
 \subsection{Variable Importance
 Measures}\label{variable-importance-measures}
@@ -546,8 +547,8 @@ all trees in the ensemble. Note that \(p(t)\) is the proportion of
 observations of a particular class in the node \(t\) and
 \(\Delta i(s,t)\) is the decrease in impurity over the node \(t\) when
 variable \(X_j\) is chosen. More important variables are those which are
-on average more often chose for splits and which also contribute most to
-reducing the nodal impurity of the trees. \par
+on average more often chosens for splits and which also contribute most
+to reducing the nodal impurity of the trees. \par 
 \begin{algorithm}
         \caption{MDI Variable Importance}\label{mdi variable importance}
         \begin{algorithmic}[1]
@@ -560,10 +561,10 @@ reducing the nodal impurity of the trees. \par
             \EndFor
         \end{algorithmic}
     \end{algorithm}
-The idea of MDA is to measure for each variable \(X_j\), on average how
-much the predictive accuracy of the forest as measured using RSS suffers
-when the \(X_j\) component is permuted across observations within the
-OOB dataset \(\bar{Z}_b\) of each tree \(T_b\) in the ensemble. \par
+The idea of MDA is to measure, for each variable \(X_j\), how much the
+predictive accuracy of the forest as measured using RSS suffers when the
+\(X_j\) component is permuted across observations within the OOB dataset
+\(\bar{Z}_b\) of each tree \(T_b\) in the ensemble. \par 
 \begin{algorithm}
         \caption{MDA Variable Importance}\label{mda variable importance}
         \begin{algorithmic}[1]
@@ -581,8 +582,8 @@ More important variables in the random forests are those for which the
 variable importance is large, as those are the variables for which the
 predictive accuracy of the random forest suffers the most when the out
 of bag data is permuted. Note that as variable importance measures
-currently defined and used, the threshold for importance of a variable
-is something which the researcher has to decide. \par
+currently are defined and used, the threshold for importance of a
+variable is something which the researcher has to decide. \par
 
 \subsection{Example of MDA and MDI variable
 importance}\label{example-of-mda-and-mdi-variable-importance}
@@ -634,28 +635,28 @@ heavily-tailed distribution or if there are particularly extreme values.
 In this case, a different bootstrap scheme could perhaps remedy the
 situation where the naive bootstrap fails. One common resampling scheme
 used within random forests is to use the m-out-of-n bootstrap (also
-referred to subsampling or subagging in the literature). The m-out-of-n
-bootstrap is a resampling scheme which resamples with or without
-replacement \(m\leq n\) observations from the data to form datasets with
-\(m\) many data points to run the bootstrap computation. Of course,
-using less of the available data is less efficient, but in the context
-of random forests this loss of efficiency may not be an issue. In Strobl
-et al. (2008), simulation results showed that subsampling instead of
-using the standard nonparametric bootstrap can improve the performance
-of random forests. The authors suggested that subsampling further
-reduces the variance of the ensemble by producing trees that are even
-more decorrelated. Their heuristic is that there is a lower probability
-of duplicate data points being chosen using subsampling (this
-probability is zero if we are subsampling without replacement),
-furthermore there is a lower probability of highly correlated data
-points being chosen as one of the \(m\leq n\) points. This certainly
-seems plausible, but we would like to see further simulation results or
-a technical result that explains why subsampling works well for forests.
-We would also like to note that consistency results such as from Mentch
-\& Hooker (2016b) and Wager \& Athey (2017) make this subsampling
-assumption in their analysis of the random forest model, as subsampling
-constructions make the forest ensemble more amenable to mathematical
-analysis. \par
+referred to AS subsampling or subagging in the literature). The
+m-out-of-n bootstrap is a resampling scheme which resamples with or
+without replacement \(m\leq n\) observations from the data to form
+datasets with \(m\) many data points to run the bootstrap computation.
+Of course, using less of the available data is less efficient, but in
+the context of random forests this loss of efficiency may not be an
+issue. In Strobl et al. (2008), simulation results showed that
+subsampling instead of using the standard nonparametric bootstrap can
+improve the performance of random forests. The authors suggested that
+subsampling further reduces the variance of the ensemble by producing
+trees that are even more decorrelated. Their heuristic is that there is
+a lower probability of duplicate data points being chosen using
+subsampling (this probability is zero if we are subsampling without
+replacement), furthermore there is a lower probability of highly
+correlated data points being chosen as one of the \(m\leq n\) points.
+This certainly seems plausible, but we would like to see further
+simulation results or a technical result that explains why subsampling
+works well for forests. We would also like to note that consistency
+results such as from Mentch \& Hooker (2016b) and Wager \& Athey (2017)
+make this subsampling assumption in their analysis of the random forest
+model, as subsampling constructions make the forest ensemble more
+amenable to mathematical analysis. \par
 
 \newpage
 
@@ -706,13 +707,12 @@ from the original variable importance measures for random forests, so we
 require some additional vocabulary. \par 
 
 Suppose \(T\) is a binary recursive tree and suppose that \(T\) has
-\(M\) many terminal nodes. For each point \(\mathbf{x}\) in the feature
-space, \(T\) maps \(\mathbf{x}\) to one of the \(M\)-many terminal
-nodes. In particular, if we let \(\mathcal{X}\) denote the feature
-space, then \(T\) is a function
-\(\mathcal{X}\rightarrow \{1,\ldots, M\}\) defined by the equation
-\[T(\mathbf{x})=\sum_{m=1}^M m B_m(\mathbf{x}),\] where
-\(B_m(\mathbf{x})\) is a \(0-1\) basis function which partition the
+\(M\) terminal nodes. For each point \(\mathbf{x}\) in the feature
+space, \(T\) maps \(\mathbf{x}\) to one of the \(M\) terminal nodes. In
+particular, if we let \(\mathcal{X}\) denote the feature space, then
+\(T\) is a function \(\mathcal{X}\rightarrow \{1,\ldots, M\}\) defined
+by the equation \[T(\mathbf{x})=\sum_{m=1}^M m B_m(\mathbf{x}),\] where
+\(B_m(\mathbf{x})\) is a \(0-1\) basis function which partitions the
 feature space \(\mathcal{X}\). \par
 
 Let \(Z=\{(\mathbf{x}_i,Y_i)|i=1,\ldots,n\}\) denote the training data,
@@ -744,20 +744,19 @@ written as a linear combination of basis functions:
 \[\hat{\mu}(\mathbf{x})=\sum_{m=1}^M a_m B_m(\mathbf{x}).\] We are now
 prepared to define Ishwaran's variable importance measure. \par
 
-Informally, the \(MDA\) variable importance of a variable \(x_j\) is the
-difference between \(MSE\) of the tree \(T\) when \(x_j\) is randomly
-permuted and \(MSE\) of the tree \(T\) when \(x_j\) is not permuted. As
-such a scheme of variable importance is difficult to analyze, Ishwaran
+Informally, the MDA variable importance of a variable \(x_j\) is the
+difference between MSE of the tree \(T\) when \(x_j\) is randomly
+permuted and MSE of the tree \(T\) when \(x_j\) is not permuted. As such
+a scheme of variable importance is difficult to analyze, Ishwaran
 proposes a surrogate measure. For the variable \(x_j\), we drop
 \(\mathbf{x}\) down the tree and follow the binary splits until either a
 terminal node is reached or a node with a split depending on \(x_j\) is
 reached. If a node with a split depending on \(x_j\) is reached, we then
 subsequently assign \(\mathbf{x}\) randomly to either the left or right
 daughter node, whenever there is a split, until we reach a terminal
-node. The difference in \(MSE\) between noising up \(x_j\) and not
-noising up \(x_j\) to be the variable importance of \(x_j\) in the tree
-\(T\). Denote the tree that results from noising up \(x_j\) by \(T_j\).
-\par
+node. The difference in MSE between noising up \(x_j\) and not noising
+up \(x_j\) to be the variable importance of \(x_j\) in the tree \(T\).
+Denote the tree that results from noising up \(x_j\) by \(T_j\). \par
 
 Such a scheme relies on the following heuristic: if we chose an adequate
 splitting rule to construct our tree, then we expect that variables that
@@ -774,7 +773,7 @@ Results}\label{maximal-subtrees-and-theoretical-results}
 
 Defining a structure on binary regression trees called subtrees, we can
 write the predictor for the noised up tree as a deterministic component
-relying on terminal nodes for no parent nodes involve a split on
+relying on terminal nodes for which no parent nodes involve a split on
 \(x_j\), and a random component involving terminal nodes for which there
 are parent nodes involving a split on \(x_j\). The definition of the
 subtree is quite intuitive. We call \(\tilde{T}_j\) a \(j\)-subtree of
@@ -795,7 +794,7 @@ the predictor for the tree \(T_j\). \par
 Let $\hat{\mu}_j(\mathbf{x})$ denote the predictor for $T_j$. Then $$\hat{\mu}_j(\mathbf{x})=\sum_{m\notin M_j}a_m B_m(\mathbf{x})+\sum_{k=1}^{K_j} \tilde{a}_{k,j}\mathbb{I}\{T(\mathbf{x})\in M_{k,j}\},$$ where $\tilde{a}_{k,j}$ is the random terminal value assigned by $\tilde{T}_{k,j}$ under the random left right path through $\tilde{T}_{k,j}$. We write $\tilde{P}_{k,j}$ to denote the distribution of $\tilde{a}_{k,j}$. 
 \end{lemma}
 For a proof, see Ishwaran (2007). It is a bit surprising that the
-functional form of \(\hat{mu}_j(\mathbf{x})\) can be separated into the
+functional form of \(\hat{\mu}_j(\mathbf{x})\) can be separated into the
 two components. Given this lemma and the definition of \(j\)-subtrees,
 we can more formally define the variable importance of \(x_j\) in the
 tree \(T\). \par
@@ -848,9 +847,9 @@ forest \(\hat{\mu}_F\) as the average of predictions over the trees
 where \(\hat{\mu}(\mathbf{x};b)\) denotes the predictor for the tree
 \(T(\mathbf{x};b)\). Given that each \(\hat{\mu}(\mathbf{x};b)\) is a
 linear combination of basis functions, we can write
-\[\hat{\mu_F}(\mathbf{x})=\frac{1}{B}\sum_{b=1}^B\sum_{m=1}^{M^b}a_m^b B_m(\mathbf{x};b).\]
-Again assume that the \(\mu(\mathbf{x})\) has a similar structure to
-\(\mu(\mathbf{x})\). That is,
+\[\hat{\mu}_F(\mathbf{x})=\frac{1}{B}\sum_{b=1}^B\sum_{m=1}^{M^b}a_m^b B_m(\mathbf{x};b).\]
+Again assume that \(\mu(\mathbf{x})\) has a similar structure to
+\(\hat{\mu}_F(\mathbf{x})\). That is,
 \(\mu(\mathbf{x})=\frac{1}{B}\sum_{b=1}^B\sum_{m=1}^{M^b}a_{m,0}^b B_m(\mathbf{x};b)\),
 where \(a_{m,0}\) are the true, but unknown, terminal values. We denote
 the noised up forest predictor for the variable \(x_j\) by
@@ -873,7 +872,7 @@ where
 \par
 
 We are now ready to state a result about the asymptotic form of
-\(\Delta_{f,j}\):
+\(\Delta_{F_j}\):
 \begin{theorem}
 Let $R_{F_j, 0}(\mathbf{x})$ be the function $R_{F_j}(\mathbf{x})$, in which each instance of $a_m^b$ has been replaced with $a_{m,0}^b$. Assume that $Y$ can be written in terms of a regression model $$Y=\mu(\mathbf{x})+\varepsilon$$ and that $$\mu(\mathbf{x})=\frac{1}{B}\sum_{b=1}^B\sum_{m=1}^{M^b}a_{m,0}^b B_m(\mathbf{x};b).$$ If $a_m^b\rightarrow a_{m,0}^b$ for each $m$ and $b$, then $$\Delta_{F_j}\rightarrow \mathbb{E}\left(R_{F_j,0}(\mathbf{x})^2\right)\leq\mathbb{E}\left(\frac{1}{B}\sum_{b=1}^b\sum_{k=1}^{K_j^b}\theta_0(k,j,b)\right),$$ where $$\theta_0(k,j,b)=\sum_{m\in M_{k,j}^b} \pi_{m,b}\tilde{P}_{k,j,0}^b\left(\tilde{a}_{k,j,0}^b-a_{m,0}^b\right)^2$$ is the node mean squared error for the $k$th maximal $v$-subtree of $T(\mathbf{x};b)$and $\pi_{m,b}=\mathbb{P}(B_m(\mathbf{x};b)=1|Z)$. 
 \end{theorem}
@@ -884,36 +883,36 @@ the forest predictor is consistent. This suggests that forest ensemble
 methods which are consistent and produce trees that are at least
 approximately orthogonal to each other allow for variable importance to
 be characterized through node mean squared error of subtrees. Variable
-importance as defined above differs from the \(MDA\) variable importance
-for random forests, but the two follow a similar heuristic towards
-measuring variable importance via the loss of predictive accuracy when
-the variable \(x_j\) is perturbed. Therefore this result suggests that,
+importance as defined above differs from the MDA variable importance for
+random forests, but the two follow a similar heuristic towards measuring
+variable importance via the loss of predictive accuracy when the
+variable \(x_j\) is perturbed. Therefore this result suggests that,
 perhaps, so long as the random forest estimator is consistent and the
-trees constructed are at least approximately orthogonal, the \(MDA\)
+trees constructed are at least approximately orthogonal, the MDA
 variable importance can be characterized via the mean squared error of
 some analogous structure to maximal subtrees. This is, of course,
 conjectural, but we are interested whether for simpler forest
-algorithms, results similar to the theorem can be proven. Asymptotic
-results for the \(MDA\) and also \(MDI\) variable importance measures
+algorithms, results similar to the theorem can be proven. \par
+
+Asymptotic results for the MDA and also MDI variable importance measures
 are difficult to formulate and prove for several reasons. First, the
-\(CART\) tree construction process combined with the bootstrapping and
+CART tree construction process combined with the bootstrapping and
 randomization procedure of the random forest is difficult to
 mathematically analyze. Second, it is still unknown whether random
-forests constructed via \(CART\) are consistent. However, there are
-other random forest variants known to be consistent, so those variants
-may be a natural starting point to try to prove asymptotic results about
-\(MDA\) and \(MDI\) variable importances. Third, the definition of
-\(MDA\) variable importance involves a permutation step that is
-difficult to analyze mathematically. The above results are
-mathematically amenable due to the noising-up procedure adopted allowing
-for a quite elegant analysis of the variable importance. One possible
-approach to dealing with this issue may be to adopt the above definition
-of variable importance in different random forest settings and see if
-similar results to Ishwaran (2007) may be derived. Another approach,
-which is the one more or less taken by Ishwaran (2007), is to to find a
-mathematically tractable definition of variable importance which is
-approximately the MDA variable importance measure and proceed with
-analysis from there. \par
+forests constructed via CART are consistent. However, there are other
+random forest variants known to be consistent, so those variants may be
+a natural starting point to try to prove asymptotic results about MDA
+and MDI variable importances. Third, the definition of MDA variable
+importance involves a permutation step that is difficult to analyze
+mathematically. The above results are mathematically amenable due to the
+noising-up procedure adopted allowing for a quite elegant analysis of
+the variable importance. One possible approach to dealing with this
+issue may be to adopt the above definition of variable importance in
+different random forest settings and see if similar results to Ishwaran
+(2007) may be derived. Another approach, which is the one more or less
+taken by Ishwaran (2007), is to to find a mathematically tractable
+definition of variable importance which is approximately the MDA
+variable importance measure and proceed with analysis from there. \par
 
 \section{Theoretical Analysis of MDI Variable
 Importance}\label{theoretical-analysis-of-mdi-variable-importance}
@@ -926,7 +925,7 @@ some of the theory for \(MDI\) variable importance of forest ensembles.
 In order to discuss the following theoretical results regarding MDI
 variable importance, we make some modifications to the setting we are
 working in. Assume that we are working in a finite probability space
-{[}this assumption is necessary primarily for technical reasons{]} and
+({[})this assumption is necessary primarily for technical reasons) and
 that observations \(Y,X_1,\ldots,X_p\) in the training set \(Z\) are
 categorical variables. Recall that if a forest ensemble is grown by
 choosing splits and variables maximizing the decrease in nodal impurity
@@ -998,13 +997,13 @@ Importance}\label{dealing-with-bias-in-random-forest-variable-importance}
 
 In the previous two sections of this chapter we discussed theoretical
 results pertaining to MDA and MDI variable importance measures. For MDA
-variable importance, a consistent ensemble with orthogonal trees have a
-nice asymptotic form in the framework developed in Ishwaran (2007). On
-the other hand, with MDI variable importance, if the trees are grown in
-the random forest setting, then there are issues of the variable
-importance not capturing the actual importance of the variables in the
-training data. This could particularly arise as an issue in data sets
-with correlated variables where equally important variables receive
+variable importance, a consistent ensemble with orthogonal trees has a
+particular asymptotic form in the framework developed in Ishwaran
+(2007). On the other hand, with MDI variable importance, if the trees
+are grown in the random forest setting, then there are issues of the
+variable importance not capturing the actual importance of the variables
+in the training data. This could particularly arise as an issue in data
+sets with correlated variables where equally important variables receive
 different variable importances due to bias introduced by tree
 construction process. In using the term `bias,' we would like to
 emphasise that this is not bias in the sense of biased estimators, but
@@ -1055,7 +1054,9 @@ that the MDA variable importance measure operates on the null hypothesis
 that permuting the values of the variable \(X_j\) has no affect on the
 predictive accuracy of the random forest predictor. This corresponds to
 the null hypothesis that the variable \(X_j\) is independent of the
-response \(Y\) and the variables \(X_1,\ldots,X_p\). If the predictive
+response \(Y\) and the variables \(X_1,\ldots,X_p\). For simplicity, let
+\(X_{-j}\) denote the set of predictors excluding \(X_j\), i.e.,
+\[X_{-j}=\{X_1,\ldots,X_{j-1},X_{j+1},\ldots,X_p\}.\] If the predictive
 accuracy of the random forest suffers from permuting \(X_j\), that is if
 the \(VI(X_j)\) is nonzero, then if also \(X_j\perp X_{-j}\), it would
 follow that \(Y\) and \(X_j\) are not independent. However, it is
@@ -1138,12 +1139,12 @@ In particular, this corresponds to the mean of the sampling distribution
 of the infforest variable importances of \(X_j\) over the trees \(T_b\).
 \par
 
-Originally, Owens (2017) developed for random forests using CART trees
-as base learners. However, the infforest variable importance could
-certainly be used with random forest variants such as conditional
-inference forests used in Strobl et al. (2008). Another possible
-modification of the infforest variable importance algorithm is to only
-grow an auxiliary tree predicting
+Originally, Owens (2017) developed infforest variable importance for
+random forests using CART trees as base learners. However, the infforest
+variable importance could certainly be used with random forest variants
+such as conditional inference forests used in Strobl et al. (2008).
+Another possible modification of the infforest variable importance
+algorithm is to only grow an auxiliary tree predicting
 \(X_j\sim X_{\alpha_1},\ldots,X_{\alpha_k}\), where
 \(X_{\alpha_1},\ldots,X_{\alpha_k}\) are variables whose correlation
 with \(X_j\) exceeds some reasonable threshold. This would combine the
@@ -1195,7 +1196,7 @@ empirical correlation in the case of conditional variable importance, or
 the partitions induced by a particular tree in the case of Infforest
 variable importance. In any case, we are primarily interested in the
 conditional importance of a predictor given the information provided by
-other predictors. While we would like to have a exact method of
+other predictors. While we would like to have an exact method of
 computing the conditional importance of a predictor in a random forest
 ensemble, in practice it is unclear how to construct an exact method
 given the complexity of the random forest ensemble. We can, however,
@@ -1206,12 +1207,12 @@ added variable plot. \par
 Added variable plots are a diagnostic plot which estimate the effect of
 adding a predictor variable to the model. In this chapter we propose a
 method of measuring the importance of each predictor in a random forest
-ensemble via a quantity we call the Added Variable Importance (AVI) that
-depends on the added variable plot of each predictor. The AVI attempts
-to estimate the effect of adding a predictor as a possible candidate in
-the splitting step of the random forest ensemble. To understand AVI, we
-regress from the random forest setting to the linear regression setting
-to explain how added variable plots work. \par
+ensemble via a quantity we call the Added Variable Plot Importance
+(AVPI) that depends on the added variable plot of each predictor. AVPI
+attempts to estimate the effect of adding a predictor as a possible
+candidate in the splitting step of the random forest ensemble. To
+understand AVPI, we regress from the random forest setting to the linear
+regression setting to explain how added variable plots work. \par
 
 \section{Added Variable Plots in Linear
 Regression}\label{added-variable-plots-in-linear-regression}
@@ -1224,7 +1225,7 @@ variable plot for example dataset}
 Suppose that we have data \(Z=\{(\mathbf{x}_i,Y_i)|i=1,\ldots,n\}\),
 where \(\mathbf{x}_i\) is a covariate in the feature space, and that we
 fit a multiple linear regression model of the form
-\(\mathbf{Y}_1=\mathbf{X}\beta_1+\mathbf{W}\alpha+\mathbf{\varepsilon}_1\)
+\(\mathbf{Y}_1=\mathbf{X}\tilde{\beta}_1+\mathbf{W}\alpha+\mathbf{\varepsilon}_1\)
 where \(\mathbf{X}\) is a \(n\times p\) matrix consisting of \(p-1\)
 predictors, \(\beta=(\beta_0,\beta_1,\ldots,\beta_p)^T\),
 \(\mathbf{W}=(w_1,\ldots,w_n)\) is a predictor, \(\alpha\) is a scalar,
@@ -1232,10 +1233,10 @@ and \(\text{Var}(\mathbf{\varepsilon})=\sigma^2 I\). \par
 
 Say we are interested in estimating the effect of the predictor
 \(\mathbf{W}\) in the regression model \(\hat{\mathbf{Y}}_1\). We could
-first fit the models \(\hat{\mathbf{Y}}_2=\mathbf{X}\beta_2\) and
-\(\hat{\mathbf{W}}=\mathbf{X}\delta\), where \(\beta_2\) and \(\delta\)
-are coefficient vectors like \(\beta_1\) and then plot the residuals
-\(\mathbf{W}-\hat{\mathbf{W}}\) against the residuals
+first fit the models \(\hat{\mathbf{Y}}_2=\mathbf{X}\gamma\) and
+\(\hat{\mathbf{W}}=\mathbf{X}\delta\), where \(\gamma\) and \(\delta\)
+are coefficient vectors like \(\tilde{\beta}_1\) and then plot the
+residuals \(\mathbf{W}-\hat{\mathbf{W}}\) against the residuals
 \(\mathbf{Y}-\hat{\mathbf{Y}}_2\). The plot we obtain by plotting
 \(\mathbf{W}-\hat{\mathbf{W}}\) against
 \(\mathbf{Y}-\hat{\mathbf{Y}}_2\) is called the added variable plot of
@@ -1245,7 +1246,7 @@ are coefficient vectors like \(\beta_1\) and then plot the residuals
 residuals that we plot for the added variable plot is the portion of
 \(\mathbf{W}\) unexplained by \(\mathbf{X}\) on the \(x\)-axis and the
 portion of \(\mathbf{Y}\) unexplained by
-\(\hat{\mathbf{Y}}_2=\mathbf{X}\beta_2\) on the \(y\)-axis. \par
+\(\hat{\mathbf{Y}}_2=\mathbf{X}\gamma\) on the \(y\)-axis. \par
 
 In the linear regression setting the added variable plot has useful
 properties. In particular, let \(\alpha_{AVP}\) denote the estimate of
@@ -1253,17 +1254,18 @@ the slope from regressing \(\mathbf{Y}-\hat{\mathbf{Y}}_2\) on
 \(\mathbf{W}-\hat{\mathbf{W}}\). Then with some linear algebra it can be
 shown that \(\alpha_{AVP}\) is equal to the least-squares estimate of
 \(\alpha\) from
-\(\hat{\mathbf{Y}}_1=\mathbf{X}\beta_1+\mathbf{W}\alpha\). For full
-details see Sheather (2009) and Cook \& Weisberg (1982). Hence if we
-want to estimate the linear effect of the variable \(\mathbf{W}\) on the
-linear regression \(\hat{\mathbf{Y}}_1\), we can construct and visually
-inspect the trend of the added variable plot of \(\mathbf{W}\). \par
+\(\hat{\mathbf{Y}}_1=\mathbf{X}\tilde{\beta}_1+\mathbf{W}\alpha\). For
+full details see Sheather (2009) and Cook \& Weisberg (1982). Hence if
+we want to estimate the linear effect of the variable \(\mathbf{W}\) on
+the linear regression \(\hat{\mathbf{Y}}_1\), we can construct and
+visually inspect the trend of the added variable plot of \(\mathbf{W}\).
+\par
 
-We provide an example of an added variable plot. Recall our example of a
-simple linear response from chapter 1. That is, we have three
-independent normals \(X_1,X_2,X_3\sim N(0,1)\) and a response defined by
-\(Y=10X_1-5X_2+\varepsilon.\) We can plot the added variable plot of
-\(X_1, X_2,\) and \(X_3\). \par
+In figure \ref{AVPlinex}, we provide an example of an added variable
+plot. Recall our example of a simple linear response from chapter 1.
+That is, we have three independent normals \(X_1,X_2,X_3\sim N(0,1)\)
+and a response defined by \(Y=10X_1-5X_2+\varepsilon.\) We can plot the
+added variable plot of \(X_1, X_2,\) and \(X_3\). \par
 
 As we can see from figure \ref{AVPlinex}, the AVP for \(X_1\) is a
 positive line through the origin, the AVP for \(X_2\) is a negative line
@@ -1274,24 +1276,24 @@ with \(Y\) once we have taken into account the effects of \(X_2\) and
 \(X_2\) with \(Y\) once we take into account the effects of \(X_1\) and
 \(X_3\) is negative and linear. On the other hand, there is no
 conditional relationship between \(X_3\) and \(Y\) once we have taken
-into account the effects of \(X_1\) and \(X_3\). Most the variability of
-\(Y\) can be explained by \(X_1\) and \(X_2\) and once we take into
+into account the effects of \(X_1\) and \(X_3\). Most OF the variability
+of \(Y\) can be explained by \(X_1\) and \(X_2\) and once we take into
 account the effect of those two variables, the remaining portion of
 \(Y\) is largely noise. \par
 
 \section{Added Variable Plots in Random
 Forests}\label{added-variable-plots-in-random-forests}
 
-While added variable plots in the linear regression setting allows us to
+While added variable plots in the linear regression setting allow us to
 conditionally estimate the effect of the predictor on the response, the
 picture for more complex regression functions such as random forests is
 more complicated. In particular, if the relationship between the
 response and predictors is non-linear, or we are using a statistical
-learning method such as a random forest, then we do not have the nice
-linear algebra that under girds the interpretation of added variable
-plots of linear regression models. However, we can still construct added
-variable plots for random forests that are similar to the added variable
-plots for linear regression. \par
+learning method such as a random forest, then we do not have the linear
+algebra that under girds the interpretation of added variable plots of
+linear regression models. However, we can still construct added variable
+plots for random forests that are similar to the added variable plots
+for linear regression. \par
 
 \subsection{Residual-Based Added Variable
 Plot}\label{residual-based-added-variable-plot}
@@ -1384,17 +1386,17 @@ then, suppose for a moment that \(\hat{\theta}_{RF}(Y|X)\) and
 \(\hat{\theta}_{RF}(Y|X_{-k})\) are consistent estimators of
 \(\mathbb{E}(Y|X)\) and \(\mathbb{E}(Y|X_{-k})\), respectively. Then by
 the Law of Total Expectation, we would expect that asymptotically
-\(\mathbb{E}_X(\hat{\theta}_{RF}(Y|X))=Y\) and
-\(\mathbb{E}_{X_{-k}}(\hat{\theta}_{RF}(Y|X_{-k}))=Y\). Hence in the
-limit, by linearity of expectation,
-\[\mathbb{E}(\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k}))=\mathbb{E}(\hat{\theta}_{RF}(Y|X))-\mathbb{E}(\hat{\theta}_{RF}(Y|X_{-k}))=Y-Y=0.\]
-Similarly, \[\mathbb{E}(Y-\hat{\theta}_{RF}(Y|X_{-k}))=Y-Y=0.\] Hence if
-a predictor \(X_k\) is uninformative, provided we have grown adequately
-accurate forest ensembles to predict \(Y\) given \(X\) and \(Y\) given
-\(X_{-k}\), respectively, then we expect that the the added variable
-plot of \(X_k\) to either be radially centered about the origin or to
-otherwise be arranged in a line with a slope and \(y\)-intercept of
-zero. \par
+\(\mathbb{E}_X(\hat{\theta}_{RF}(Y|X))=\mathbb{E}(Y)\) and
+\(\mathbb{E}_{X_{-k}}(\hat{\theta}_{RF}(Y|X_{-k}))=\mathbb{E}(Y)\).
+Hence in the limit, by linearity of expectation,
+\[\mathbb{E}(\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k}))=\mathbb{E}_X(\hat{\theta}_{RF}(Y|X))-\mathbb{E}_{X_{-k}}(\hat{\theta}_{RF}(Y|X_{-k}))=\mathbb{E}(Y)-\mathbb{E}(Y)=0.\]
+Similarly,
+\[\mathbb{E}(Y-\hat{\theta}_{RF}(Y|X_{-k}))=\mathbb{E}(Y)-\mathbb{E}(Y)=0.\]
+Hence if a predictor \(X_k\) is uninformative, provided we have grown
+adequately accurate forest ensembles to predict \(Y\) given \(X\) and
+\(Y\) given \(X_{-k}\), respectively, then we expect that the added
+variable plot of \(X_k\) to either be radially centered about the
+origin. \par
 
 On the other hand, suppose that the predictor \(X_k\) is informative
 with respect to the response. Then we would expect that when properly
@@ -1407,7 +1409,7 @@ in the limit, we would expect that
 when we evaluate \(X=x\) and \(X_{-k}=x_{-k}\) where \(x,x_{-k}\) are
 training examples in the full dataset and the reduced dataset,
 respectively. Since the difference
-\(\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k}\) and
+\(\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k})\) and
 \(Y-\hat{\theta}_{RF}(Y|X_{-k})\) is generally non-zero when we evaluate
 the random forest at a particular point in the feature space and these
 differences are precisely what we plot on the x and y-axis of the added
@@ -1432,14 +1434,14 @@ different predictors. \par
 \caption{\label{fig:unnamed-chunk-6}\label{AVPmodex}Model-based added
 variable plot for example dataset}
 \end{figure}
-As we see in figure \ref{AVPmodex}, the indicates the conditional
-relationship of each predictor with respect to the response, but does
-not, in general, preserve the sign of the relationship. In particular,
-we note that the relationship between variable 2 and the response \(Y\)
-in the example dataset is negative and linear, but that the model-based
-AVP has a positive trend. This is as instead of plotting
-\(X_k-\hat{\theta}_{RF}(X_k|X_{-k})\) on the x-axis as in the
-residual-based AVP, we plot
+As we see in figure \ref{AVPmodex}, the model-based added variable plot
+indicates the conditional relationship of each predictor with respect to
+the response, but does not, in general, preserve the sign of the
+relationship. In particular, we note that the relationship between
+variable 2 and the response \(Y\) in the example dataset is negative and
+linear, but that the model-based AVP has a positive trend. This is
+because instead of plotting \(X_k-\hat{\theta}_{RF}(X_k|X_{-k})\) on the
+x-axis as in the residual-based AVP, we plot
 \(\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k})\), which will
 generally have a positive relationship with
 \(Y-\hat{\theta}_{RF}(Y|X_{-k})\) on the y-axis of the added variable
@@ -1448,7 +1450,7 @@ plot. \par
 \subsection{Discussion of Added Variable
 Plot}\label{discussion-of-added-variable-plot}
 
-We note that in the above argument that we made an appeal to the random
+We note that in the above argument we made an appeal to the random
 forest estimator \(\hat{\theta}_{RF}(Y|X)\) being a consistent estimator
 of \(\mathbb{E}(Y|X)\). As discussed earlier, the random forest
 algorithm as introduced and implemented by Breiman and collaborators has
@@ -1478,7 +1480,7 @@ grown using \(X_k\) at that particular node would likely have lower
 predictive performance than the tree grown using \(X_j\) at that node.
 Hence WLOG suppose the subset
 \(\{X_1,\ldots,X_m\}\subseteq \{X_1,\ldots,X_p\}\) of our predictors are
-correlated where \(m\leq p\). If \(X_j\in \{X_1,\ldots,X_m\}\) is not
+correlated where \(m< p\). If \(X_j\in \{X_1,\ldots,X_m\}\) is not
 informative to the response, then we would expect
 \(\hat{\theta}_{RF}(Y|X)\) and \(\hat{\theta}_{RF}(Y|X_{-j})\) to
 provide similar predictions, while if \(X_k\in \{X_1,\ldots,X_m\}\) is
@@ -1599,7 +1601,7 @@ full model \(\hat{\theta}_{RF}(Y|X)\). \par
           \For{ $k=1,\ldots,p$ }
             \State Grow the random forest ensemble $\hat{\theta}_{RF}(Y|X_{-k})$ predicting $Y$ using the full set of predictors minus the predictor $X_k$.
             \State Grow the random forest ensemble $\hat{\theta}_{RF}(X_k|X_{-k})$ predicting $X_k$ using the set of predictors not the predictor $X_k$
-            \State Compute $U_k=X_k-\hat{\theta}_{RF}(X_k|X_{-k})$ and $W_k=Y-\hat{\theta}_{RF}(Y|X_{-k})).$
+            \State Compute $U_k=X_k-\hat{\theta}_{RF}(X_k|X_{-k})$ and $W_k=Y-\hat{\theta}_{RF}(Y|X_{-k}).$
             \State Grow the bagged forest ensemble $\hat{\theta}_{BF}(W_k|U_k)$ predicting $W_k$ using $U_k$. 
             \State Compute the added variable plot importance of $X_k$ to be the MDA variable importance of $U_k$: $VI_{AVP}(X_k)=VI_{MDA}(U_K)$.
           \EndFor
@@ -1611,7 +1613,7 @@ full model \(\hat{\theta}_{RF}(Y|X)\). \par
           \State Grow the random forest ensemble $\hat{\theta}_{RF}(Y|X)$ predicting $Y$ using the full set of predictors. 
           \For{ $k=1,\ldots,p$ }
             \State Grow the random forest ensemble $\hat{\theta}_{RF}(Y|X_{-k})$ predicting $Y$ using the full set of predictors minus the predictor $X_k$.
-            \State Compute $U_k=\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k})$ and $W_k=Y-\hat{\theta}_{RF}(Y|X_{-k})).$
+            \State Compute $U_k=\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k})$ and $W_k=Y-\hat{\theta}_{RF}(Y|X_{-k}).$
             \State Grow the bagged forest ensemble $\hat{\theta}_{BF}(W_k|U_k)$ predicting $W_k$ using $U_k$. 
             \State Compute the added variable plot importance of $X_k$ to be the MDA variable importance of $U_k$: $VI_{AVP}(X_k)=VI_{MDA}(U_K)$.
           \EndFor
@@ -1638,7 +1640,7 @@ couple directions we can extend our framework. Once again suppose we
 have grown our full random forest ensemble \(\hat{\theta}_{RF}(Y|X)\)
 and also the random forest ensemble \(\hat{\theta}_{RF}(Y|X_{-k})\). Let
 \(U_k=\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-k})\) and
-\(W_k=Y-\hat{\theta}_{RF}(Y|X_{-k})).\) \par
+\(W_k=Y-\hat{\theta}_{RF}(Y|X_{-k}).\) \par
 
 Once we have computed the AVPI of \(X_k\), \(VI_{AVP}(X_k)\), we can
 take a simulation approach to generating a null distribution for
@@ -1679,7 +1681,7 @@ In this chapter, we present simulation results of the random forest
 added variable plot and added variable plot importance methods. The
 design of our simulation follows closely to Strobl et al. (2008). In
 particular, we are interested in answering the following questions we
-layed out in Chapter 1:
+laid out in Chapter 1:
 \begin{enumerate}
   \item Can AVPI handle correlated predictors in the data? 
   \item Can we extend AVPI to a hypothesis testing framework via permutation tests?
@@ -1754,7 +1756,7 @@ and response for each of the four scenarios below. \par
 \text{Scenario 3: } & Y=8X_1X_2+7X_5X_6+\varepsilon \nonumber \\
 \text{Scenario 4: } & Y=3^{X_1}+2^{X_2}+4^{X_5}+\varepsilon \nonumber
 \end{align}
-\caption{Functional Form of the Response With Respect to the Predictors}
+\caption{Functional form of the response with respect to the predictors}
 \label{ScenarioForms}
 \end{figure}
 In each scenario, variables 1 and 2 are always informative towards the
@@ -1801,7 +1803,7 @@ replacement. \par
 \text{ Simulation 7: } & \text{ Scenario 4 with Independent Predictors} \nonumber \\
 \text{ Simulation 8: } & \text{ Scenario 4 with Correlated Predictors} \nonumber
 \end{align}
-\caption{Which Scenario and Set of Predictors Each Simulation Corresponds to}
+\caption{The scenario and corresponding set of predictors for each simulation}
 \label{ScenarioPredictors}
 \end{figure}
 For each simulated dataset, we drew 2000 entries. We then ran the added
@@ -1855,7 +1857,7 @@ would have expected. \par
 \caption{\label{fig:unnamed-chunk-13}\label{MDAwrep}MDA simulation results
 using sampling with replacement}
 \end{figure}
-In figure \ref{AVPIwrep}, for simulation 3 , we see that AVPI matches
+In figure \ref{AVPIwrep}, for simulation 3, we see that AVPI matches
 with the MDA variable importance in matching which variables are
 informative. However, with simulation 4, while variable 2 has a higher
 score than variable 4 with AVPI and MDA variable importance, both
@@ -1908,10 +1910,10 @@ responses. In particular, the residuals-based AVPI cannot handle a
 response defined by an interaction term (scenario 3) across both
 independent and correlated predictors. The residuals-based AVPI also
 cannot handle correlated polynomial terms. With simulations 5 and 6, we
-expected to see that variables 1, 2, 5, and 6 to have the larges bars on
-the plot of AVPI values, however, what we see is that in both of these
-simulations, is that these variables have AVPI scores similar in value
-to uninformative variables. For simulation 8, we see that while
+expected to see that variables 1, 2, 5, and 6 to have the largest bars
+on the plot of AVPI values, however, what we see is that in both of
+these simulations, is that these variables have AVPI scores similar in
+value to uninformative variables. For simulation 8, we see that while
 variables 1 and 8 properly receive high AVPI scores, variable 2 received
 a similar AVPI score as variable 12, which was an uninformative. We do
 note, however, that relative to other correlated predictors in
@@ -2125,11 +2127,11 @@ statistic is
 If \(F\) is large when compared to the
 \(F(df_{H_0}-df_{H_1}, df_{H_1})\) distribution, then there is evidence
 against the null hypothesis that the coefficients of
-\(\mathbf{\beta}_2\) should be set to zero. In particular, while we
-cannot compute a test statistic similar to the F-test statistic for
-joint added variable importance, we can take the approach of comparing
-models fit with and without \(\mathbf{X}_2\) to determine the importance
-of \(\mathbf{X}_2\) in the random forest context. \par
+\(\mathbf{\beta}_2\) should be set to zero. While we cannot compute a
+test statistic similar to the F-test statistic for joint added variable
+importance, we can take the approach of comparing models fit with and
+without \(\mathbf{X}_2\) to determine the importance of \(\mathbf{X}_2\)
+in the random forest context. \par
 
 \section{Joint Added Variable Plots}\label{joint-added-variable-plots}
 
@@ -2258,7 +2260,7 @@ between sets of predictors. \par
       \begin{algorithmic}[1]
           \State Grow the random forest ensemble $\hat{\theta}_{RF}(Y|X)$ predicting $Y$ using the full set of predictors.
           \State Grow the random forest ensemble $\hat{\theta}_{RF}(Y|X_{-J})$ predicting $Y$ using the full set of predictors minus the predictors in $J$.
-          \State Compute $U_J=\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-J})$ and $W_J=Y-\hat{\theta}_{RF}(Y|X_{-J})).$
+          \State Compute $U_J=\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-J})$ and $W_J=Y-\hat{\theta}_{RF}(Y|X_{-J}).$
           \State Grow the bagged forest ensemble $\hat{\theta}_{BF}(W_J|U_J)$ predicting $W_J$ using $U_J$. 
           \State Compute the added variable plot importance of $X_J$ to be the MDA variable importance of $U_J$: $VI_{JAVP}(X_J)=VI_{MDA}(U_J)$.
           
@@ -2267,8 +2269,8 @@ between sets of predictors. \par
 \begin{figure}
 \centering
 \includegraphics{thesis_files/figure-latex/unnamed-chunk-25-1.pdf}
-\caption{\label{fig:unnamed-chunk-25}\label{JAVPIex}Joint Added Variable
-Plot Importances of Example Dataset}
+\caption{\label{fig:unnamed-chunk-25}\label{JAVPIex}Joint added variable
+plot importances of example dataset}
 \end{figure}
 In figure \ref{JAVPIex}, we compute JAVPI for the parititions of the
 predictors from figure \ref{JAVPex}. We see that in the partition where
@@ -2434,7 +2436,7 @@ Run}\label{javpi-simulation-results-for-second-run}
 \centering
 \includegraphics{thesis_files/figure-latex/unnamed-chunk-30-1.pdf}
 \caption{\label{fig:unnamed-chunk-30}\label{JAVPItwosig}JAVPI simulation
-results when Signal is contained in both partitions of the predictors}
+results when signal is contained in both partitions of the predictors}
 \end{figure}
 We present the JAVPI scores of the second simulation run in figure
 \ref{JAVPItwosig}. For the second simulation run, where there was signal
@@ -2526,7 +2528,7 @@ importance measures for random forests. We developed the residual-based
 and model-based added variable plot importance measure, and we also
 developed the joint added variable plot importance measure. Simulation
 results in chapter 4 indicate that using the model-based AVPI with
-sampling without replacement was more stable than using the
+sampling without replacement may be more stable than using the
 residual-based AVPI. However, both AVPI measures suffer from noisiness.
 In particular, with AVPI, we often obtain non-zero AVPI scores for
 non-informative variables. In addition, the MDA variable importance

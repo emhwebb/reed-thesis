@@ -433,7 +433,7 @@ In the linear regression context, we may be interested in if a subset of predict
 H_0: \mathbf{Y}&=\mathbf{X}_1\mathbf{\beta}_1+\varepsilon \nonumber \\
 H_1: \mathbf{Y}&=\mathbf{X}_1\mathbf{\beta}_1+\mathbf{X}_2\mathbf{\beta}_2+\varepsilon. \nonumber
 \end{align}
-The partial F-test allows us to test the above hypotheses. First fit the model under the null hypothesis $H_0$ and find the residual sums of squares $RSS_{H_0}$ and degrees of freedom $df_{H_0}$ of the model. Next fit the model under the alternative hypothesis $H_1$ and find $RSS_{H_1}$ and $df_{H_1}$. As @weisberg2005 notes, $df_{H_0}>df_{H_1}$ and $RSS_{H_0}-RSS_{H_1}>0$. The partial F-test statistic is $$F=\frac{(RSS_{H_0}-RSS_{H_1})/(df_{H_0}-df_{H_1})}{RSS_{H_1}/df_{H1}}.$$ If $F$ is large when compared to the $F(df_{H_0}-df_{H_1}, df_{H_1})$ distribution, then there is evidence against the null hypothesis that the coefficients of $\mathbf{\beta}_2$ should be set to zero. In particular, while we cannot compute a test statistic similar to the F-test statistic for joint added variable importance, we can take the approach of comparing models fit with and without $\mathbf{X}_2$ to determine the importance of $\mathbf{X}_2$ in the random forest context.    \par
+The partial F-test allows us to test the above hypotheses. First fit the model under the null hypothesis $H_0$ and find the residual sums of squares $RSS_{H_0}$ and degrees of freedom $df_{H_0}$ of the model. Next fit the model under the alternative hypothesis $H_1$ and find $RSS_{H_1}$ and $df_{H_1}$. As @weisberg2005 notes, $df_{H_0}>df_{H_1}$ and $RSS_{H_0}-RSS_{H_1}>0$. The partial F-test statistic is $$F=\frac{(RSS_{H_0}-RSS_{H_1})/(df_{H_0}-df_{H_1})}{RSS_{H_1}/df_{H1}}.$$ If $F$ is large when compared to the $F(df_{H_0}-df_{H_1}, df_{H_1})$ distribution, then there is evidence against the null hypothesis that the coefficients of $\mathbf{\beta}_2$ should be set to zero. While we cannot compute a test statistic similar to the F-test statistic for joint added variable importance, we can take the approach of comparing models fit with and without $\mathbf{X}_2$ to determine the importance of $\mathbf{X}_2$ in the random forest context.    \par
 
 
 ## Joint Added Variable Plots
@@ -472,14 +472,14 @@ As with the single variable case, once we have acquired the joint added variable
       \begin{algorithmic}[1]
           \State Grow the random forest ensemble $\hat{\theta}_{RF}(Y|X)$ predicting $Y$ using the full set of predictors.
           \State Grow the random forest ensemble $\hat{\theta}_{RF}(Y|X_{-J})$ predicting $Y$ using the full set of predictors minus the predictors in $J$.
-          \State Compute $U_J=\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-J})$ and $W_J=Y-\hat{\theta}_{RF}(Y|X_{-J})).$
+          \State Compute $U_J=\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-J})$ and $W_J=Y-\hat{\theta}_{RF}(Y|X_{-J}).$
           \State Grow the bagged forest ensemble $\hat{\theta}_{BF}(W_J|U_J)$ predicting $W_J$ using $U_J$. 
           \State Compute the added variable plot importance of $X_J$ to be the MDA variable importance of $U_J$: $VI_{JAVP}(X_J)=VI_{MDA}(U_J)$.
           
       \end{algorithmic}
   \end{algorithm}
 
-```{r results = "asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap = "\\label{JAVPIex}Joint Added Variable Plot Importances of Example Dataset"}
+```{r results = "asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap = "\\label{JAVPIex}Joint added variable plot importances of example dataset"}
 
 
 javpi.ex.all <- javp.ex.all[[1]][,1]
@@ -615,7 +615,7 @@ do.call("grid.arrange", c(mda.jt.siml.plots1, ncol = 2, nrow = 4))
 
 ### JAVPI Simulation Results for Second Run
 
-```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap= "\\label{JAVPItwosig}JAVPI simulation results when Signal is contained in both partitions of the predictors"}
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap= "\\label{JAVPItwosig}JAVPI simulation results when signal is contained in both partitions of the predictors"}
 
 #javpi signal in both partitions
 

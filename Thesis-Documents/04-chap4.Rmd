@@ -392,7 +392,7 @@ plot_AVPI <-function(i, df){
 
 ## Introduction 
 
-In this chapter, we present simulation results of the random forest added variable plot and added variable plot importance methods. The design of our simulation follows closely to @strobl2008. In particular, we are interested in answering the following questions we layed out in Chapter 1: 
+In this chapter, we present simulation results of the random forest added variable plot and added variable plot importance methods. The design of our simulation follows closely to @strobl2008. In particular, we are interested in answering the following questions we laid out in Chapter 1: 
 \begin{enumerate}
   \item Can AVPI handle correlated predictors in the data? 
   \item Can we extend AVPI to a hypothesis testing framework via permutation tests?
@@ -421,7 +421,7 @@ We note that our covariance is the same covariance matrix used by @strobl2008 fo
 \text{Scenario 3: } & Y=8X_1X_2+7X_5X_6+\varepsilon \nonumber \\
 \text{Scenario 4: } & Y=3^{X_1}+2^{X_2}+4^{X_5}+\varepsilon \nonumber
 \end{align}
-\caption{Functional Form of the Response With Respect to the Predictors}
+\caption{Functional form of the response with respect to the predictors}
 \label{ScenarioForms}
 \end{figure}
 
@@ -484,7 +484,7 @@ kable(matrix(scen_vec_names, nrow = 8, ncol = 1, dimnames = list(siml_name)),
 \text{ Simulation 7: } & \text{ Scenario 4 with Independent Predictors} \nonumber \\
 \text{ Simulation 8: } & \text{ Scenario 4 with Correlated Predictors} \nonumber
 \end{align}
-\caption{Which Scenario and Set of Predictors Each Simulation Corresponds to}
+\caption{The scenario and corresponding set of predictors for each simulation}
 \label{ScenarioPredictors}
 \end{figure}
 
@@ -558,7 +558,7 @@ do.call("grid.arrange", c(mda.wrep.siml.plots, ncol = 2, nrow = 4))
 
 ```
 
-In figure \ref{AVPIwrep}, for simulation 3 , we see that AVPI matches with the MDA variable importance in matching which variables are informative. However, with simulation 4, while variable 2 has a higher score than variable 4 with AVPI and MDA variable importance, both variables have similar scores with respect to AVPI and MDA variable importance.  For simulation 5, the AVPI scores for variables 1, 2, 5, and 6 were highest although the uninformative predictors had relatively high AVPI scores. For simulation 6, which was the interaction terms with correlated predictors, the AVPI correctly down weights the importance of variables 3 and 4, while accounting for the importance of variables 1 and 2. With simulation 7 and 8, which was a highly non-linear response, there was small signal with respect to variable 2, so both AVPI and MDA importance computed low scores for variable 2. In particular, variable 2 in simulation 8 for AVPI has a particularly low score. However, variables 1 and 5 have high AVPI scores as expected. \par 
+In figure \ref{AVPIwrep}, for simulation 3, we see that AVPI matches with the MDA variable importance in matching which variables are informative. However, with simulation 4, while variable 2 has a higher score than variable 4 with AVPI and MDA variable importance, both variables have similar scores with respect to AVPI and MDA variable importance.  For simulation 5, the AVPI scores for variables 1, 2, 5, and 6 were highest although the uninformative predictors had relatively high AVPI scores. For simulation 6, which was the interaction terms with correlated predictors, the AVPI correctly down weights the importance of variables 3 and 4, while accounting for the importance of variables 1 and 2. With simulation 7 and 8, which was a highly non-linear response, there was small signal with respect to variable 2, so both AVPI and MDA importance computed low scores for variable 2. In particular, variable 2 in simulation 8 for AVPI has a particularly low score. However, variables 1 and 5 have high AVPI scores as expected. \par 
 
 ```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.env = 'marginfigure', fig.cap= "\\label{AVPIworep}Model-based AVPI simulation results using sampling without replacement"}
 
@@ -618,7 +618,7 @@ do.call("grid.arrange", c(mda.worep.siml.plots, ncol = 2, nrow = 4))
 
 ### Residuals-Based AVPI Simulation Results
 
-Looking at figure \ref{resAVPI}, we see that while the residuals-based AVPI can handle a linear response with both independent and correlated predictors, the residuals-based AVPI has difficulty with other types of responses. In particular, the residuals-based AVPI cannot handle a response defined by an interaction term (scenario 3) across both independent and correlated predictors.  The residuals-based AVPI also cannot handle correlated polynomial terms. With simulations 5 and 6, we expected to see that variables 1, 2, 5, and 6 to have the larges bars on the plot of AVPI values, however, what we see is that in both of these simulations, is that these variables have AVPI scores similar in value to uninformative variables. For simulation 8, we see that while variables 1 and 8 properly receive high AVPI scores, variable 2 received a similar AVPI score as variable 12, which was an uninformative. We do note, however, that relative to other correlated predictors in simulation 8, variables 1 and 2 received higher AVPI scores than variables 3 or 4, which is what we expected to see. \par
+Looking at figure \ref{resAVPI}, we see that while the residuals-based AVPI can handle a linear response with both independent and correlated predictors, the residuals-based AVPI has difficulty with other types of responses. In particular, the residuals-based AVPI cannot handle a response defined by an interaction term (scenario 3) across both independent and correlated predictors.  The residuals-based AVPI also cannot handle correlated polynomial terms. With simulations 5 and 6, we expected to see that variables 1, 2, 5, and 6 to have the largest bars on the plot of AVPI values, however, what we see is that in both of these simulations, is that these variables have AVPI scores similar in value to uninformative variables. For simulation 8, we see that while variables 1 and 8 properly receive high AVPI scores, variable 2 received a similar AVPI score as variable 12, which was an uninformative. We do note, however, that relative to other correlated predictors in simulation 8, variables 1 and 2 received higher AVPI scores than variables 3 or 4, which is what we expected to see. \par
 
 ```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 6, fig.env = 'marginfigure', fig.cap= "\\label{resAVPI}Residuals-based AVPI simulation results using sampling without replacement"}
 

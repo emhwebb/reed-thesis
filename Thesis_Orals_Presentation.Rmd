@@ -1,0 +1,1309 @@
+---
+title: "Added Variable Plot Importance and Joint Added Variable Plot Importance Measures for Random Forests"
+author: "Emerson Webb"
+date: "May 3, 2018"
+header-includes:
+- \usepackage{tikz, algorithm}
+- \usepackage[noend]{algpseudocode}
+output: ioslides_presentation
+---
+
+```{r, include = FALSE, echo = FALSE, warning = FALSE, message = FALSE}
+
+library(rpart)
+library(randomForest)
+library(tidyverse)
+library(grid)
+library(gridExtra)
+library(mvtnorm)
+library(knitr)
+library(kableExtra)
+library(highlight)
+load(file = "Thesis-Documents/data/siml_examples.Rdata")
+
+
+plot_AVPI_ex <-function(i, df){
+  AVPI_vec <- df[,i]
+  var_name <- sapply(1:3, FUN = function(i) paste0("V", as.character(i)))
+  x_axis_order <- sapply(1:3, FUN = function(i) paste0("V", as.character(4-i)))
+  plot_df <- data.frame(variable = var_name, AVPI = AVPI_vec)
+  
+  plot_obj <- ggplot(plot_df, aes(x = variable, y = AVPI))+
+  geom_bar(stat = 'identity')+
+  coord_flip()+
+  scale_x_discrete(limits = x_axis_order)+
+  labs(y = paste("Simulation", as.character(i), sep = " "), x = "")+
+  theme(text = element_text(size = 10))
+  #theme(axis.title.y=element_blank())
+  plot_obj
+}
+
+plot_add_var_excep <- function(i, df.list){
+  df <- df.list[[i]]
+  x.name <- colnames(df)[1]
+  y.name <- colnames(df)[2]
+  plot.obj <- ggplot(df, aes_string(x = x.name, y = y.name))+
+    geom_point(alpha = 0.3, size = 1)+
+    theme(text = element_text(size = 10))
+  plot.obj
+}
+
+```
+
+```{r, include = FALSE, warning = FALSE, message = FALSE, echo = FALSE}
+
+library(randomForest)
+library(tidyverse)
+library(grid)
+library(gridExtra)
+library(mvtnorm)
+library(knitr)
+library(kableExtra)
+library(highlight)
+
+#first need to take our data frame and make the p+1 datasets that we apply the random forest to
+
+#itr_col takes as input an integer and removes that column from the dataset
+#note: should make itr_col more robust
+itr_col <- function(i, data){
+  select(data,-i)
+}
+
+#df_combs is a function which takes as input a dataframe and returns all iterations of the
+#dataframe where one predictor has been removed. Output is a p+1 element list where each element
+#is a dataframe with the ith variable removed. the last element of the list is the entire dataframe
+df_combs <- function(data){
+  p <- ncol(data)-1
+  df.list <- map(1:p, itr_col, data = data)
+  df.list[[p+1]] <- data
+  df.list
+}
+
+#extract_rf_pred is a function which takes as input 
+#a list of randomforest objects, an index value, 
+#and the number of predictors in the model and 
+#outputs the predicted values of the random forest in 
+#a dataframe. extract_rf_pred is mainly for use in map_dfc, 
+#which binds by column the predicted values in 
+#data.list as a dataframe. Primarily for use in each_pred_rf
+extract_rf_pred <- function(i, data.list, p){
+ new.df <- as.data.frame(data.list[[i]]$predicted) 
+ colnames(new.df) <- ifelse(i <= p, paste("PredWoVar", as.character(i), sep = ""),
+                            "PredFullMod")
+ new.df
+}
+
+#each_pred_rf is a function whose input is a list of dataframes 
+#that come from output of df_combs and runs the 
+#randomForest function on each dataframe using the map function. 
+#Output is dataframe of predicted values along with actual value of Y as last column. 
+#Second to last column is the predicted value of full model. 
+each_pred_rf <- function(data.list, ntree1, replace = TRUE){
+  p <- length(data.list)-1
+  rf.list <- map(.x = data.list, function(x) 
+    randomForest(Y~., data = x, ntree = ntree1, replace = replace, importance = TRUE))
+  rf.df <- map_dfc(1:(p+1), extract_rf_pred, data.list = rf.list, p = p)
+  Y <- data.list[[1]]$Y
+  new.df <- cbind(rf.df, Y)
+  imp <- importance(rf.list[[p+1]])
+  list(new.df, imp)
+}
+
+#extract_add_var takes as input an index value and data frame and 
+#outputs a dataframe of the basic added variable data frame where 
+#x.res is the difference between predicted values of full model and 
+#predicted values of model with out jth variable
+#y.res is the residual of Y and predicted values of model without jth variable.
+#For use with map in rf_add_var
+extract_add_var <-function(i, df){
+  PredFullMod <- as.name("PredFullMod")
+  Y <- as.name("Y")
+  V <- as.name(paste("PredWoVar", as.character(i), sep =""))
+  x.res <- df[[PredFullMod]]-df[[V]]
+  y.res <- df[[Y]]-df[[V]]
+  new.df <- data.frame(x.res, y.res)
+  colnames(new.df) <- c(paste("added.Var", as.character(i), sep = ""), "y.res")
+  new.df
+}
+
+#rf_add_var takes as input the output of each_pred_rf and outputs a list of length p 
+#in which each entry is a data frame corresponding
+#to an added variable plot for the jth predictor in the 
+#data set.
+rf_add_var <- function(data.list){
+  rf.df <- data.list[[1]]
+  p <- length(rf.df)-2
+  add.var.list <- map(1:p, extract_add_var, df = rf.df)
+  add.var.list
+}
+
+#rf_add_var_imp takes as input a list of add_var df's from rf_add_var and runs
+#a random forest on the y-residuals with x-residuals as input.
+#output is a list of random forest objects. \
+#Might change output to be just variable importance values. 
+rf_add_var_imp <- function(data.list, ntree2, replace = TRUE){
+  p <- length(data.list)
+  rf.add.imp.list <- map(.x = data.list, function(x) 
+    randomForest(y.res~., data = x, ntree = ntree2, replace = replace, importance = TRUE))
+  rf.add.imp.list
+}
+
+rf_shallow_add_var_imp <- function(data.list, ntree2, replace = TRUE){
+  p <- length(data.list)
+  rf.add.imp.list <- map(.x = data.list, function(x) 
+    randomForest(y.res~., data = x, ntree = ntree2, replace = replace, importance = TRUE, nodesize = 3))
+  rf.add.imp.list
+}
+
+extract_imp <-function(i, data.list){
+  new.df <- as.data.frame(t(importance(data.list[[i]])))
+  new.df
+}
+
+extract_var_imp <- function(data.list){
+  p <- length(data.list)
+  new.df <- map_dfc(1:p, extract_imp, data.list = data.list)
+  rownames(new.df) <- c("%IncMSE", "IncNodePurity")
+  as.data.frame(t(new.df))
+}
+
+
+#Once rf has been run once on each added variable plot, we can try to assess
+#importance via framework of p-values. In particular, we implement a 
+#permutation test to obtain distribution of variable importance scores 
+#rf_perm takes as input a list of added variable dataframes 
+#(in particular output of rf_add_var
+#and outputs a list of dataframes consisting of variable importance scores 
+#obtained after permuting each added variable dataframe. 
+#number of permutations is it input for rf_perm
+
+#perm_rf takes as input a dataframe, permutes the dataframe
+#runs a randomforest and returns the variable importance score
+#variable importance score is MDA (mean decrease in accuracy) as a percentage change
+perm_rf <-function(df, ntree3, replace){
+  df.names <- colnames(df)
+  df.mat <- as.matrix(df)
+  x <- df.mat[sample(nrow(df.mat),replace = FALSE),1]
+  y <- df.mat[,2]
+  perm.df <- as.data.frame(cbind(x,y))
+  colnames(perm.df) <- df.names
+  perm.rf <- randomForest(y.res~., data = perm.df, replace = replace, importance = TRUE)
+  importance(perm.rf, type = 1)
+}
+
+#perm_add_var takes as input an index value, the data.list, it the number of permutations, 
+#ntree3 the number of trees to grow for each forest on the permuted data
+perm_add_var <- function(i, data.list, it, ntree3, replace){
+  df <- data.list[[i]]
+  new.df <- as.data.frame(replicate(n = it, expr = perm_rf(df = df, 
+                                                           ntree3 = ntree3, replace = replace)))
+  colnames(new.df) <- paste("Var", as.character(i), "VI", sep = "")
+  new.df
+}
+
+rf_perm_add_var <- function(data.list, it, ntree3, replace = TRUE){
+  p <- length(data.list)
+  new.list <- map(1:p, perm_add_var, data.list = data.list, 
+      it = it, ntree3 = ntree3, replace = replace)
+  new.list
+}
+
+#add_var_randomforest is a wrapper for the previous functions (exluding rf_perm_add_var)
+add_var_randomforest <- function(data, ntree1, ntree2, replace = TRUE){
+  #to get the copy of the data with one predictor removed
+  df.list <- df_combs(data)
+  #running initial randomFoest on each data frame
+  rf.list <- each_pred_rf(df.list, ntree1 = ntree1, replace = replace)
+  #tidying the data to compute added variable plots
+  rf.add.var.list <- rf_add_var(rf.list)
+  #running randomForests on each plot
+  rf.add.imp.list <- rf_add_var_imp(rf.add.var.list, ntree2 = ntree2, replace = replace)
+  #extracts variable importance values for each randomForest ran on added variable plots
+  add.var.imp <- extract_var_imp(rf.add.imp.list)
+  #output is list containing data frame of added variable plot variable importances, 
+  #rf.add.var.list which are dataframe for added variable plots, and 
+  #the variable importances from full model run in each_pred_rf
+  list(add.var.imp, rf.add.var.list, rf.list[[2]])
+}
+
+#perm_add_var_randomforest is a wrapper for previous functions (including rf_perm_add_var)
+perm_add_var_randomforest <- function(data, it, ntree1, ntree2, ntree3, replace = TRUE){
+  df.list <- df_combs(data)
+  #running initial randomFoest on each data frame
+  rf.list <- each_pred_rf(df.list, ntree1 = ntree1, replace = replace)
+  #tidying the data to compute added variable plots
+  rf.add.var.list <- rf_add_var(rf.list)
+  #running randomForests on each plot
+  rf.add.imp.list <- rf_add_var_imp(rf.add.var.list, 
+                                    ntree2 = ntree2, replace = replace)
+  #extracts variable importance values for each randomForest ran on added variable plots
+  add.var.imp <- extract_var_imp(rf.add.imp.list)
+  #run permutations on each dataframe in rf.add.var.list to obtain 
+  #distribution of importance values
+  rf.perm.add.var.list <- rf_perm_add_var(data.list = rf.add.var.list, 
+                                          it = it, ntree3 = ntree3, replace = replace)
+  list(add.var.imp, rf.add.var.list, rf.list[[2]], rf.perm.add.var.list)
+}
+
+#input for rf_added_var_plot is output of 
+#add_var_randomforest. Output is plot of added variable plots for 
+#the random forest arranged in a grid.
+
+plot_add_var <- function(i, df.list){
+  df <- df.list[[i]]
+  x.name <- colnames(df)[1]
+  y.name <- colnames(df)[2]
+  plot.obj <- ggplot(df, aes_string(x = x.name, y = y.name))+geom_point()
+  plot.obj
+}
+
+rf_added_var_plot <- function(data.list){
+    df.list <- data.list[[2]]
+    p <- length(df.list)
+    gg.list <- map(1:p, plot_add_var, df.list = df.list)
+    nCol <- floor(sqrt(p))
+    do.call("grid.arrange", c(gg.list, ncol = nCol))
+}
+
+#next make functions which plot distributions of the added variable importances and 
+#adds in observed variable importance of added variable
+
+plot_var_imp <- function(i, df.list, add.var.imp){
+  df <- df.list[[i]]
+  x.name <- colnames(df)
+  obs.add.var <- add.var.imp[i,1]
+  plot.obj <- ggplot(df, aes_string(x = x.name))+
+    geom_histogram(bins = 50)+
+    geom_vline(xintercept = obs.add.var, col = "Red", size = 1)
+  plot.obj
+}
+
+plot_var_imp_excep <- function(i, df.list, add.var.imp){
+  df <- df.list[[i]]
+  x.name <- colnames(df)
+  obs.add.var <- add.var.imp[i,1]
+  plot.obj <- ggplot(df, aes_string(x = x.name))+
+    geom_histogram(bins = 50)+
+    geom_vline(xintercept = obs.add.var, col = "Red", size = 1)+
+    theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        text = element_text(size = 10))+
+    labs(x = paste(paste0("V", as.character(i)), 
+                   "AVPI", sep = " "))
+  plot.obj
+}
+
+rf_plot_var_imp <- function(data.list){
+ df.list  <-data.list[[4]]
+ add.var.imp <- data.list[[1]]
+ p <- length(df.list)
+ gg.list <- map(1:p, plot_var_imp, df.list = df.list, add.var.imp = add.var.imp)
+ nCol <- floor(sqrt(p))
+ do.call("grid.arrange", c(gg.list, ncol = nCol))
+}
+
+rf_plot_var_imp_excep <- function(data.list){
+ df.list  <-data.list[[4]]
+ add.var.imp <- data.list[[1]]
+ p <- length(df.list)
+ gg.list <- map(1:p, plot_var_imp_excep, df.list = df.list, add.var.imp = add.var.imp)
+ nCol <- floor(sqrt(p))
+ do.call("grid.arrange", c(gg.list, ncol = nCol))
+}
+
+#Next define a function which takes the output of perm_add_var_randomforest
+#and computes p-values of variable importances.
+
+perm_pval <- function(i, var.imp.df, var.imp.list){
+  obs.var.imp <- var.imp.df[i,1]
+  perm.var.imp <- var.imp.list[[i]]
+  n.perm <- nrow(perm.var.imp)
+  right.tail <- (sum(obs.var.imp <= perm.var.imp)+1)/(n.perm+1)
+  left.tail <- (sum(perm.var.imp <= obs.var.imp)+1)/(n.perm+1)
+  p.val <- ifelse(right.tail<=left.tail, 2*right.tail, 2*left.tail)
+  p.val <- ifelse(1<p.val, 1, p.val)
+  names(p.val) <- paste("p.val.Var.", as.character(i), sep = "")
+  p.val
+}
+
+add_var_pval <- function(data.list){
+  var.imp.df <- data.list[[1]]
+  var.imp.list <- data.list[[4]]
+  p <- nrow(var.imp.df)
+  pval.df <- sapply(1:p, perm_pval, var.imp.df = var.imp.df, var.imp.list = var.imp.list)
+  as.data.frame(pval.df)
+}
+
+
+```
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.cap = "testing"}
+load(file = "Thesis-Documents/data/MarChp4SimlResults.Rdata")
+load(file = "Thesis-Documents/data/avp_res_siml.Rdata")
+list.siml.results <- list.siml.data.results[9:24]
+res.siml.results <- avp_orig_list
+
+siml1.wrep <- list.siml.results[[1]]
+siml1.worep <- list.siml.results[[2]]
+siml2.wrep <- list.siml.results[[3]]
+siml2.worep <- list.siml.results[[4]]
+siml3.wrep <- list.siml.results[[5]]
+siml3.worep <- list.siml.results[[6]]
+siml4.wrep <- list.siml.results[[7]]
+siml4.worep <- list.siml.results[[8]]
+siml5.wrep <- list.siml.results[[9]]
+siml5.worep <- list.siml.results[[10]]
+siml6.wrep <- list.siml.results[[11]]
+siml6.worep <- list.siml.results[[12]]
+siml7.wrep <- list.siml.results[[13]]
+siml7.worep <- list.siml.results[[14]]
+siml8.wrep <- list.siml.results[[15]]
+siml8.worep <- list.siml.results[[16]]
+
+list.wrep <- list(siml1.wrep,siml2.wrep, siml3.wrep,siml4.wrep,siml5.wrep,siml6.wrep,siml7.wrep, siml8.wrep)
+list.worep <- list(siml1.worep, siml2.worep, siml3.worep, siml4.worep, siml5.worep, siml6.worep, siml7.worep, siml8.worep)
+
+extract_table_col <- function(i, data.list,rf.type){
+ data.col <- data.list[[i]][[rf.type]][,1] 
+ names(data.col) <- paste("Simulation", as.character(i), sep = "")
+ data.col
+}
+
+extract_matrix <- function(numvar, numsiml, data.list, rf.type){
+  mat <- matrix(NA, ncol = numsiml, nrow = numvar)
+  for(i in 1:numsiml){
+    mat[,i] <- extract_table_col(i, data.list, rf.type) 
+  }
+  
+  var_name <- sapply(1:numvar, FUN = function(i) paste("Variable", as.character(i), sep = " "))
+  siml_name <- sapply(1:numsiml, FUN = function(i) paste("Simulation", as.character(i), sep = " "))
+  
+  colnames(mat) <- siml_name
+  rownames(mat) <- var_name
+  mat
+}
+
+extract_pval_matrix <- function(numvar, numsiml, data.list){
+  mat <- matrix(NA, ncol = 8, nrow = 12)
+  for(i in 1:8){
+    mat[,i] <- unlist(add_var_pval(list.wrep[[i]]))
+  }
+  
+  var_name <- sapply(1:numvar, FUN = function(i) paste("Variable", as.character(i), "P-Value", sep = " "))
+  siml_name <- sapply(1:numsiml, FUN = function(i) paste("Simulation", as.character(i), sep = " "))
+  
+  colnames(mat) <- siml_name
+  rownames(mat) <- var_name
+  mat
+}
+
+v1 <- c(1,0.9,0.9,0.9)
+v2 <- c(0.9,1,0.9,0.9)
+v3 <- c(0.9,0.9,1,0.9)
+v4 <- c(0.9,0.9,0.9,1)
+w <- rep(0, times = 8)
+u1 <- c(rep(0, times = 4), 1, rep(0, times = 7))
+u2 <- c(rep(0, times = 5), 1, rep(0, times = 6))
+u3 <- c(rep(0, times = 6), 1, rep(0, times = 5))
+u4 <- c(rep(0, times = 7), 1, rep(0, times = 4))
+u5 <- c(rep(0, times = 8), 1, rep(0, times = 3))
+u6 <- c(rep(0, times = 9), 1, 0,0)
+u7 <- c(rep(0, times = 10), 1, 0)
+u8 <- c(rep(0, times = 11), 1)
+
+sigma_name <- c("X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11", "X12")
+
+Sigma2 <- matrix(c(v1,w,v2,w,v3,w,v4,w,
+                   u1,u2,u3,u4,u5,u6,u7,u8), nrow = 12, ncol = 12)
+
+colnames(Sigma2) <- sigma_name
+rownames(Sigma2) <- sigma_name
+
+
+
+plot_AVPI <-function(i, df){
+  AVPI_vec <- df[,i]
+  var_name <- sapply(1:12, FUN = function(i) paste0("V", as.character(i)))
+  x_axis_order <- sapply(1:12, FUN = function(i) paste0("V", as.character(13-i)))
+  plot_df <-data.frame(variable = var_name, AVPI = AVPI_vec)
+  
+  plot_obj <- ggplot(plot_df, aes(x = variable, y = AVPI))+
+  geom_bar(stat = 'identity')+
+  coord_flip()+
+  scale_x_discrete(limits = x_axis_order)+
+  labs(y = paste("Simulation", as.character(i), sep = " "), x = "")+
+  theme(text = element_text(size = 9))
+  #theme(axis.title.y=element_blank())
+  plot_obj
+}
+
+```
+
+```{r, include = FALSE, warning = FALSE, message = FALSE, echo = FALSE}
+
+#extract_rf_pred is a function which takes as input 
+#a list of randomforest objects, an index value, 
+#and the number of predictors in the model and 
+#outputs the predicted values of the random forest in 
+#a dataframe. extract_rf_pred is mainly for use in map_dfc, 
+#which binds by column the predicted values in 
+#data.list as a dataframe. Primarily for use in each_pred_rf
+extract_rf_pred <- function(i, data.list, p){
+ new.df <- as.data.frame(data.list[[i]]$predicted) 
+ colnames(new.df) <- ifelse(i <= p, paste("PredWoVar", as.character(i), sep = ""),
+                            "PredFullMod")
+ new.df
+}
+
+#each_pred_rf is a function whose input is a list of dataframes 
+#that come from output of df_combs and runs the 
+#randomForest function on each dataframe using the map function. 
+#Output is dataframe of predicted values along with actual value of Y as last column. 
+#Second to last column is the predicted value of full model. 
+each_pred_rf <- function(data.list, ntree1, replace = TRUE){
+  p <- length(data.list)-1
+  rf.list <- map(.x = data.list, function(x) 
+    randomForest(Y~., data = x, ntree = ntree1, replace = replace, importance = TRUE))
+  rf.df <- map_dfc(1:(p+1), extract_rf_pred, data.list = rf.list, p = p)
+  Y <- data.list[[1]]$Y
+  new.df <- cbind(rf.df, Y)
+  imp <- importance(rf.list[[p+1]])
+  list(new.df, imp)
+}
+
+#extract_add_var takes as input an index value and data frame and 
+#outputs a dataframe of the basic added variable data frame where 
+#x.res is the difference between predicted values of full model and 
+#predicted values of model with out jth variable
+#y.res is the residual of Y and predicted values of model without jth variable.
+#For use with map in rf_add_var
+extract_add_var <-function(i, df){
+  PredFullMod <- as.name("PredFullMod")
+  Y <- as.name("Y")
+  V <- as.name(paste("PredWoVar", as.character(i), sep =""))
+  x.res <- df[[PredFullMod]]-df[[V]]
+  y.res <- df[[Y]]-df[[V]]
+  new.df <- data.frame(x.res, y.res)
+  colnames(new.df) <- c(paste("added.Var", as.character(i), sep = ""), "y.res")
+  new.df
+}
+
+#rf_add_var takes as input the output of each_pred_rf and outputs a list of length p 
+#in which each entry is a data frame corresponding
+#to an added variable plot for the jth predictor in the 
+#data set.
+rf_add_var <- function(data.list){
+  rf.df <- data.list[[1]]
+  p <- length(rf.df)-2
+  add.var.list <- map(1:p, extract_add_var, df = rf.df)
+  add.var.list
+}
+
+#rf_add_var_imp takes as input a list of add_var df's from rf_add_var and runs
+#a random forest on the y-residuals with x-residuals as input.
+#output is a list of random forest objects. \
+#Might change output to be just variable importance values. 
+rf_add_var_imp <- function(data.list, ntree2, replace = TRUE){
+  p <- length(data.list)
+  rf.add.imp.list <- map(.x = data.list, function(x) 
+    randomForest(y.res~., data = x, ntree = ntree2, replace = replace, importance = TRUE))
+  rf.add.imp.list
+}
+
+extract_imp <-function(i, data.list){
+  new.df <- as.data.frame(t(importance(data.list[[i]])))
+  new.df
+}
+
+extract_var_imp <- function(data.list){
+  p <- length(data.list)
+  new.df <- map_dfc(1:p, extract_imp, data.list = data.list)
+  rownames(new.df) <- c("%IncMSE", "IncNodePurity")
+  as.data.frame(t(new.df))
+}
+
+
+#Once rf has been run once on each added variable plot, we can try to assess
+#importance via framework of p-values. In particular, we implement a 
+#permutation test to obtain distribution of variable importance scores 
+#rf_perm takes as input a list of added variable dataframes 
+#(in particular output of rf_add_var
+#and outputs a list of dataframes consisting of variable importance scores 
+#obtained after permuting each added variable dataframe. 
+#number of permutations is it input for rf_perm
+
+#perm_rf takes as input a dataframe, permutes the dataframe
+#runs a randomforest and returns the variable importance score
+#variable importance score is MDA (mean decrease in accuracy) as a percentage change
+perm_rf <-function(df, ntree3, replace){
+  df.names <- colnames(df)
+  df.mat <- as.matrix(df)
+  x <- df.mat[sample(nrow(df.mat),replace = FALSE),1]
+  y <- df.mat[,2]
+  perm.df <- as.data.frame(cbind(x,y))
+  colnames(perm.df) <- df.names
+  perm.rf <- randomForest(y.res~., data = perm.df, replace = replace, importance = TRUE)
+  importance(perm.rf, type = 1)
+}
+
+#perm_add_var takes as input an index value, the data.list, it the number of permutations, 
+#ntree3 the number of trees to grow for each forest on the permuted data
+perm_add_var <- function(i, data.list, it, ntree3, replace){
+  df <- data.list[[i]]
+  new.df <- as.data.frame(replicate(n = it, expr = perm_rf(df = df, 
+                                                           ntree3 = ntree3, replace = replace)))
+  colnames(new.df) <- paste("Var", as.character(i), "VI", sep = "")
+  new.df
+}
+
+rf_perm_add_var <- function(data.list, it, ntree3, replace = TRUE){
+  p <- length(data.list)
+  new.list <- map(1:p, perm_add_var, data.list = data.list, 
+      it = it, ntree3 = ntree3, replace = replace)
+  new.list
+}
+
+#add_var_randomforest is a wrapper for the previous functions (exluding rf_perm_add_var)
+add_var_randomforest <- function(data, ntree1, ntree2, replace = TRUE){
+  #to get the copy of the data with one predictor removed
+  df.list <- df_combs(data)
+  #running initial randomFoest on each data frame
+  rf.list <- each_pred_rf(df.list, ntree1 = ntree1, replace = replace)
+  #tidying the data to compute added variable plots
+  rf.add.var.list <- rf_add_var(rf.list)
+  #running randomForests on each plot
+  rf.add.imp.list <- rf_add_var_imp(rf.add.var.list, ntree2 = ntree2, replace = replace)
+  #extracts variable importance values for each randomForest ran on added variable plots
+  add.var.imp <- extract_var_imp(rf.add.imp.list)
+  #output is list containing data frame of added variable plot variable importances, 
+  #rf.add.var.list which are dataframe for added variable plots, and 
+  #the variable importances from full model run in each_pred_rf
+  list(add.var.imp, rf.add.var.list, rf.list[[2]])
+}
+
+#perm_add_var_randomforest is a wrapper for previous functions (including rf_perm_add_var)
+perm_add_var_randomforest <- function(data, it, ntree1, ntree2, ntree3, replace = TRUE){
+  df.list <- df_combs(data)
+  #running initial randomFoest on each data frame
+  rf.list <- each_pred_rf(df.list, ntree1 = ntree1, replace = replace)
+  #tidying the data to compute added variable plots
+  rf.add.var.list <- rf_add_var(rf.list)
+  #running randomForests on each plot
+  rf.add.imp.list <- rf_add_var_imp(rf.add.var.list, 
+                                    ntree2 = ntree2, replace = replace)
+  #extracts variable importance values for each randomForest ran on added variable plots
+  add.var.imp <- extract_var_imp(rf.add.imp.list)
+  #run permutations on each dataframe in rf.add.var.list to obtain 
+  #distribution of importance values
+  rf.perm.add.var.list <- rf_perm_add_var(data.list = rf.add.var.list, 
+                                          it = it, ntree3 = ntree3, replace = replace)
+  list(add.var.imp, rf.add.var.list, rf.list[[2]], rf.perm.add.var.list)
+}
+
+#input for rf_added_var_plot is output of 
+#add_var_randomforest. Output is plot of added variable plots for 
+#the random forest arranged in a grid.
+
+plot_add_var <- function(i, df.list){
+  df <- df.list[[i]]
+  x.name <- colnames(df)[1]
+  y.name <- colnames(df)[2]
+  plot.obj <- ggplot(df, aes_string(x = x.name, y = y.name))+geom_point()
+  plot.obj
+}
+
+rf_added_var_plot <- function(data.list){
+    df.list <- data.list[[2]]
+    p <- length(df.list)
+    gg.list <- map(1:p, plot_add_var, df.list = df.list)
+    nCol <- floor(sqrt(p))
+    do.call("grid.arrange", c(gg.list, ncol = nCol))
+}
+
+#next make functions which plot distributions of the added variable importances and 
+#adds in observed variable importance of added variable
+
+plot_var_imp <- function(i, df.list, add.var.imp){
+  df <- df.list[[i]]
+  x.name <- colnames(df)
+  obs.add.var <- add.var.imp[i,1]
+  plot.obj <- ggplot(df, aes_string(x = x.name))+
+    geom_histogram(bins = 50)+
+    geom_vline(xintercept = obs.add.var, col = "Red", size = 1)
+  plot.obj
+}
+
+rf_plot_var_imp <- function(data.list){
+ df.list  <-data.list[[4]]
+ add.var.imp <- data.list[[1]]
+ p <- length(df.list)
+ gg.list <- map(1:p, plot_var_imp, df.list = df.list, add.var.imp = add.var.imp)
+ nCol <- floor(sqrt(p))
+ do.call("grid.arrange", c(gg.list, ncol = nCol))
+}
+
+#Next define a function which takes the output of perm_add_var_randomforest
+#and computes p-values of variable importances.
+
+perm_pval <- function(i, var.imp.df, var.imp.list){
+  obs.var.imp <- var.imp.df[i,1]
+  perm.var.imp <- var.imp.list[[i]]
+  n.perm <- nrow(perm.var.imp)
+  right.tail <- (sum(obs.var.imp <= perm.var.imp)+1)/(n.perm+1)
+  left.tail <- (sum(perm.var.imp <= obs.var.imp)+1)/(n.perm+1)
+  p.val <- ifelse(right.tail<=left.tail, 2*right.tail, 2*left.tail)
+  p.val <- ifelse(1<p.val, 1, p.val)
+  names(p.val) <- paste("p.val.Var.", as.character(i), sep = "")
+  p.val
+}
+
+add_var_pval <- function(data.list){
+  var.imp.df <- data.list[[1]]
+  var.imp.list <- data.list[[4]]
+  p <- nrow(var.imp.df)
+  pval.df <- sapply(1:p, perm_pval, var.imp.df = var.imp.df, var.imp.list = var.imp.list)
+  as.data.frame(pval.df)
+}
+
+```
+
+```{r, include = FALSE, warning = FALSE, message = FALSE, echo = FALSE}
+
+#predictor part has as input the data and the partition of the predictors that is of interest
+
+predictor_part <- function(data, partition){
+  data.wo.part <- select(data,-one_of(partition))
+  data.w.part <- select(data, Y, partition)
+  data.list <- list(data.wo.part, data.w.part)
+  data.list[[3]] <- data
+  data.list
+}
+
+#extract_part_rf_pred is a function which extracts the 
+#predicted values from the random forest ran on each partition 
+
+extract_part_rf_pred <- function(i, data.list){
+ new.df <- as.data.frame(data.list[[i]]$predicted)
+ colnames(new.df) <- ifelse(i <= 2, paste("PredWoVar", as.character(i), sep = ""),
+                            "PredFullMod")
+ new.df
+}
+
+#each_part_pred_rf is essentially the same as each_pred_rf with difference that 
+#extract_part_rf_pred is ran instead of extract_rf_pred
+each_part_pred_rf <- function(data.list, ntree1, replace = TRUE){
+  p <- length(data.list)-1
+  rf.list <- map(.x = data.list, function(x) 
+    randomForest(Y~., data = x, ntree = ntree1, replace = replace, importance = TRUE))
+  rf.df <- map_dfc(1:(p+1), extract_part_rf_pred, data.list = rf.list)
+  Y <- data.list[[1]]$Y
+  new.df <- cbind(rf.df, Y)
+  imp <- importance(rf.list[[p+1]])
+  list(new.df, imp)
+}
+
+#joint_add_var_rf is the function which runs the joint added variable scheme given and 
+#input of pred.part consisting of the variables to be collected into subset of interest. 
+joint_add_var_rf <- function(data, pred.part, ntree1, ntree2, replace = TRUE){
+  #obtain the three data sets for analysis
+  df.list <- predictor_part(data = data, partition = pred.part)
+  #run randomforest on each dataframe to obtain predicted values
+  rf.list <- each_part_pred_rf(data.list = df.list, ntree1 = ntree1, replace = replace)
+  #tidying the data to compute added variable plots
+  rf.add.var.list <- rf_add_var(rf.list)
+  #running randomForests on each plot
+  rf.add.imp.list <- rf_add_var_imp(rf.add.var.list, ntree2 = ntree2, replace = replace)
+  #extracts variable importance values for each randomForest ran on added variable plots
+  add.var.imp <- extract_var_imp(rf.add.imp.list)
+  #output is list containing data frame of added variable plot variable importances, 
+  #rf.add.var.list which are dataframe for added variable plots, and 
+  #the variable importances from full model run in each_pred_rf
+  list(add.var.imp, rf.add.var.list, rf.list[[2]])
+}
+
+#joint_perm_add_var_rf runs permutation test on javp in addition to the joint added variable scheme
+joint_perm_add_var_rf <- function(data, it, pred.part, ntree1, ntree2, ntree3, replace = TRUE){
+  #obtain the three data sets for analysis
+  df.list <- predictor_part(data = data, partition = pred.part)
+  #run randomforest on each dataframe to obtain predicted values
+  rf.list <- each_part_pred_rf(data.list = df.list, ntree1 = ntree1, replace = replace)
+  #tidying the data to compute added variable plots
+  rf.add.var.list <- rf_add_var(rf.list)
+  #running randomForests on each plot
+  rf.add.imp.list <- rf_add_var_imp(rf.add.var.list, ntree2 = ntree2, replace = replace)
+  #extracts variable importance values for each randomForest ran on added variable plots
+  add.var.imp <- extract_var_imp(rf.add.imp.list)
+  #run permutations on each dataframe in rf.add.var.list to obtain 
+  #null distribution of importance values
+  rf.perm.add.var.list <- rf_perm_add_var(data.list = rf.add.var.list, 
+                                          it = it, ntree3 = ntree3, replace = replace)
+  #output is list containing data frame of added variable plot variable importances, 
+  #rf.add.var.list which are dataframe for added variable plots, and 
+  #the variable importances from full model run in each_pred_rf
+  
+  list(add.var.imp, rf.add.var.list, rf.list[[2]], rf.perm.add.var.list)
+}
+
+plot_jt_add_var <- function(i, df.list){
+  df <- df.list[[i]]
+  x.lab <- paste("Added Variable Plot For", ifelse(i == 1, " Variables In Partition", 
+                                                   " Variables Not In Partition"), sep = "")
+  x.name <- colnames(df)[1]
+  y.name <- colnames(df)[2]
+  plot.obj <- ggplot(df, aes_string(x = x.name, y = y.name))+
+    geom_point(alpha = 0.3, size = 2)+
+    labs(x = x.lab, y = "y-residuals")+
+    theme(text = element_text(size = 10))
+  plot.obj
+}
+
+plot_jt_add_var_mult <- function(i, df.list){
+  df <- df.list[[i]]
+  x.lab <- paste("Added Variable Plot For", ifelse(i == 1, " Variables In Partition", 
+                                                   " Variables Not In Partition"), sep = "")
+  x.name <- colnames(df)[1]
+  y.name <- colnames(df)[2]
+  plot.obj <- ggplot(df, aes_string(x = x.name, y = y.name))+
+    geom_point(alpha = 0.3, size = 1)+
+    labs(x = x.lab, y = "y-residuals")+
+    theme(text = element_text(size = 10))
+  plot.obj
+}
+
+
+rf_jt_added_var_plot <- function(data.list){
+    df.list <- data.list[[2]]
+    p <- length(df.list)
+    gg.list <- map(1:p, plot_jt_add_var, df.list = df.list)
+    nCol <- floor(sqrt(p))
+    do.call("grid.arrange", c(gg.list, ncol = nCol))
+}
+
+
+rf_jt_added_var_plot_mult <- function(data.lists){
+  gg.list <- list()
+  for(i in 1:length(data.lists)){
+    list.i <- data.lists[[i]]
+    df.list <- list.i[[2]]
+    p <- length(df.list)
+    new.gg.lists <- map(1:p, plot_jt_add_var_mult, df.list = df.list)
+    gg.list <- c(gg.list, new.gg.lists)
+  }
+  gg.list
+}
+
+
+```
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+
+load(file = "Thesis-Documents/data/jt_siml_list1.Rdata")
+load(file = "Thesis-Documents/data/jt_siml_list2.Rdata")
+
+#simulation results for when we partition out the signal completely
+jt.siml1 <- jt_siml_list1[[1]]
+jt.siml2 <- jt_siml_list1[[2]]
+jt.siml3 <- jt_siml_list1[[3]]
+jt.siml4 <- jt_siml_list1[[4]]
+jt.siml5 <- jt_siml_list1[[5]]
+jt.siml6 <- jt_siml_list1[[6]]
+jt.siml7 <- jt_siml_list1[[7]]
+jt.siml8 <- jt_siml_list1[[8]]
+
+#simulation results for when there is signal in both partitions
+
+jt.siml12 <- jt_siml_list2[[1]]
+jt.siml22 <- jt_siml_list2[[2]]
+jt.siml32 <- jt_siml_list2[[3]]
+jt.siml42 <- jt_siml_list2[[4]]
+jt.siml52 <- jt_siml_list2[[5]]
+jt.siml62 <- jt_siml_list2[[6]]
+jt.siml72 <- jt_siml_list2[[7]]
+jt.siml82 <- jt_siml_list2[[8]]
+
+
+plot_JAVPI <-function(i, df){
+  JAVPI_vec <- df[,i]
+  var_name <- c("Important Var", "Unimportant Var")
+    #sapply(1:12, FUN = function(i) paste0("V", as.character(i)))
+  x_axis_order <- c("Unimportant Var", "Important Var")
+    #sapply(1:12, FUN = function(i) paste0("V", as.character(13-i)))
+  plot_df <-data.frame(variable = var_name, JAVPI = JAVPI_vec)
+  
+  plot_obj <- ggplot(plot_df, aes(x = variable, y = JAVPI))+
+  geom_bar(stat = 'identity')+
+  coord_flip()+
+  scale_x_discrete(limits = x_axis_order)+
+  labs(y = paste("Simulation", as.character(i), sep = " "), x = "")+
+  theme(text = element_text(size = 10))
+  #theme(axis.title.y=element_blank())
+  plot_obj
+}
+
+plot_JAVPI_eq <-function(i, df){
+  JAVPI_vec <- df[,i]
+  var_name <- c("Var in Partition", "Var Not in Partition")
+    #sapply(1:12, FUN = function(i) paste0("V", as.character(i)))
+  x_axis_order <- c("Var Not in Partition", "Var in Partition")
+    #sapply(1:12, FUN = function(i) paste0("V", as.character(13-i)))
+  plot_df <-data.frame(variable = var_name, JAVPI = JAVPI_vec)
+  
+  plot_obj <- ggplot(plot_df, aes(x = variable, y = JAVPI))+
+  geom_bar(stat = 'identity')+
+  coord_flip()+
+  scale_x_discrete(limits = x_axis_order)+
+  labs(y = paste("Simulation", as.character(i), sep = " "), x = "")+
+  theme(text = element_text(size = 9))
+  #theme(axis.title.y=element_blank())
+  plot_obj
+}
+
+```
+
+
+## What is regression? 
+
+- > Regression is about measuring dependence between variables in a dataset.
+
+- > Set-up: Data is of the form $\{(\mathbf{X}_1,Y_1),\ldots,(\mathbf{X}_n,Y_n)\},$ where $(\mathbf{X}_i,Y_i)$ is a $p+1$ dimensional vector in $\mathbb{R}^{p+1}$. Here $\mathbf{X}_i$ denotes a $p$-dimensional vector of predictor variables and $Y_i$ is the response. For simplicity we often refer to different predictors by $X_1,\ldots,X_p$.  
+
+- > In the regression setting, we are often interested in estimating the mean function $f(X)=\mathbb{E}(Y|X=x)$. 
+
+- > Different methods of estimating $f(X)=\mathbb{E}(Y|X=x)$. One common method is linear regression. 
+
+## Simple Linear Regression
+
+- > In simple linear regression, we write the mean function as $$\mathbb{E}(Y|X=x)=\beta_0+\beta_1\mathbf{X},$$ and try to estimate values for $\beta_0$ and $\beta_1$. 
+
+- > One way of finding estimates of $\beta_0$ and $\beta_1$ is by method of least squares: find the values of $\beta_0$ and $\beta_1$ which minimizes the function $$RSS(\beta_0,\beta_1)=\sum_{i=1}^n(Y_i-\beta_0-\beta_1X_i)^2.$$  
+
+- > The quantity $RSS(\hat{\beta}_0,\hat{\beta}_1)$, where $\hat{\beta}_0$ and $\hat{\beta}_1$ are estimates of $\beta_0$ and $\beta_1$, respectively, is called the residual sum of squares or RSS. 
+
+## Why Tree Structured Learners?
+
+- > There are situations where simple linear regression performs well, but there are also situations where we might want flexibility in our mean function.
+
+- > Tree structured learners allow us to have flexibility in estimating $\mathbb{E}(Y|X=x)$. 
+
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4}
+
+siml_data_ex <- siml.ex.list[[1]]
+tree_ex <- rpart(Y~., data = siml_data_ex)
+plot(tree_ex)
+text(tree_ex, cex = 0.8, use.n = TRUE, xpd = TRUE)
+
+```
+
+
+## How CART works
+
+- > One popular regression tree algorithm is CART. Breiman et al. developed up the CART algorithm in 1984. 
+
+- > CART uses a decision tree structure to partition the data into nodes until a minimum node size is reached. The predicted response of a point falling in a terminal node is the average response of all the points in that node. 
+
+- > CART partitions the data into left and right nodes by finding the splitting variable and splitting point that maximizes the reduction in RSS between the parent node and the proposed left and right daughter nodes. 
+
+- > In particular, CART greedily finds the split which maximizes $RSS_l(j,s)+RSS_r(j,s)$ where $j$ is the proposed splitting variable and $s$ is the proposed splitting point, and $RSS_l$ is the RSS of the proposed left node and $RSS_r$ is the RSS of the proposed right node.
+
+
+## Bagging and Bagging Trees
+
+- > CART trees on their own are fairly weak learners. But can use bagging to improve performance of CART trees.
+
+- > Bagging (Bootstrap aggregation) is a variance reduction technique that can be used to improve predictive performance of weak learners. 
+
+- > Bagging a CART tree works by resampling (bootstrapping) the data, say $B=1000$ times, and training a CART tree on each bootstrap replicate. We call the output of this procedure a bagged forest and denote it by $\{T_b\}_{b=1}^B$.
+
+- > Given a test data point $x$, we form a prediction by taking the average of predictions given by the tree ensemble
+$\hat{\theta}_{BF}(x)=\frac{1}{B}\sum_{b=1}^B T_b(x)$.
+
+## Random Forest (RF)
+
+- > Bagging improves performance of CART trees but collinearity between trees is an issue with bagged forests. 
+
+- > The random forest mechanism tries to deal with collinearity between trees by introducing an additional randomization step. 
+
+- > In addition to bagging, the random forest algorithm also chooses at random only $m\leq p$ of the predictors to be considered as candidate splitting variables at each split in each tree in the ensemble.
+
+- > Recap: random forests use bagging to decrease variance but also introduce randomization at each split in each tree to deal with collinearity.  
+
+## Variable Importance (VI) Measures
+
+- > Can define variable importance measures for random forests which measure the predictive influence of each predictor. Analogous to beta's in linear regression setting. 
+
+- > Mean Decrease in Impurity (MDI) measures the total decrease in nodal impurity for all nodes in which the variable of interest $X_j$ is used and takes the average over all trees in the ensemble. 
+
+- > Mean Decrease in Accuracy (MDA) measures, for each variable $X_j$, on average how much the predictive accuracy of the forest as measured using RSS suffers when the $X_j$ component is permuted across observations within the OOB dataset $\bar{Z}_b$ of each tree $T_b$ in the ensemble.
+
+## Example of VI Measures
+
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.env = 'marginfigure', fig.cap= "\\label{mda_ex}Example of MDA and MDI variable importance", fig.height = 4}
+
+rf_ex <- siml.ex.list[[3]]
+
+rf_ex_imp <- data.frame(Variable = c("V1", "V2", 'V3'), rf_ex$importance)
+
+mda_ex_plot <- ggplot(rf_ex_imp, aes(x = Variable, y = X.IncMSE))+
+  geom_bar(stat = 'identity')+
+  coord_flip()+
+  labs( y = "PercIncMSE")+
+  scale_x_discrete(limits = c("V3", 'V2', 'V1'))
+mdi_ex_plot <- ggplot(rf_ex_imp, aes(x = Variable, y = IncNodePurity))+
+  geom_bar(stat = 'identity')+
+  coord_flip()+
+  labs(y = "IncNodePurity")+
+  scale_x_discrete(limits = c("V3", 'V2', 'V1'))
+
+do.call("grid.arrange", c(list(mda_ex_plot, mdi_ex_plot), nrow = 1, ncol = 2))
+
+
+```
+
+
+## Issues With Variable Importance Measures
+
+- > Simulation results from Strobl et al. (2007) find that MDI and MDA measures suffer in performance with the presence of correlated predictors in the dataset.
+
+- > This is unfortunate as random forests are not very interpretable. VI measures are easily interpretable and offer a potential route towards statistical inference with random forests. 
+
+- > Hence a measure of variable importance that can handle correlated predictors is desirable. 
+
+- > To deal with correlated predictors, several other variable importance measures have been proposed.
+
+## Conditional VI (Strobl et al. 2008)
+
+- > MDA variable importance corresponds to testing the null hypothesis $H_0: X_j\perp (Y, X_{-j})$. 
+
+- > If $X_j$ is correlated with any of the $X_{-j}$, then variable importance of $X_j$ will be biased. 
+
+- > Strobl proposes a permutation scheme corresponding to the null hypothesis $H_0: (X_j\perp Y)|X_{-j}$. 
+
+- > Define a grid within which values of $X_j$ are permuted according to partitions of the feature space given by each tree. Grid should be defined to take into account correlation structure of dataset.
+
+- > Conditional VI is the average loss in predictive accuracy for values permuted within grid across ensemble.
+
+## Infforest VI (Owens 2017)
+
+- > Owens proposed a partition then permute scheme to produce a sampling distribution for the variable importance of each variable $X_j$ called Infforest VI
+
+- > Basic Steps of Infforest VI: 
+
+- > For each bootstrap resample $b$ and variable $X_j$, grow a tree $T_j^{b*}$ predicting $X_j\sim X_{-j}$ using in-bag sample. 
+
+- > Permute OOB sample $\overline{Z}_b$ within partitions of feature space determined by $T_j^{b*}$ 
+ 
+- > The difference in predictive accuracy of $T_b$ before and after the OOB sample $\overline{Z}_b$ has been permuted is the infforest variable importance for the variable $X_j$ in the tree $T_b$.
+
+## Motivating Goals 
+
+- > Develop computationally tractable random forest variable importance measures which can handle correlated predictors in the data. 
+- > Extend our random forest variable importance measures to a hypothesis testing framework via permutation tests. 
+
+- > Specific question: How to conditionally estimate the effect of $X_j$ on the response $Y$ while taking into account the effect of $X_{-j}$? 
+
+- > Our approach is motivated by added variable plots in linear regression setting. 
+
+
+## Added Variable Plots (AVP)
+
+- > The added variable plot (AVP) for a predictor $X_j$ captures the relationship between $X_j$ and $Y$ once we have taken into account the effect of $X_{-j}$ on $X_j$ and $Y$, respectively.
+
+- > The AVP of $X_j$ is given by plotting $$(X_j-\hat{X_j}, Y-\hat{Y}),$$ where $\hat{X_j}=X_{-j}\delta$ and $\hat{Y}=X_{-j}\beta$. 
+
+- > AVP plots the part of $X_j$ unexplained by $X_{-j}$ against the part of $Y$ unexplained by $X_{-j}$ with respect to using simple linear regression.
+
+## Example of AVP in Linear Regression 
+
+```{r results="asis", message = FALSE, echo = FALSE, warning = FALSE, fig.env = 'marginfigure', fig.cap = "\\label{AVPlinex}Linear regression added variable plot for example dataset"}
+
+lm.avp.list <- siml.ex.list[[5]]
+
+var1.avp <- ggplot(lm.avp.list[[1]], aes(x = x.res, y = y.res))+
+  geom_point(size = 1, alpha = 0.3)+
+  labs(title="AVP for V1")+
+  theme(text = element_text(size = 10))
+var2.avp <- ggplot(lm.avp.list[[2]], aes(x = x.res, y = y.res))+
+  geom_point(size = 1, alpha = 0.3)+
+  labs(title="AVP for V2")+
+  theme(text = element_text(size = 10))
+var3.avp <- ggplot(lm.avp.list[[3]], aes(x = x.res, y = y.res))+
+  geom_point(size = 1, alpha = 0.3)+
+  labs(title="AVP for V3")+
+  theme(text = element_text(size = 10))
+
+#blank <- grid.rect(gp=gpar(col="white"))
+
+do.call("grid.arrange", c(list(var1.avp,var2.avp,var3.avp), ncol = 2))
+
+```
+
+
+## Definition of Random Forest AVP
+
+- > Can also define AVP for random forests. Two approaches: Residual-based AVP which follows the form of AVP in linear regression setting, and Model-based AVP as proposed in Rendahl (2008). 
+
+- > Residual-based AVP is given by plotting $$(X_j-\hat{\theta}_{RF}(X_j|X_{-j}), Y-\hat{\theta}_{RF}(Y|X_{-j})).$$
+
+- > Model-based AVP is given by plotting $$(\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-j}),Y-\hat{\theta}_{RF}(Y|
+X_{-j})).$$
+
+## Example of Residual-based AVP
+
+```{r results = "asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap = "\\label{AVPresex}Residual-based added variable plot for example dataset"}
+
+res.avp.ex <- siml.ex.list[[7]]
+res.ex.gg.list <- map(1:3, plot_add_var_excep, res.avp.ex[[2]])
+
+do.call("grid.arrange", c(res.ex.gg.list, ncol = 2))
+
+```
+
+## Example of Model-based AVP
+
+```{r results = "asis", echo = FALSE, warning = FALSE, message = FALSE,  fig.env = 'marginfigure', fig.cap = "\\label{AVPmodex}Model-based added variable plot for example dataset"}
+
+mod.avp.ex <- siml.ex.list[[6]]
+mod.ex.gg.list <- map(1:3, plot_add_var_excep, mod.avp.ex[[2]])
+
+do.call("grid.arrange", c(mod.ex.gg.list, ncol = 2))
+
+```
+
+
+## AVP Importance (AVPI)
+
+- > Want quantitative measure of how the AVP captures the effect of $X_j$. 
+
+- > We propose training a bagged forest on the AVP of $X_j$. We define the added variable plot importance (AVPI) of $X_j$ to be the MDA variable importance score of the bagged forest trained on the AVP of $X_j$.
+
+- > Advantage of AVPI is that it is generally computationally quicker than conditional VI or Infforest VI. 
+
+- > Expect that AVPI would be able to handle correlated predictors.
+
+## AVPI Example 
+
+```{r results = "asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 3, fig.env = 'marginfigure', fig.cap = "\\label{AVPIex}Residual and model based AVPI scores of example dataset"}
+
+
+var_name <- sapply(1:3, FUN = function(i) paste0("V", as.character(i)))
+x_axis_order <- sapply(1:3, FUN = function(i) paste0("V", as.character(4-i)))
+
+mod.avp.ex.df <- data.frame(variable = var_name, AVPI = mod.avp.ex[[1]][,1])
+res.avp.ex.df <- data.frame(variable = var_name, AVPI = res.avp.ex[[1]][,1])
+
+mod.avp.ex.plot <- ggplot(mod.avp.ex.df, aes(x = variable, y = AVPI))+
+  geom_bar(stat = 'identity')+
+  coord_flip()+
+  scale_x_discrete(limits = x_axis_order)+
+  theme(text = element_text(size = 10), axis.title.y=element_blank())+
+  labs(title = "Model-based AVPI")
+
+res.avp.ex.plot <- ggplot(res.avp.ex.df, aes(x = variable, y = AVPI))+
+  geom_bar(stat = 'identity')+
+  coord_flip()+
+  scale_x_discrete(limits = x_axis_order)+
+  theme(text = element_text(size = 10), axis.title.y=element_blank())+
+  labs(title = "Residual-based AVPI")
+
+do.call("grid.arrange", c(list(res.avp.ex.plot, mod.avp.ex.plot), ncol = 2))
+
+
+```
+
+
+## AVPI Simulation Results
+
+- > Model-based AVPI appears to be more stable than residual-based AVPI as a variable importance measure.
+
+- > AVPI suffers from issues of noisiness. In particular, uninformative variables often receive non-zero AVPI scores.
+
+- > In some situations, AVPI performs better than MDA VI, but MDA often provides same information of AVPI without same degree of noisiness. 
+
+- > If source of noisiness with respect to AVPI can be sorted out, then AVPI could be a viable alternative to MDA VI.
+
+## Model-based AVPI results
+
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 5.7, fig.env = 'marginfigure', fig.cap= "\\label{AVPIworep}Model-based AVPI simulation results using sampling without replacement"}
+
+#addvar wo replacement
+
+add.var.worep.siml <- as.data.frame(extract_matrix(numvar = 12, numsiml = 8, 
+                             data.list = list.worep, rf.type = 1))
+
+avp.worep.siml.plots <- map(1:8, plot_AVPI, add.var.worep.siml)
+
+avp.worep.siml.plots[[1]] <- avp.worep.siml.plots[[1]]+
+  ggtitle("Independent Predictors")+
+  labs(x = "Scenario 1")+
+  theme(plot.title = element_text(hjust = 0.5))
+avp.worep.siml.plots[[2]] <- avp.worep.siml.plots[[2]]+
+  ggtitle("Correlated Predictors")+
+  theme(plot.title = element_text(hjust = 0.5))
+avp.worep.siml.plots[[3]] <- avp.worep.siml.plots[[3]]+
+  labs(x = "Scenario 2")
+avp.worep.siml.plots[[5]] <- avp.worep.siml.plots[[5]]+
+  labs(x = "Scenario 3")
+avp.worep.siml.plots[[7]] <- avp.worep.siml.plots[[7]]+
+  labs(x = "Scenario 4")
+
+do.call("grid.arrange", c(avp.worep.siml.plots, ncol = 2, nrow = 4))
+
+```
+
+## Residual-based AVPI Results
+
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 5.7, fig.env = 'marginfigure', fig.cap= "\\label{resAVPI}Residuals-based AVPI simulation results using sampling without replacement"}
+
+#avpi residuals simulation w/o replacement
+
+avp.res.worep.siml <- as.data.frame(extract_matrix(numvar = 12, numsiml = 8, 
+                             data.list = res.siml.results, rf.type = 1))
+
+avp.res.worep.plots <- map(1:8, plot_AVPI, avp.res.worep.siml)
+
+avp.res.worep.plots[[1]] <- avp.res.worep.plots[[1]]+
+  ggtitle("Independent Predictors")+
+  labs(x = "Scenario 1")+
+  theme(plot.title = element_text(hjust = 0.5))
+avp.res.worep.plots[[2]] <- avp.res.worep.plots[[2]]+
+  ggtitle("Correlated Predictors")+
+  theme(plot.title = element_text(hjust = 0.5))
+avp.res.worep.plots[[3]] <- avp.res.worep.plots[[3]]+
+  labs(x = "Scenario 2")
+avp.res.worep.plots[[5]] <- avp.res.worep.plots[[5]]+
+  labs(x = "Scenario 3")
+avp.res.worep.plots[[7]] <- avp.res.worep.plots[[7]]+
+  labs(x = "Scenario 4")
+
+do.call("grid.arrange", c(avp.res.worep.plots, ncol = 2, nrow = 4))
+
+```
+
+
+
+## Joint Added Variable Plots (JAVP)
+
+- > Say we are interested in the joint effect of the predictors in a subset $J=\{X_{\alpha_1},\ldots,X_{\alpha_m}\}\subseteq \{X_1,\ldots,X_p\}$.
+
+- > Can assess the joint added effect of the predictors in $J$ is to form the joint added variable plot (JAVP): $$(\hat{\theta}_{RF}(Y|X)-\hat{\theta}_{RF}(Y|X_{-J}),Y-\hat{\theta}_{RF}(Y|X_{-J})).$$
+
+- > Analogous to AVPI, we can train a bagged forest on the JAVP of the set of predictors $J$. We define the joint added variable plot importance (JAVPI) for the set of predictors $J$ to be the MDA variable importance score of the bagged forest trained on the JAVP for the set of predictors $J$.
+
+
+## JAVP Example
+
+```{r results = "asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap = "\\label{JAVPex}Joint added variable plots of example dataset. Top two plots are JAVP plots when all the signal is contained in the partition. Bottom two plots are JAVP plots when only some of signal is contained in partition"}
+
+javp.ex.all <- siml.ex.list[[8]]
+javp.ex.some <- siml.ex.list[[9]]
+
+javp.ex.plots <- rf_jt_added_var_plot_mult(list(javp.ex.all, javp.ex.some))
+javp.ex.plots[[1]] <- javp.ex.plots[[1]]+labs(title = "Partition Containing V1 and V2")
+javp.ex.plots[[2]] <- javp.ex.plots[[2]]+labs(title = "Partition Containing V3")
+javp.ex.plots[[3]] <- javp.ex.plots[[3]]+labs(title = "Partition Containing V1")
+javp.ex.plots[[4]] <- javp.ex.plots[[4]]+labs(title = "Partition Containing V2 and V3")
+
+do.call("grid.arrange", c(javp.ex.plots, ncol = 2, nrow = 2))
+
+```
+
+
+## JAVPI Example
+
+```{r results = "asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap = "\\label{JAVPIex}Joint Added Variable Plot Importances of Example Dataset"}
+
+
+javpi.ex.all <- javp.ex.all[[1]][,1]
+javpi.ex.some <- javp.ex.some[[1]][,1]
+
+javpi.ex.plots <- map(1:2, plot_JAVPI_eq, df = data.frame(javpi.ex.all, javpi.ex.some))
+
+javpi.ex.plots[[1]] <- javpi.ex.plots[[1]]+labs(y = "Where All of Signal is in One Subset")
+javpi.ex.plots[[2]] <- javpi.ex.plots[[2]]+labs(y = "Where Signal is Split Between Subsets")
+
+do.call("grid.arrange", c(javpi.ex.plots, nrow = 1))
+
+```
+
+
+## JAVPI Simulation Results
+
+- > JAVPI appears to be more stable of a variable importance measure than AVPI. In general, JAVPI provides less noisy results than AVPI. 
+
+- > In simulation run 1, with some exceptions, generally found that only subset containing all the signal have high JAVPI scores.
+
+- > In simulation run 2, generally found that both subsets had high JAVPI scores when signal is split between the two subsets. 
+
+- > Could likely use JAVPI to determine which subsets of predictors contain or do not contain signal when there are correlated predictors in dataset. 
+
+## JAVPI Results Simulation Run 1
+
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap= "\\label{JAVPIonesig}JAVPI simulation results when all the signal is contained in the partition"}
+
+#javpi signal in one partition
+
+jt.siml.df1 <- as.data.frame(extract_matrix(numvar = 2, numsiml = 8, 
+                                             data.list = jt_siml_list1, rf.type = 1))
+#rownames(jt.siml.df1) <- c("JAVPI of Important Variables", "JAVPI of Unimportant Variables")
+
+javp.siml.plots1 <- map(1:8, plot_JAVPI, jt.siml.df1)
+javp.siml.plots1[[1]] <- javp.siml.plots1[[1]]+
+  ggtitle("Independent Predictors")+
+  labs(x = "Scenario 1")+
+  theme(plot.title = element_text(hjust = 0.5))
+javp.siml.plots1[[2]] <- javp.siml.plots1[[2]]+
+  ggtitle("Correlated Predictors")+
+  theme(plot.title = element_text(hjust = 0.5))
+javp.siml.plots1[[3]] <- javp.siml.plots1[[3]]+
+  labs(x = "Scenario 2")
+javp.siml.plots1[[5]] <- javp.siml.plots1[[5]]+
+  labs(x = "Scenario 3")
+javp.siml.plots1[[7]] <- javp.siml.plots1[[7]]+
+  labs(x = "Scenario 4")
+
+do.call("grid.arrange", c(javp.siml.plots1, ncol = 2, nrow = 4))
+
+```
+
+
+## JAVPI Results Simulation Run 2
+
+```{r results="asis", echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4, fig.env = 'marginfigure', fig.cap= "\\label{JAVPItwosig}JAVPI simulation results when Signal is contained in both partitions of the predictors"}
+
+#javpi signal in both partitions
+
+jt.siml.df2 <- as.data.frame(extract_matrix(numvar = 2, numsiml = 8, 
+                                            data.list = jt_siml_list2, rf.type = 1))
+#rownames(jt_siml_mat2) <- c("JAVPI of Predictors in Partition", "JAVPI of Predictors Not in Partition")
+
+javp.siml.plots2 <- map(1:8, plot_JAVPI_eq, jt.siml.df2)
+javp.siml.plots2[[1]] <- javp.siml.plots2[[1]]+
+  ggtitle("Independent Predictors")+
+  labs(x = "Scenario 1")+
+  theme(plot.title = element_text(hjust = 0.5))
+javp.siml.plots2[[2]] <- javp.siml.plots2[[2]]+
+  ggtitle("Correlated Predictors")+
+  theme(plot.title = element_text(hjust = 0.5))
+javp.siml.plots2[[3]] <- javp.siml.plots2[[3]]+
+  labs(x = "Scenario 2")
+javp.siml.plots2[[5]] <- javp.siml.plots2[[5]]+
+  labs(x = "Scenario 3")
+javp.siml.plots2[[7]] <- javp.siml.plots2[[7]]+
+  labs(x = "Scenario 4")
+
+do.call("grid.arrange", c(javp.siml.plots2, ncol = 2, nrow = 4))
+
+
+```
+
+
+## Using JAVPI or AVPI for Permutation Tests
+
+- > In theory possible to use JAVPI or AVPI as test statistics in permutation test. In practice, however, AVPI is too noisy for such use. 
+
+- > If issue of noise with AVPI is sorted out, then likely possible to use AVPI as test statistic in permutation tests for statistical inference. 
+
+- > JAVPI is more promising as a test statistic in permutation test. JAVPI is computationally easier to compute than AVPI and suffers from less noise. However, JAVPI comes with very specific interpretation.
+
+- > Care should be taken if either AVPI or JAVPI are used as test statistics in a permutation test setting.
